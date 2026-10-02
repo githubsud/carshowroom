@@ -95,6 +95,7 @@ jobs:
           cp .env.example .env
           key=$(supabase status -o env | grep '^SECRET_KEY=' | cut -d= -f2- | tr -d '"')
           sed -i "s|^SUPABASE_SERVICE_ROLE_KEY=.*|SUPABASE_SERVICE_ROLE_KEY=$key|" .env
+          sed -i "s|^NATIONAL_ID_KEY=.*|NATIONAL_ID_KEY=$(python -c 'import base64,os;print(base64.b64encode(os.urandom(32)).decode())')|" .env
           .venv/bin/pytest tests/integration
 
       - name: E2E (Playwright)

@@ -135,7 +135,18 @@ def get_entry(conn: Connection, entry_id: UUID) -> JournalEntryOut:
 
 # --- Reversal (rule 24) ------------------------------------------------------------------------------
 
-_DOCUMENT_TABLES = {"GENERAL_EXPENSE": "general_expenses", "TRANSFER": "transfers"}
+_DOCUMENT_TABLES = {
+    "GENERAL_EXPENSE": "general_expenses",
+    "TRANSFER": "transfers",
+    "OTHER_INCOME": "other_incomes",
+    "PARTNER_CONTRIBUTION": "partner_transactions",
+    "PARTNER_CAPITAL_WITHDRAWAL": "partner_transactions",
+    "PARTNER_DRAWING": "partner_transactions",
+    "PARTNER_LOAN": "partner_transactions",
+    "PARTNER_LOAN_REPAYMENT": "partner_transactions",
+    "PARTNER_LOAN_TO_BUSINESS": "partner_transactions",
+    "PARTNER_LOAN_TO_BUSINESS_REPAYMENT": "partner_transactions",
+}
 
 
 def _reversal_plan(conn: Connection, entry_id: UUID, reversal_date: date) -> tuple[JournalEntryOut, EntryDraft]:

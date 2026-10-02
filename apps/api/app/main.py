@@ -3,8 +3,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import finance, health, session
+from app.api.routers import finance, health, partners, session
 from app.core.config import API_PREFIX, PRODUCT_NAME, Settings, get_settings
+from app.core.crypto import FieldCipher
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.core.request_context import REQUEST_ID_HEADER, RequestContextMiddleware
@@ -49,6 +50,7 @@ def create_app(
             else DisabledAuthAdmin()
         )
     app.state.auth_admin = auth_admin
+    app.state.cipher = FieldCipher(settings.national_id_key.get_secret_value() if settings.national_id_key else None)
 
     app.add_middleware(RequestContextMiddleware)
     app.add_middleware(
@@ -65,4 +67,5 @@ def create_app(
     app.include_router(health.router)
     app.include_router(session.router, prefix=API_PREFIX)
     app.include_router(finance.router, prefix=API_PREFIX)
+    app.include_router(partners.router, prefix=API_PREFIX)
     return app

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { currencyLabel, formatAmount, formatInteger, formatMoney, toDigitStyle } from './money-format';
+import { currencyLabel, formatAmount, formatInteger, formatMoney, formatPercent, ltr, toDigitStyle } from './money-format';
 
 const western = { language: 'en', digitStyle: 'WESTERN' } as const;
 const arabicWestern = { language: 'ar', digitStyle: 'WESTERN' } as const;
@@ -39,13 +39,25 @@ describe('formatAmount', () => {
 
 describe('formatMoney', () => {
   it('places the currency after the amount in Arabic and before it in English', () => {
-    expect(formatMoney('50000', 'EGP', arabicWestern)).toBe('50,000.00 ج.م');
+    expect(formatMoney('50000', 'EGP', arabicWestern)).toBe(`${ltr('50,000.00')} ج.م`);
     expect(formatMoney('50000', 'EGP', western)).toBe('EGP 50,000.00');
-    expect(formatMoney('50000', 'QAR', arabicIndic)).toBe('٥٠٬٠٠٠٫٠٠ ر.ق');
+    expect(formatMoney('50000', 'QAR', arabicIndic)).toBe(`${ltr('٥٠٬٠٠٠٫٠٠')} ر.ق`);
+  });
+
+  it('keeps the minus sign in front of the digits inside Arabic text', () => {
+    expect(formatMoney('-2000', 'EGP', arabicWestern)).toBe('\u2066-2,000.00\u2069 ج.م');
   });
 
   it('falls back to the ISO code for unknown currencies', () => {
     expect(currencyLabel('XYZ', 'ar')).toBe('XYZ');
+  });
+});
+
+describe('formatPercent', () => {
+  it('drops trailing zeros and keeps needed decimals', () => {
+    expect(formatPercent('50.0000', western)).toBe(ltr('50%'));
+    expect(formatPercent('33.3334', western)).toBe(ltr('33.3334%'));
+    expect(formatPercent('12.5000', arabicIndic)).toBe(ltr('١٢٫٥%'));
   });
 });
 

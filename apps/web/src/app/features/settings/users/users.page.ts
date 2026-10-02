@@ -10,7 +10,8 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
-import { Member, Role } from '../../../core/api/api.models';
+import { Member, Partner, Role } from '../../../core/api/api.models';
+import { PartnersService } from '../../partners/partners.service';
 import { AppDatePipe } from '../../../core/format/format.service';
 import { LanguageService } from '../../../core/i18n/language.service';
 import { TenantContextService } from '../../../core/tenant/tenant-context.service';
@@ -40,6 +41,7 @@ import { UsersService } from './users.service';
 })
 export class UsersPage implements OnInit {
   private readonly users = inject(UsersService);
+  private readonly partnersApi = inject(PartnersService);
   private readonly toast = inject(MessageService);
   private readonly errors = inject(ErrorMessageService);
   private readonly transloco = inject(TranslocoService);
@@ -50,6 +52,7 @@ export class UsersPage implements OnInit {
   protected readonly loadError = signal<string | null>(null);
   protected readonly members = signal<Member[]>([]);
   protected readonly roles = signal<Role[]>([]);
+  protected readonly partners = signal<Partner[]>([]);
 
   protected readonly inviteOpen = signal(false);
   protected readonly inviting = signal(false);
@@ -67,9 +70,14 @@ export class UsersPage implements OnInit {
   protected async load(): Promise<void> {
     this.state.set('loading');
     try {
-      const [members, roles] = await Promise.all([this.users.list(), this.users.roles()]);
+      const [members, roles, partners] = await Promise.all([
+        this.users.list(),
+        this.users.roles(),
+        this.context.can('partner.view_all') ? this.partnersApi.list() : Promise.resolve([]),
+      ]);
       this.members.set(members);
       this.roles.set(roles);
+      this.partners.set(partners);
       this.state.set('ready');
     } catch (error) {
       this.loadError.set(this.errors.message(error));
@@ -114,11 +122,22 @@ export class UsersPage implements OnInit {
     await this.apply(member, { role_code: roleCode });
   }
 
+  protected async linkPartner(member: Member, partnerId: string | null): Promise<void> {
+    await this.apply(member, { partner_id: partnerId });
+  }
+
+  protected partnerLabel(partner: Partner): string {
+    return this.language.language() === 'ar' ? partner.name_ar : (partner.name_en ?? partner.name_ar);
+  }
+
   protected async toggleStatus(member: Member): Promise<void> {
     await this.apply(member, { status: member.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE' });
   }
 
-  private async apply(member: Member, changes: { role_code?: string; status?: 'ACTIVE' | 'DISABLED' }): Promise<void> {
+  private async apply(
+    member: Member,
+    changes: { role_code?: string; status?: 'ACTIVE' | 'DISABLED'; partner_id?: string | null },
+  ): Promise<void> {
     try {
       const updated = await this.users.update(member.membership_id, changes);
       this.members.update((list) => list.map((m) => (m.membership_id === updated.membership_id ? updated : m)));

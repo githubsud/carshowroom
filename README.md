@@ -41,6 +41,17 @@ Demo users (local seed only; password `Demo-Pass-2026`):
 
 Invitation emails sent locally can be read in Mailpit at http://127.0.0.1:54324.
 
+## PrimeUI licence
+
+PrimeNG needs a PrimeUI licence key (DECISIONS Q-38). Set it as an environment variable before starting or building the web app; it is never committed:
+
+```powershell
+$env:PRIMEUI_LICENSE = "<your key>"; ./scripts/dev.ps1 web
+# build: npx ng build --define PRIMEUI_LICENSE="'<your key>'"
+```
+
+Without a key the app works but shows an "Invalid PrimeUI License" notice.
+
 ## Tests
 
 ```bash

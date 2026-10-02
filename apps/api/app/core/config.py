@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     supabase_service_role_key: SecretStr | None = None
     jwt_audience: str = "authenticated"
 
+    # AES-256 key (base64, 32 bytes) for national IDs (DECISIONS D-05). Without it,
+    # national IDs cannot be stored or revealed; everything else works.
+    national_id_key: SecretStr | None = None
+
     cors_origins: list[str] = ["http://localhost:4200", "http://127.0.0.1:4200"]
     invite_redirect_url: str = "http://localhost:4200/reset-password"
 

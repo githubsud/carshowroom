@@ -18,6 +18,10 @@ env:              ## apps/api/.env from the template + local secret key from the
 	key=$$(npx supabase status -o env | grep '^SECRET_KEY=' | cut -d= -f2- | tr -d '"'); \
 	test -n "$$key" || { echo "Local Supabase is not running; run make db-start"; exit 1; }; \
 	sed -i.bak "s|^SUPABASE_SERVICE_ROLE_KEY=.*|SUPABASE_SERVICE_ROLE_KEY=$$key|" $(API)/.env && rm -f $(API)/.env.bak
+	grep -q '^NATIONAL_ID_KEY=.' $(API)/.env || { \
+	  nid=$$(python3 -c 'import base64,os;print(base64.b64encode(os.urandom(32)).decode())'); \
+	  grep -v '^NATIONAL_ID_KEY=' $(API)/.env > $(API)/.env.tmp; echo "NATIONAL_ID_KEY=$$nid" >> $(API)/.env.tmp; \
+	  mv $(API)/.env.tmp $(API)/.env; }
 
 db-reset:         ## Re-apply all migrations and the local seed
 	npx supabase db reset
@@ -28,8 +32,8 @@ db-test:          ## pgTAP: RLS, tenant isolation, permissions, audit
 api:              ## Run the API on :8000
 	cd $(API) && .venv/bin/python -m uvicorn app.main:create_app --factory --reload --port 8000
 
-web:              ## Run Angular on :4200
-	cd $(WEB) && npm start
+web:              ## Run Angular on :4200 (PRIMEUI_LICENSE env var, if set, is passed to the build)
+	cd $(WEB) && npm start $(if $(PRIMEUI_LICENSE),-- --define PRIMEUI_LICENSE="'$(PRIMEUI_LICENSE)'")
 
 dev:              ## Supabase + API + web (API and web in the background)
 	$(MAKE) db-start

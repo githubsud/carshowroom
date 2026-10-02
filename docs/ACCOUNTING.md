@@ -520,7 +520,7 @@ The spec has no rule for each event below. The **candidate treatment** is a prop
 
 | ID | Event / gap | Candidate treatment (to confirm) | Link |
 |---|---|---|---|
-| P-01 | Other income received (§4.10 module, no rule) | Dr Cash/Bank / Cr 4900 Other income | G-01 |
+| P-01 | Other income received (§4.10 module, no rule) | Dr Cash/Bank / Cr 4900 Other income | G-01. **Approved (Q-26); implemented in Phase 3** |
 | P-02 | Customer overpayment kept as credit (business rule 3) | **Approved as tenant option (D-41)**: `BLOCK` (default) or `ALLOW_AS_CREDIT` → Dr Cash / Cr 2310 (customer); later applied or refunded (Dr 2310 / Cr Cash) | G-02, Q-13 |
 | P-03 | Sale cancellation without an immediate refund (fixes C-06) | **Approved as tenant option (D-41)**: `REFUND_LIABILITY` (default) reverses revenue and cost, and all amounts received move to 2310; the refund is posted separately. `MIRROR` = literal rule 33 | C-06, Q-12 |
 | P-04 | Expense recorded on a car that is already SOLD | Dr 5000 COGS (vehicle) / Cr Cash; the car's profit is recalculated | G-03, Q-14 |

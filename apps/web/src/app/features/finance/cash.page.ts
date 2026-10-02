@@ -13,6 +13,8 @@ import {
   CashBook,
   ExpenseCategory,
   ExpensePosting,
+  OtherIncomePosting,
+  Partner,
   GeneralExpense,
   PostingWarning,
   Transfer,
@@ -23,8 +25,12 @@ import { LanguageService } from '../../core/i18n/language.service';
 import { CanDirective } from '../../core/permissions/can.directive';
 import { StateComponent } from '../../shared/components/state.component';
 import { ErrorMessageService } from '../../shared/error-message.service';
+import { translationsLoaded } from '../../shared/translated';
+import { TenantContextService } from '../../core/tenant/tenant-context.service';
+import { PartnersService } from '../partners/partners.service';
 import { ExpenseDialogComponent } from './expense-dialog.component';
 import { FinanceService } from './finance.service';
+import { IncomeDialogComponent } from './income-dialog.component';
 import { TransferDialogComponent } from './transfer-dialog.component';
 
 type View = 'book' | 'expenses' | 'transfers';
@@ -46,28 +52,33 @@ type View = 'book' | 'expenses' | 'transfers';
     CanDirective,
     ExpenseDialogComponent,
     TransferDialogComponent,
+    IncomeDialogComponent,
   ],
   templateUrl: './cash.page.html',
   styleUrl: './cash.page.scss',
 })
 export class CashPage implements OnInit {
   private readonly finance = inject(FinanceService);
+  private readonly partnersApi = inject(PartnersService);
+  private readonly context = inject(TenantContextService);
   private readonly format = inject(FormatService);
   private readonly toast = inject(MessageService);
   private readonly transloco = inject(TranslocoService);
   private readonly errors = inject(ErrorMessageService);
+  private readonly translations = translationsLoaded();
   protected readonly language = inject(LanguageService);
 
   protected readonly state = signal<'loading' | 'ready' | 'error'>('loading');
   protected readonly loadError = signal<string | null>(null);
   protected readonly accounts = signal<CashAccount[]>([]);
   protected readonly categories = signal<ExpenseCategory[]>([]);
+  protected readonly partners = signal<Partner[]>([]);
   protected readonly selectedId = signal<string | null>(null);
   protected readonly selected = computed(() => this.accounts().find((a) => a.id === this.selectedId()) ?? null);
 
   protected readonly view = signal<View>('book');
   protected readonly viewOptions = computed(() => {
-    this.language.language(); // re-translate on language change
+    this.translations(); // re-translate once loaded and on language change
     return (['book', 'expenses', 'transfers'] as const).map((value) => ({
       value,
       label: this.transloco.translate(`finance.view_${value}`),
@@ -84,6 +95,7 @@ export class CashPage implements OnInit {
 
   protected readonly expenseOpen = signal(false);
   protected readonly transferOpen = signal(false);
+  protected readonly incomeOpen = signal(false);
 
   ngOnInit(): void {
     const today = this.format.todayIso();
@@ -95,12 +107,15 @@ export class CashPage implements OnInit {
   protected async load(): Promise<void> {
     this.state.set('loading');
     try {
-      const [accounts, categories] = await Promise.all([
+      const [accounts, categories, partners] = await Promise.all([
         this.finance.cashAccounts(),
         this.finance.categories('GENERAL'),
+        // Partners for "paid personally by a partner" (rule 30), only for those allowed to see them.
+        this.context.can('partner.view_all') ? this.partnersApi.list() : Promise.resolve([]),
       ]);
       this.accounts.set(accounts);
       this.categories.set(categories);
+      this.partners.set(partners);
       if (!this.selected()) {
         this.selectedId.set(accounts.find((a) => a.is_default)?.id ?? accounts[0]?.id ?? null);
       }
@@ -160,7 +175,7 @@ export class CashPage implements OnInit {
     }
   }
 
-  protected async onPosted(result: ExpensePosting | TransferPosting): Promise<void> {
+  protected async onPosted(result: ExpensePosting | TransferPosting | OtherIncomePosting): Promise<void> {
     const entryNo = result.journal_entries[0]?.entry_no;
     this.toast.add({
       severity: 'success',

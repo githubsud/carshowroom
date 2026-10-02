@@ -184,3 +184,74 @@ begin
   perform set_config('app.tenant_id', '', true);
 end
 $$;
+
+-- =============================================================================
+-- Phase 3: partners, ownership and capital, posted through post_journal_entry.
+--   معرض النور: أحمد 50% (owner@), منى 30%, يوسف 20% (partner@) from 2026-01-01;
+--     capital contributions into بنك CIB on 2026-09-02 (rule 1): 500,000 / 300,000 / 200,000
+--   Doha Motors: Khalid 70% (owner@doha), Youssef 30% (partner@ — the same person, a second showroom)
+-- =============================================================================
+do $$
+declare
+  v_nour   constant uuid := '11111111-1111-1111-1111-111111111111';
+  v_doha   constant uuid := '22222222-2222-2222-2222-222222222222';
+  v_bank   constant uuid := 'c0000000-0000-0000-0000-000000000002';
+  v_ahmed  constant uuid := 'f0000000-0000-0000-0000-000000000001';
+  v_mona   constant uuid := 'f0000000-0000-0000-0000-000000000002';
+  v_yousef constant uuid := 'f0000000-0000-0000-0000-000000000003';
+  v_khalid constant uuid := 'f0000000-0000-0000-0000-000000000011';
+  v_yousef_doha constant uuid := 'f0000000-0000-0000-0000-000000000013';
+  v_bank_la uuid;
+  v_capital uuid;
+  v_entry record;
+  v_doc uuid;
+  v_partner record;
+begin
+  insert into public.partners (id, tenant_id, name_ar, name_en, phone) values
+    (v_ahmed,  v_nour, 'أحمد السيد',  'Ahmed El-Sayed', '+201000000011'),
+    (v_mona,   v_nour, 'منى عبد الله', 'Mona Abdallah',  '+201000000012'),
+    (v_yousef, v_nour, 'يوسف حسن',    'Youssef Hassan', '+201000000013'),
+    (v_khalid, v_doha, 'خالد المري',   'Khalid Al-Marri', '+97440000011'),
+    (v_yousef_doha, v_doha, 'يوسف حسن', 'Youssef Hassan', '+201000000013');
+
+  insert into public.partner_share_history (tenant_id, partner_id, percentage, effective_from, change_batch_id) values
+    (v_nour, v_ahmed,  50, '2026-01-01', 'a1000000-0000-0000-0000-000000000001'),
+    (v_nour, v_mona,   30, '2026-01-01', 'a1000000-0000-0000-0000-000000000001'),
+    (v_nour, v_yousef, 20, '2026-01-01', 'a1000000-0000-0000-0000-000000000001'),
+    (v_doha, v_khalid, 70, '2026-01-01', 'a1000000-0000-0000-0000-000000000002'),
+    (v_doha, v_yousef_doha, 30, '2026-01-01', 'a1000000-0000-0000-0000-000000000002');
+
+  update public.memberships set partner_id = v_ahmed
+   where tenant_id = v_nour and user_id = 'a0000000-0000-0000-0000-000000000001';
+  update public.memberships set partner_id = v_yousef
+   where tenant_id = v_nour and user_id = 'a0000000-0000-0000-0000-000000000004';
+  update public.memberships set partner_id = v_khalid
+   where tenant_id = v_doha and user_id = 'b0000000-0000-0000-0000-000000000001';
+  update public.memberships set partner_id = v_yousef_doha
+   where tenant_id = v_doha and user_id = 'a0000000-0000-0000-0000-000000000004';
+
+  -- Capital contributions (rule 1): Dr bank / Cr partner capital
+  perform set_config('app.tenant_id', v_nour::text, true);
+  select ledger_account_id into v_bank_la from public.cash_accounts where id = v_bank;
+  select id into v_capital from public.ledger_accounts where tenant_id = v_nour and system_key = 'PARTNER_CAPITAL';
+
+  for v_partner in
+    select * from (values (v_ahmed, 500000.00, 'أحمد السيد'), (v_mona, 300000.00, 'منى عبد الله'),
+                          (v_yousef, 200000.00, 'يوسف حسن')) as p (id, amount, name)
+  loop
+    v_doc := gen_random_uuid();
+    select * into v_entry from private.post_journal_entry(jsonb_build_object(
+      'entry_date', '2026-09-02', 'description', 'مساهمة في رأس المال — ' || v_partner.name,
+      'source_type', 'PARTNER_CONTRIBUTION', 'source_id', v_doc,
+      'lines', jsonb_build_array(
+        jsonb_build_object('ledger_account_id', v_bank_la, 'debit', v_partner.amount::text, 'cash_account_id', v_bank),
+        jsonb_build_object('ledger_account_id', v_capital, 'credit', v_partner.amount::text,
+                           'partner_id', v_partner.id))));
+    insert into public.partner_transactions
+      (id, tenant_id, partner_id, type, txn_date, amount, cash_account_id, journal_entry_id)
+    values (v_doc, v_nour, v_partner.id, 'CONTRIBUTION', '2026-09-02', v_partner.amount, v_bank, v_entry.journal_entry_id);
+  end loop;
+
+  perform set_config('app.tenant_id', '', true);
+end
+$$;

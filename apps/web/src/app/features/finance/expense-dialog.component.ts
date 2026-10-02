@@ -1,28 +1,29 @@
-import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
-import { CashAccount, ExpenseCategory, ExpensePosting, Preview } from '../../core/api/api.models';
-import { FormatService } from '../../core/format/format.service';
-import { LanguageService } from '../../core/i18n/language.service';
+import { ExpenseCategory, ExpensePosting, GeneralExpenseInput, Preview } from '../../core/api/api.models';
 import { MoneyInputComponent } from '../../shared/components/money-input.component';
 import { PostingPreviewComponent } from '../../shared/components/posting-preview.component';
-import { ErrorMessageService } from '../../shared/error-message.service';
 import { positiveMoney } from '../../shared/money-input';
+import { translationsLoaded } from '../../shared/translated';
 import { FinanceService } from './finance.service';
+import { Option, PostingDialogBase, PostingKind } from './posting-dialog.base';
 
 /**
- * Record a general expense (rule 20): form → plain-language preview → confirm.
- * Smart defaults (today, default cash box) keep it to a few taps (SPEC §9.3).
+ * Record a general expense: paid from a cash box / bank (rule 20) or
+ * personally by a partner (rule 30). Smart defaults keep it to a few taps.
  */
 @Component({
   selector: 'app-expense-dialog',
   imports: [
+    FormsModule,
     ReactiveFormsModule,
     TranslocoPipe,
     ButtonModule,
@@ -30,109 +31,96 @@ import { FinanceService } from './finance.service';
     InputTextModule,
     MessageModule,
     SelectModule,
+    SelectButtonModule,
     MoneyInputComponent,
     PostingPreviewComponent,
   ],
   templateUrl: './posting-dialog.html',
   styleUrl: './posting-dialog.scss',
 })
-export class ExpenseDialogComponent {
+export class ExpenseDialogComponent extends PostingDialogBase<GeneralExpenseInput, ExpensePosting> {
   private readonly finance = inject(FinanceService);
-  private readonly format = inject(FormatService);
-  private readonly errors = inject(ErrorMessageService);
-  protected readonly language = inject(LanguageService);
+  private readonly transloco = inject(TranslocoService);
+  private readonly translations = translationsLoaded();
 
-  readonly visible = model(false);
-  readonly accounts = input.required<CashAccount[]>();
   readonly categories = input.required<ExpenseCategory[]>();
   readonly posted = output<ExpensePosting>();
 
-  protected readonly kind: 'expense' | 'transfer' = 'expense';
-  protected readonly step = signal<'form' | 'preview'>('form');
-  protected readonly preview = signal<Preview | null>(null);
-  protected readonly busy = signal(false);
-  protected readonly error = signal<string | null>(null);
-  private idempotencyKey = crypto.randomUUID();
-
-  protected readonly form = inject(NonNullableFormBuilder).group({
+  readonly kind: PostingKind = 'expense';
+  readonly dateControl = 'expense_date';
+  readonly noteControl = 'description';
+  readonly form = inject(NonNullableFormBuilder).group({
     expense_date: ['', Validators.required],
     category_id: ['', Validators.required],
     amount: ['', [Validators.required, positiveMoney]],
-    cash_account_id: ['', Validators.required],
+    cash_account_id: [''],
+    paid_by_partner_id: [''],
+    partner_funding_mode: ['CURRENT_ACCOUNT' as 'CURRENT_ACCOUNT' | 'LOAN'],
     description: [''],
   });
 
-  protected readonly categoryOptions = computed(() =>
-    this.categories().map((c) => ({ value: c.id, label: this.language.language() === 'ar' ? c.name_ar : c.name_en })),
+  protected override readonly categoryOptions = computed<Option[]>(() =>
+    this.categories().map((c) => ({ value: c.id, label: this.name(c) })),
   );
-  protected readonly accountOptions = computed(() =>
-    this.accounts().map((a) => ({
-      value: a.id,
-      label: this.language.language() === 'ar' ? a.name_ar : (a.name_en ?? a.name_ar),
-    })),
-  );
+  protected override readonly fundingOptions = computed<Option[]>(() => {
+    this.translations();
+    return [
+      { value: 'cash', label: this.transloco.translate('finance.fundingCash') },
+      { value: 'partner', label: this.transloco.translate('finance.fundingPartner') },
+    ];
+  });
+  protected override readonly modeOptions = computed<Option[]>(() => {
+    this.translations();
+    return [
+      { value: 'CURRENT_ACCOUNT', label: this.transloco.translate('finance.modeCurrent') },
+      { value: 'LOAN', label: this.transloco.translate('finance.modeLoan') },
+    ];
+  });
 
-  constructor() {
-    // Each opening is a fresh submission with its own idempotency key and defaults.
-    effect(() => {
-      if (this.visible()) {
-        this.reset();
-      }
-    });
+  protected override setFunding(value: 'cash' | 'partner'): void {
+    super.setFunding(value);
+    const { cash_account_id, paid_by_partner_id } = this.form.controls;
+    cash_account_id.setValidators(value === 'cash' ? Validators.required : null);
+    paid_by_partner_id.setValidators(value === 'partner' ? Validators.required : null);
+    cash_account_id.updateValueAndValidity();
+    paid_by_partner_id.updateValueAndValidity();
   }
 
-  private reset(): void {
-    this.idempotencyKey = crypto.randomUUID();
-    this.step.set('form');
-    this.preview.set(null);
-    this.error.set(null);
+  protected reset(): void {
     this.form.reset({
       expense_date: this.format.todayIso(),
       category_id: '',
       amount: '',
-      cash_account_id: this.accounts().find((a) => a.is_default)?.id ?? this.accounts()[0]?.id ?? '',
+      cash_account_id: this.defaultAccountId(),
+      paid_by_partner_id: '',
+      partner_funding_mode: 'CURRENT_ACCOUNT',
       description: '',
     });
+    this.setFunding('cash');
   }
 
-  private body() {
-    const value = this.form.getRawValue();
-    return { ...value, description: value.description.trim() || null };
+  protected body(): GeneralExpenseInput {
+    const v = this.form.getRawValue();
+    const base = {
+      expense_date: v.expense_date,
+      category_id: v.category_id,
+      amount: v.amount,
+      description: v.description.trim() || null,
+    };
+    return this.funding() === 'partner'
+      ? { ...base, paid_by_partner_id: v.paid_by_partner_id, partner_funding_mode: v.partner_funding_mode }
+      : { ...base, cash_account_id: v.cash_account_id };
   }
 
-  protected async review(): Promise<void> {
-    if (this.form.invalid || this.busy()) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    await this.run(async () => {
-      this.preview.set(await this.finance.previewExpense(this.body()));
-      this.step.set('preview');
-    });
+  protected previewCall(body: GeneralExpenseInput): Promise<Preview> {
+    return this.finance.previewExpense(body);
   }
 
-  protected async confirm(): Promise<void> {
-    await this.run(async () => {
-      const result = await this.finance.recordExpense(this.body(), this.idempotencyKey);
-      this.visible.set(false);
-      this.posted.emit(result);
-    });
+  protected postCall(body: GeneralExpenseInput, key: string): Promise<ExpensePosting> {
+    return this.finance.recordExpense(body, key);
   }
 
-  protected back(): void {
-    this.step.set('form');
-    this.error.set(null);
-  }
-
-  private async run(action: () => Promise<void>): Promise<void> {
-    this.busy.set(true);
-    this.error.set(null);
-    try {
-      await action();
-    } catch (error) {
-      this.error.set(this.errors.message(error));
-    } finally {
-      this.busy.set(false);
-    }
+  protected emitPosted(result: ExpensePosting): void {
+    this.posted.emit(result);
   }
 }

@@ -60,3 +60,21 @@ export type ReverseInput = Schemas['ReverseIn'];
 export type ReverseResult = Schemas['ReverseOut'];
 export type Period = Schemas['PeriodOut'];
 export type LedgerAccount = Schemas['LedgerAccountOut'];
+
+// --- Partners (Phase 3) -------------------------------------------------------------------
+
+export type Partner = Schemas['PartnerOut'];
+export type PartnerInput = Schemas['PartnerIn'];
+export type PartnerUpdate = Schemas['PartnerUpdate'];
+export type PartnerSummary = Schemas['PartnerSummaryOut'];
+export type PartnerSummaryRow = Schemas['PartnerSummaryRow'];
+export type PartnerStatement = Schemas['PartnerStatementOut'];
+export type PartnerPosition = Schemas['PartnerPosition'];
+export type PartnerTransactionInput = Schemas['PartnerTransactionIn'];
+export type PartnerTransaction = Schemas['PartnerTransactionOut'];
+export type PartnerTransactionKind = PartnerTransactionInput['type'];
+export type PartnerPosting = Schemas['PostingResult_PartnerTransactionOut_'];
+export type ShareChangeInput = Schemas['ShareChangeIn'];
+export type Share = Schemas['ShareOut'];
+export type OtherIncomeInput = Schemas['OtherIncomeIn'];
+export type OtherIncomePosting = Schemas['PostingResult_OtherIncomeOut_'];

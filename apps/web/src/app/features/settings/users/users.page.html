@@ -24,6 +24,7 @@
         <tr>
           <th>{{ 'users.name' | transloco }}</th>
           <th>{{ 'users.role' | transloco }}</th>
+          <th>{{ 'users.partner' | transloco }}</th>
           <th>{{ 'users.status' | transloco }}</th>
           <th>{{ 'users.lastSignIn' | transloco }}</th>
           <th></th>
@@ -43,6 +44,18 @@
               optionValue="code"
               [optionLabel]="language.language() === 'ar' ? 'name_ar' : 'name_en'"
               [attr.aria-label]="'users.role' | transloco"
+            />
+          </td>
+          <td>
+            <p-select
+              [options]="partners()"
+              [ngModel]="member.partner_id"
+              (ngModelChange)="linkPartner(member, $event)"
+              optionValue="id"
+              [optionLabel]="language.language() === 'ar' ? 'name_ar' : 'name_en'"
+              [showClear]="true"
+              [placeholder]="'users.noPartner' | transloco"
+              [attr.aria-label]="'users.partner' | transloco"
             />
           </td>
           <td>

@@ -160,6 +160,8 @@ class InviteIn(StrictModel):
 class MemberUpdate(StrictModel):
     role_code: AssignableRole | None = None
     status: Literal["ACTIVE", "DISABLED"] | None = None
+    # Link the user to a partner record (a partner sees their own statement); null unlinks.
+    partner_id: UUID | None = None
 
 
 class RoleOut(BaseModel):

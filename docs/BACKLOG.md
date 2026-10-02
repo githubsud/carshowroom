@@ -92,6 +92,21 @@
 
 **Phase 3 accepted when (FACT):** the owner can answer "what is each partner's balance?" in one screen, matching hand-calculated tests.
 
+### Phase 3 status: accepted by the product owner on 2026-10-02
+
+| ID | Status | Notes |
+|---|---|---|
+| 3.1 | ✅ | Partner records (Arabic/English name, phone, national ID, notes, archive per D-62); share batches checked at commit to total 100.0000 (SR010), no overlapping periods, history append-only (D-64), pgTAP `07_partners` |
+| 3.2 | ✅ | Rules 1, 2, 3, 4, 5, 28, 29 and 30 (unit tests first), one transactions endpoint with preview; repayment cap and warnings (D-63); national ID encrypted, masked and audited (D-65) |
+| 3.3 | ✅ | Statement by bucket with opening, running net and closing; JSON / Excel / PDF (D-56) |
+| 3.4 | ✅ | Summary: %, capital, allocated profit, drawings, current account, loans both ways, net (Q-17); totals row; the hand-calculated Doha scenario matches |
+| 3.5 | ✅ | A partner user sees only their own record, history and statement (RLS + API), the summary only with `partner_sees_summary`, and their position on the dashboard; user ↔ partner link in Settings → Users (D-66) |
+| 3.6 | ✅ | Partners screen (summary, add partner, change ownership with "split equally", new movement), statement screen, dialogs with plain-language previews |
+| 2.10 | ✅ | Other income (P-01, approved under Q-26) on the Cash & bank screen |
+| 2.6 | ✅ | General expense paid personally by a partner (rule 30, D-67) |
+| Seed | ✅ | Three partners (50/30/20) with capital for معرض النور, two for Doha; a user linked to each |
+| Tests | ✅ | pgTAP 111 · API 131 (+1 PDF test in Docker/CI) · web unit 35 · E2E 28 |
+
 ---
 
 ## Phase 4: Vehicles and sales

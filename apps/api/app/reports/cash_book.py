@@ -208,7 +208,8 @@ def render_html(book: CashBookOut, language: Language, showroom_name: str) -> st
 </body></html>"""
 
 
-def render_pdf(book: CashBookOut, language: Language, showroom_name: str) -> bytes:
+def html_to_pdf(html: str) -> bytes:
+    """Shared by every report. WeasyPrint needs native Pango (DECISIONS D-56)."""
     try:
         from weasyprint import HTML
     except OSError as exc:
@@ -217,5 +218,9 @@ def render_pdf(book: CashBookOut, language: Language, showroom_name: str) -> byt
             "PDF rendering is not available on this server (missing Pango libraries)",
             status_code=503,
         ) from exc
-    pdf: bytes = HTML(string=render_html(book, language, showroom_name)).write_pdf()
+    pdf: bytes = HTML(string=html).write_pdf()
     return pdf
+
+
+def render_pdf(book: CashBookOut, language: Language, showroom_name: str) -> bytes:
+    return html_to_pdf(render_html(book, language, showroom_name))

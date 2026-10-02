@@ -214,6 +214,198 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/other-incomes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Incomes */
+        get: operations["list_incomes_api_v1_other_incomes_get"];
+        put?: never;
+        /** Record Income */
+        post: operations["record_income_api_v1_other_incomes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/other-incomes/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Income */
+        post: operations["preview_income_api_v1_other_incomes_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Partners */
+        get: operations["list_partners_api_v1_partners_get"];
+        put?: never;
+        /** Create Partner */
+        post: operations["create_partner_api_v1_partners_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners/shares": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Current Shares */
+        get: operations["current_shares_api_v1_partners_shares_get"];
+        put?: never;
+        /** Change Shares */
+        post: operations["change_shares_api_v1_partners_shares_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners/shares/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shares History */
+        get: operations["shares_history_api_v1_partners_shares_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Partners Summary */
+        get: operations["partners_summary_api_v1_partners_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners/{partner_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Partner */
+        get: operations["get_partner_api_v1_partners__partner_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Partner */
+        patch: operations["update_partner_api_v1_partners__partner_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/partners/{partner_id}/national-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reveal National Id */
+        get: operations["reveal_national_id_api_v1_partners__partner_id__national_id_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners/{partner_id}/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Partner Statement */
+        get: operations["partner_statement_api_v1_partners__partner_id__statement_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners/{partner_id}/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Transactions */
+        get: operations["list_transactions_api_v1_partners__partner_id__transactions_get"];
+        put?: never;
+        /** Record Transaction */
+        post: operations["record_transaction_api_v1_partners__partner_id__transactions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners/{partner_id}/transactions/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Transaction */
+        post: operations["preview_transaction_api_v1_partners__partner_id__transactions_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/payment-methods": {
         parameters: {
             query?: never;
@@ -696,18 +888,18 @@ export interface components {
             /** Name En */
             name_en?: string | null;
         };
-        /** GeneralExpenseIn */
+        /**
+         * GeneralExpenseIn
+         * @description Paid from a cash box / bank (rule 20), or personally by a partner (rule 30).
+         */
         GeneralExpenseIn: {
             /**
              * Amount
              * @example 25000.00
              */
             amount: string;
-            /**
-             * Cash Account Id
-             * Format: uuid
-             */
-            cash_account_id: string;
+            /** Cash Account Id */
+            cash_account_id?: string | null;
             /**
              * Category Id
              * Format: uuid
@@ -720,6 +912,10 @@ export interface components {
              * Format: date
              */
             expense_date: string;
+            /** Paid By Partner Id */
+            paid_by_partner_id?: string | null;
+            /** Partner Funding Mode */
+            partner_funding_mode?: ("CURRENT_ACCOUNT" | "LOAN") | null;
         };
         /** GeneralExpenseOut */
         GeneralExpenseOut: {
@@ -728,13 +924,10 @@ export interface components {
              * @example 25000.00
              */
             amount: string;
-            /**
-             * Cash Account Id
-             * Format: uuid
-             */
-            cash_account_id: string;
+            /** Cash Account Id */
+            cash_account_id: string | null;
             /** Cash Account Name Ar */
-            cash_account_name_ar: string;
+            cash_account_name_ar: string | null;
             /** Cash Account Name En */
             cash_account_name_en: string | null;
             /**
@@ -765,6 +958,12 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Paid By Partner Id */
+            paid_by_partner_id: string | null;
+            /** Paid By Partner Name Ar */
+            paid_by_partner_name_ar: string | null;
+            /** Partner Funding Mode */
+            partner_funding_mode: ("CURRENT_ACCOUNT" | "LOAN") | null;
             /** Reversal Entry No */
             reversal_entry_no: number | null;
             /**
@@ -937,6 +1136,8 @@ export interface components {
         };
         /** MemberUpdate */
         MemberUpdate: {
+            /** Partner Id */
+            partner_id?: string | null;
             /** Role Code */
             role_code?: ("OWNER" | "MANAGER" | "ACCOUNTANT" | "SALES" | "PARTNER" | "VIEWER") | null;
             /** Status */
@@ -972,6 +1173,69 @@ export interface components {
             /** Timezone */
             timezone: string;
         };
+        /** NationalIdOut */
+        NationalIdOut: {
+            /** National Id */
+            national_id: string;
+        };
+        /** OtherIncomeIn */
+        OtherIncomeIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Description */
+            description: string;
+            /**
+             * Income Date
+             * Format: date
+             */
+            income_date: string;
+        };
+        /** OtherIncomeOut */
+        OtherIncomeOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Cash Account Name Ar */
+            cash_account_name_ar: string;
+            /** Cash Account Name En */
+            cash_account_name_en: string | null;
+            /** Description */
+            description: string;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Income Date
+             * Format: date
+             */
+            income_date: string;
+            /** Reversal Entry No */
+            reversal_entry_no: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED";
+        };
         /** Page[GeneralExpenseOut] */
         Page_GeneralExpenseOut_: {
             /** Items */
@@ -1004,6 +1268,243 @@ export interface components {
             page_size: number;
             /** Total */
             total: number;
+        };
+        /** PartnerIn */
+        PartnerIn: {
+            /** Name Ar */
+            name_ar: string;
+            /** Name En */
+            name_en?: string | null;
+            /** National Id */
+            national_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Phone */
+            phone?: string | null;
+        };
+        /** PartnerOut */
+        PartnerOut: {
+            /** Archived */
+            archived: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name Ar */
+            name_ar: string;
+            /** Name En */
+            name_en: string | null;
+            /** National Id Masked */
+            national_id_masked: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Percentage */
+            percentage: string;
+            /** Phone */
+            phone: string | null;
+        };
+        /**
+         * PartnerPosition
+         * @description A partner's position with the showroom. Net = capital + current account
+         *     + loans from the partner - loans to the partner (DECISIONS Q-17).
+         */
+        PartnerPosition: {
+            /**
+             * Capital
+             * @example 25000.00
+             */
+            capital: string;
+            /**
+             * Current
+             * @example 25000.00
+             */
+            current: string;
+            /**
+             * Loans From Partner
+             * @example 25000.00
+             */
+            loans_from_partner: string;
+            /**
+             * Loans To Partner
+             * @example 25000.00
+             */
+            loans_to_partner: string;
+            /**
+             * Net
+             * @example 25000.00
+             */
+            net: string;
+        };
+        /** PartnerStatementOut */
+        PartnerStatementOut: {
+            closing: components["schemas"]["PartnerPosition"];
+            /** Currency Code */
+            currency_code: string;
+            /**
+             * Date From
+             * Format: date
+             */
+            date_from: string;
+            /**
+             * Date To
+             * Format: date
+             */
+            date_to: string;
+            /** Lines */
+            lines: components["schemas"]["StatementLine"][];
+            opening: components["schemas"]["PartnerPosition"];
+            partner: components["schemas"]["PartnerOut"];
+        };
+        /** PartnerSummaryOut */
+        PartnerSummaryOut: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Currency Code */
+            currency_code: string;
+            /** Rows */
+            rows: components["schemas"]["PartnerSummaryRow"][];
+            totals: components["schemas"]["PartnerSummaryRow"];
+        };
+        /** PartnerSummaryRow */
+        PartnerSummaryRow: {
+            /**
+             * Allocated Profit
+             * @example 25000.00
+             */
+            allocated_profit: string;
+            /**
+             * Capital
+             * @example 25000.00
+             */
+            capital: string;
+            /**
+             * Current
+             * @example 25000.00
+             */
+            current: string;
+            /**
+             * Drawings
+             * @example 25000.00
+             */
+            drawings: string;
+            /**
+             * Loans From Partner
+             * @example 25000.00
+             */
+            loans_from_partner: string;
+            /**
+             * Loans To Partner
+             * @example 25000.00
+             */
+            loans_to_partner: string;
+            /** Name Ar */
+            name_ar: string;
+            /** Name En */
+            name_en: string | null;
+            /**
+             * Net
+             * @example 25000.00
+             */
+            net: string;
+            /**
+             * Partner Id
+             * Format: uuid
+             */
+            partner_id: string;
+            /** Percentage */
+            percentage: string;
+        };
+        /** PartnerTransactionIn */
+        PartnerTransactionIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Txn Date
+             * Format: date
+             */
+            txn_date: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "CONTRIBUTION" | "CAPITAL_WITHDRAWAL" | "DRAWING" | "LOAN_TO_PARTNER" | "LOAN_TO_PARTNER_REPAYMENT" | "LOAN_FROM_PARTNER" | "LOAN_FROM_PARTNER_REPAYMENT";
+        };
+        /** PartnerTransactionOut */
+        PartnerTransactionOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Cash Account Name Ar */
+            cash_account_name_ar: string;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Partner Id
+             * Format: uuid
+             */
+            partner_id: string;
+            /** Partner Name Ar */
+            partner_name_ar: string;
+            /** Reversal Entry No */
+            reversal_entry_no: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED";
+            /**
+             * Txn Date
+             * Format: date
+             */
+            txn_date: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "CONTRIBUTION" | "CAPITAL_WITHDRAWAL" | "DRAWING" | "LOAN_TO_PARTNER" | "LOAN_TO_PARTNER_REPAYMENT" | "LOAN_FROM_PARTNER" | "LOAN_FROM_PARTNER_REPAYMENT";
+        };
+        /** PartnerUpdate */
+        PartnerUpdate: {
+            /** Archived */
+            archived?: boolean | null;
+            /** Name Ar */
+            name_ar?: string | null;
+            /** Name En */
+            name_en?: string | null;
+            /** National Id */
+            national_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Phone */
+            phone?: string | null;
         };
         /** PaymentMethodOut */
         PaymentMethodOut: {
@@ -1038,6 +1539,22 @@ export interface components {
         /** PostingResult[GeneralExpenseOut] */
         PostingResult_GeneralExpenseOut_: {
             document: components["schemas"]["GeneralExpenseOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[OtherIncomeOut] */
+        PostingResult_OtherIncomeOut_: {
+            document: components["schemas"]["OtherIncomeOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[PartnerTransactionOut] */
+        PostingResult_PartnerTransactionOut_: {
+            document: components["schemas"]["PartnerTransactionOut"];
             /** Journal Entries */
             journal_entries: components["schemas"]["EntryRef"][];
             /** Warnings */
@@ -1132,6 +1649,85 @@ export interface components {
             name_ar: string;
             /** Name En */
             name_en: string;
+        };
+        /** ShareChangeIn */
+        ShareChangeIn: {
+            /**
+             * Effective From
+             * Format: date
+             */
+            effective_from: string;
+            /** Shares */
+            shares: components["schemas"]["ShareIn"][];
+        };
+        /** ShareIn */
+        ShareIn: {
+            /**
+             * Partner Id
+             * Format: uuid
+             */
+            partner_id: string;
+            /** Percentage */
+            percentage: number | string;
+        };
+        /** ShareOut */
+        ShareOut: {
+            /**
+             * Effective From
+             * Format: date
+             */
+            effective_from: string;
+            /** Effective To */
+            effective_to: string | null;
+            /**
+             * Partner Id
+             * Format: uuid
+             */
+            partner_id: string;
+            /** Partner Name Ar */
+            partner_name_ar: string;
+            /** Partner Name En */
+            partner_name_en: string | null;
+            /** Percentage */
+            percentage: string;
+        };
+        /** StatementLine */
+        StatementLine: {
+            /**
+             * Amount In
+             * @example 25000.00
+             */
+            amount_in: string;
+            /**
+             * Amount Out
+             * @example 25000.00
+             */
+            amount_out: string;
+            /**
+             * Bucket
+             * @enum {string}
+             */
+            bucket: "CAPITAL" | "CURRENT" | "LOAN_TO" | "LOAN_FROM";
+            /** Description */
+            description: string;
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /** Entry No */
+            entry_no: number;
+            /** Is Reversal */
+            is_reversal: boolean;
+            /** Reversed */
+            reversed: boolean;
+            /**
+             * Running Net
+             * @example 25000.00
+             */
+            running_net: string;
+            /** Source Type */
+            source_type: string;
         };
         /** TenantOut */
         TenantOut: {
@@ -1912,6 +2508,562 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeOut"];
+                };
+            };
+        };
+    };
+    list_incomes_api_v1_other_incomes_get: {
+        parameters: {
+            query?: {
+                date_from?: string | null;
+                date_to?: string | null;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OtherIncomeOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_income_api_v1_other_incomes_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OtherIncomeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_OtherIncomeOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_income_api_v1_other_incomes_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OtherIncomeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_partners_api_v1_partners_get: {
+        parameters: {
+            query?: {
+                include_archived?: boolean;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_partner_api_v1_partners_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    current_shares_api_v1_partners_shares_get: {
+        parameters: {
+            query?: {
+                on_date?: string | null;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_shares_api_v1_partners_shares_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShareChangeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    shares_history_api_v1_partners_shares_history_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    partners_summary_api_v1_partners_summary_get: {
+        parameters: {
+            query?: {
+                as_of?: string | null;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerSummaryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_partner_api_v1_partners__partner_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                partner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_partner_api_v1_partners__partner_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                partner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reveal_national_id_api_v1_partners__partner_id__national_id_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                partner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NationalIdOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    partner_statement_api_v1_partners__partner_id__statement_get: {
+        parameters: {
+            query: {
+                date_from: string;
+                date_to: string;
+                format?: "json" | "xlsx" | "pdf";
+                lang?: "ar" | "en";
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                partner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerStatementOut"];
+                    "application/pdf": unknown;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_transactions_api_v1_partners__partner_id__transactions_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                partner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerTransactionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_transaction_api_v1_partners__partner_id__transactions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                partner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerTransactionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_PartnerTransactionOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_transaction_api_v1_partners__partner_id__transactions_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                partner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerTransactionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

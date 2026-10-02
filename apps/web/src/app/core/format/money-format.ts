@@ -59,11 +59,22 @@ export function currencyLabel(currency: string, language: Language): string {
   return CURRENCY_LABELS[currency]?.[language] ?? currency;
 }
 
-/** "1250000.00", EGP → "1,250,000.00 ج.م" (ar) / "EGP 1,250,000.00" (en). */
+/** Left-to-right isolate: keeps "-2,000.00" intact inside right-to-left text. */
+export function ltr(text: string): string {
+  return `\u2066${text}\u2069`;
+}
+
+/** "1250000.00", EGP → "1,250,000.00 ج.م" (ar, number isolated) / "EGP 1,250,000.00" (en). */
 export function formatMoney(value: string, currency: string, options: FormatOptions): string {
   const amount = formatAmount(value, options);
   const label = currencyLabel(currency, options.language);
-  return options.language === 'ar' ? `${amount} ${label}` : `${label} ${amount}`;
+  return options.language === 'ar' ? `${ltr(amount)} ${label}` : `${label} ${amount}`;
+}
+
+/** "33.3330" -> "33.333%", "50.0000" -> "50%". */
+export function formatPercent(value: string, options: FormatOptions): string {
+  const trimmed = value.includes('.') ? value.replace(/0+$/, '').replace(/\.$/, '') : value;
+  return ltr(`${formatAmount(trimmed, options, 0)}%`);
 }
 
 /** Whole numbers (counts, days in stock). */

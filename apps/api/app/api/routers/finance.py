@@ -23,6 +23,8 @@ from app.domain.finance import (
     GeneralExpenseOut,
     JournalEntryOut,
     LedgerAccountOut,
+    OtherIncomeIn,
+    OtherIncomeOut,
     Page,
     PaymentMethodOut,
     PeriodOut,
@@ -181,6 +183,49 @@ def list_expenses(
             page=page,
             page_size=page_size,
         )
+
+
+# --- Other income (P-01) --------------------------------------------------------------------------------
+
+
+@router.post("/other-incomes/preview", response_model=Preview, tags=["cash"])
+def preview_income(
+    payload: OtherIncomeIn,
+    ctx: TenantContext = Depends(require(Permission.CASH_TRANSACT)),
+    db: Database = Depends(get_database),
+) -> Preview:
+    with _tx(db, ctx) as conn:
+        return finance.preview_income(conn, payload, with_lines=ctx.can(Permission.JOURNAL_VIEW))
+
+
+@router.post("/other-incomes", response_model=PostingResult[OtherIncomeOut], status_code=201, tags=["cash"])
+def record_income(
+    payload: OtherIncomeIn,
+    idempotency_key: IdempotencyKey = None,
+    ctx: TenantContext = Depends(require(Permission.CASH_TRANSACT)),
+    db: Database = Depends(get_database),
+) -> JSONResponse:
+    require_writable(ctx)
+    return idempotency.run(
+        db,
+        user_id=ctx.user.id,
+        tenant_id=ctx.tenant_id,
+        key=idempotency_key,
+        endpoint="POST /other-incomes",
+        payload=payload,
+        operation=lambda conn: finance.record_income(conn, payload),
+    )
+
+
+@router.get("/other-incomes", response_model=list[OtherIncomeOut], tags=["cash"])
+def list_incomes(
+    date_from: date | None = None,
+    date_to: date | None = None,
+    ctx: TenantContext = Depends(require(Permission.CASH_VIEW)),
+    db: Database = Depends(get_database),
+) -> list[OtherIncomeOut]:
+    with _tx(db, ctx) as conn:
+        return finance.list_incomes(conn, date_from=date_from, date_to=date_to)
 
 
 # --- Transfers (rule 21) ---------------------------------------------------------------------------------

@@ -28,7 +28,10 @@ export class UsersService {
     return firstValueFrom(this.http.post<Member>(`${this.base}/users/invite`, request));
   }
 
-  update(membershipId: string, changes: { role_code?: string; status?: 'ACTIVE' | 'DISABLED' }): Promise<Member> {
+  update(
+    membershipId: string,
+    changes: { role_code?: string; status?: 'ACTIVE' | 'DISABLED'; partner_id?: string | null },
+  ): Promise<Member> {
     return firstValueFrom(this.http.patch<Member>(`${this.base}/users/${membershipId}`, changes));
   }
 }

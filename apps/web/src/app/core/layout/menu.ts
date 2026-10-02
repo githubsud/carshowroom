@@ -33,7 +33,7 @@ export const MENU: readonly MenuItem[] = [
     anyOf: ['consignment.manage'],
     flag: 'consignment',
   },
-  { key: 'partners', icon: 'pi pi-briefcase', path: 'soon/partners', anyOf: ['partner.view_all', 'partner.view_own'] },
+  { key: 'partners', icon: 'pi pi-briefcase', path: 'partners', anyOf: ['partner.view_all', 'partner.view_own'] },
   { key: 'finance', icon: 'pi pi-wallet', path: 'finance/cash', anyOf: ['cash.view'] },
   { key: 'journal', icon: 'pi pi-book', path: 'finance/journal', anyOf: ['journal.view'] },
   { key: 'periods', icon: 'pi pi-calendar-times', path: 'finance/periods', anyOf: ['period.lock', 'journal.view'] },

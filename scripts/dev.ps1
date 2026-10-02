@@ -43,13 +43,27 @@ switch ($Command) {
     $secret = ($status | Where-Object { $_ -like 'SECRET_KEY=*' }) -replace '^SECRET_KEY=', '' -replace '"', ''
     if (-not $secret) { throw 'Local Supabase is not running; run db-start first.' }
     $lines = Get-Content $envFile | ForEach-Object { if ($_ -like 'SUPABASE_SERVICE_ROLE_KEY=*') { "SUPABASE_SERVICE_ROLE_KEY=$secret" } else { $_ } }
+    # A local AES key for national IDs, generated once (never committed; DECISIONS D-05).
+    if (-not ($lines | Where-Object { $_ -match '^NATIONAL_ID_KEY=.+' })) {
+      $bytes = New-Object byte[] 32
+      [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+      $key = [Convert]::ToBase64String($bytes)
+      if ($lines | Where-Object { $_ -like 'NATIONAL_ID_KEY=*' }) {
+        $lines = $lines | ForEach-Object { if ($_ -like 'NATIONAL_ID_KEY=*') { "NATIONAL_ID_KEY=$key" } else { $_ } }
+      } else { $lines += "NATIONAL_ID_KEY=$key" }
+    }
     Set-Content -Path $envFile -Value $lines -Encoding utf8
     Write-Host 'apps/api/.env is ready.'
   }
   'db-reset' { Push-Location $Root; try { Invoke-Checked { npx supabase db reset } } finally { Pop-Location } }
   'db-test'  { Push-Location $Root; try { Invoke-Checked { npx supabase test db } } finally { Pop-Location } }
   'api' { Push-Location $Api; try { & $Py -m uvicorn app.main:create_app --factory --reload --port 8000 } finally { Pop-Location } }
-  'web' { Push-Location $Web; try { npm start } finally { Pop-Location } }
+  'web' {
+    # PrimeUI licence key from the environment (never committed; DECISIONS D-61).
+    $define = @()
+    if ($env:PRIMEUI_LICENSE) { $define = @('--', '--define', "PRIMEUI_LICENSE=`"'$($env:PRIMEUI_LICENSE)'`"") }
+    Push-Location $Web; try { npm start @define } finally { Pop-Location }
+  }
   'dev' {
     & $PSCommandPath db-start
     Start-Process powershell -ArgumentList '-NoExit', '-File', $PSCommandPath, 'api'

@@ -173,6 +173,7 @@ erDiagram
 - **FACT.** Share changes are effective-dated and never overwritten.
 - **DECISION D-21.** A share change is a **batch**: one `change_batch_id`, all partners' new rows together. A deferred constraint trigger checks at commit that the active percentages sum to 100.0000 for every date touched. This avoids invalid intermediate states (G-04).
 - Partner ownership has an exclusion constraint: no overlapping `[effective_from, effective_to)` per partner (`btree_gist`).
+- **As built (Phase 3):** `partners` has `name_ar`, `name_en`, `national_id_enc` + `national_id_last4` (D-65) and `archived_at` instead of `active_from/active_to` (activity comes from share history, D-62); `partner_transactions` uses the `posted_document_before_update` trigger; `memberships.partner_id` links a user (D-66); `other_incomes` holds P-01 documents.
 - An expense paid personally by a partner (rule 30) is **not** a `partner_transactions` row. It is a `vehicle_expenses`/`general_expenses` row with `paid_by_partner_id` and `partner_funding_mode CURRENT_ACCOUNT|LOAN`.
 
 ---

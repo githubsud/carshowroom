@@ -33,7 +33,20 @@
 | BR-C5 | Every cash box / bank account has its own ledger sub-account (1101…, 1201…), and every general category its own 62xx account | `finance.create_cash_account`, `finance.create_category` | `test_ledger.py::test_new_cash_account_*`, `test_new_general_category_*` ✅ |
 | BR-C6 | A posted expense or transfer is never edited; it moves to REVERSED only together with its reversal entry | DB trigger `posted_document_before_update`; `journal.reverse` | `test_ledger.py::test_reversal_restores_balances_and_marks_the_document` ✅ |
 
-## Access (Phases 1–2)
+## Partners (Phase 3)
+
+| ID | Rule | Enforced in | Proven by |
+|---|---|---|---|
+| BR-P1 | Active partners' ownership percentages total 100% on every date | `partners.change_shares` (`SHARES_NOT_100`); DB deferred trigger `check_partner_shares` (SR010) | pgTAP 07; `test_partners.py` (share validations) ✅ |
+| BR-P2 | Ownership history is never overwritten or deleted; periods never overlap; a new batch starts after the latest one (D-64) | DB update/delete triggers (SR003), exclusion constraint `partner_share_no_overlap`; `SHARE_DATE_INVALID` | pgTAP 07 ✅ |
+| BR-P3 | A loan repayment cannot exceed what is owed (D-63) | `partners._plan_transaction` | `test_partners.py` (repayment cap) ✅ |
+| BR-P4 | Drawings above the net position and negative capital post with a warning (D-63) | `partners._plan_transaction` | `test_partner_rules.py`, `test_partners.py` ✅ |
+| BR-P5 | A capital withdrawal also needs `partner.equity.change` | `routers/partners.py` | `test_partners.py` (capital withdrawal permission) ✅ |
+| BR-P6 | A partner with an open share or any balance cannot be archived (D-62) | `partners.update_partner` | `test_partners.py` (archive refused) ✅ |
+| BR-P7 | National IDs are stored encrypted, shown masked, and every reveal is audited (D-65) | `core/crypto.py`; `partners.reveal_national_id` | `test_crypto.py`; `test_partners.py` (national ID) ✅ |
+| BR-P8 | An expense paid by a partner leaves the cash box untouched (rule 30, D-67) | `finance._plan_expense`; DB check `general_expenses_one_funding` | `test_partners.py` (rule 30) ✅ |
+
+## Access (Phases 1–3)
 
 | ID | Rule | Enforced in | Proven by |
 |---|---|---|---|
@@ -42,6 +55,7 @@
 | BR-A3 | Debit/credit wording is shown only to users with journal access (SPEC §9.3) | `Preview.lines` only with `journal.view`; journal page behind `journal.view` | `test_ledger.py::test_manager_preview_hides_debit_credit_lines` ✅ |
 | BR-A4 | A showroom always keeps at least one active owner | `users.update_member` | `test_users.py::test_last_owner_cannot_be_demoted_or_disabled` ✅ |
 | BR-A5 | A suspended showroom is read-only | `require_writable`; `private.tenant_writable` | `test_tenant_access.py::test_suspended_tenant_is_read_only` ✅ |
+| BR-A6 | A partner user sees only their own partner record and statement; the summary only if the showroom allows it | RLS (`my_partner_id`); `_can_see_partner`; `partner_sees_summary` | pgTAP 07; `test_partners.py` (partner own access); E2E partner user ✅ |
 
 ## From SPEC §3.4, arriving later
 
@@ -52,4 +66,3 @@
 | BR-S3 | A payment cannot exceed the outstanding amount unless the excess is recorded as customer credit (setting D-41) | ⏳ 5 |
 | BR-S4 | Installment remaining = amount due − payments, always derived | ⏳ 5 |
 | BR-S5 | Profit uses recorded costs only; manually entered profit is never accepted | ⏳ 4 |
-| BR-P1 | Active partners' ownership percentages total 100% on every date | ⏳ 3 |

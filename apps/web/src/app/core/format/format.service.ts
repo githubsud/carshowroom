@@ -2,7 +2,7 @@ import { computed, inject, Injectable, Pipe, PipeTransform } from '@angular/core
 
 import { LanguageService } from '../i18n/language.service';
 import { TenantContextService } from '../tenant/tenant-context.service';
-import { FormatOptions, formatInteger, formatMoney } from './money-format';
+import { FormatOptions, formatInteger, formatMoney, formatPercent } from './money-format';
 
 /** The single place numbers, money and dates are formatted (SPEC §9.1). */
 @Injectable({ providedIn: 'root' })
@@ -20,6 +20,10 @@ export class FormatService {
       return '—';
     }
     return formatMoney(value, currency ?? this.context.active()?.currency_code ?? '', this.options());
+  }
+
+  percent(value: string | null | undefined): string {
+    return value === null || value === undefined ? '—' : formatPercent(value, this.options());
   }
 
   integer(value: number | null | undefined): string {
@@ -60,5 +64,14 @@ export class AppDatePipe implements PipeTransform {
 
   transform(value: string | Date | null | undefined): string {
     return this.format.date(value);
+  }
+}
+
+@Pipe({ name: 'percent', pure: false })
+export class PercentPipe implements PipeTransform {
+  private readonly format = inject(FormatService);
+
+  transform(value: string | null | undefined): string {
+    return this.format.percent(value);
   }
 }

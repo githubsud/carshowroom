@@ -57,7 +57,9 @@
     "yourRole": "دورك",
     "subscription": "الاشتراك",
     "currency": "العملة",
-    "comingNext": "لوحة الفلوس والعربيات و«محتاج متابعة» هتظهر هنا مع المراحل الجاية."
+    "comingNext": "لوحة الفلوس والعربيات و«محتاج متابعة» هتظهر هنا مع المراحل الجاية.",
+    "myPosition": "رصيدي في المعرض",
+    "openStatement": "افتح كشف الحساب"
   },
   "roles": {
     "OWNER": "المالك / الشريك المدير",
@@ -88,7 +90,9 @@
     "enable": "تفعيل",
     "sendInvite": "ابعت الدعوة",
     "inviteHint": "لو الشخص عنده حساب في معرض تاني، هيتضاف على طول. غير كده هيوصله إيميل يعيّن منه كلمة السر.",
-    "invited": "تم إرسال الدعوة"
+    "invited": "تم إرسال الدعوة",
+    "partner": "الشريك المرتبط",
+    "noPartner": "—"
   },
   "notFound": {
     "title": "الصفحة مش موجودة",
@@ -132,7 +136,15 @@
     "CASH_ACCOUNT_NOT_EMPTY": "مينفعش توقف حساب فيه رصيد. حوّل الرصيد الأول.",
     "ACCOUNT_LIMIT_REACHED": "وصلت للحد الأقصى من الحسابات في المجموعة دي.",
     "PDF_UNAVAILABLE": "ملفات PDF مش متاحة على السيرفر ده حالياً. استخدم إكسل.",
-    "DATE_RANGE_INVALID": "تاريخ البداية بعد تاريخ النهاية."
+    "DATE_RANGE_INVALID": "تاريخ البداية بعد تاريخ النهاية.",
+    "SHARES_NOT_100": "إجمالي الحصص لازم يكون ١٠٠٪ بالظبط.",
+    "SHARE_DATE_INVALID": "تاريخ التعديل لازم يكون بعد آخر تعديل للحصص.",
+    "PARTNER_INVALID": "الشريك غير موجود أو موقوف.",
+    "PARTNER_NOT_SETTLED": "مينفعش توقف شريك ليه حصة أو رصيد مفتوح. صفّي حسابه الأول.",
+    "PARTNER_ALREADY_LINKED": "الشريك ده مرتبط بمستخدم تاني.",
+    "REPAYMENT_EXCEEDS_LOAN": "مبلغ السداد أكبر من المستحق.",
+    "ENCRYPTION_UNAVAILABLE": "حفظ الرقم القومي غير متاح على السيرفر حالياً.",
+    "DECRYPTION_FAILED": "مقدرناش نقرأ الرقم القومي المحفوظ."
   },
   "finance": {
     "cashTitle": "الخزنة والبنك",
@@ -169,7 +181,18 @@
     "confirm": "تأكيد وتسجيل",
     "posted": "تم التسجيل — قيد رقم {{entryNo}}",
     "reversal": "قيد عكسي",
-    "reversed": "معكوس"
+    "reversed": "معكوس",
+    "incomeTitle": "تسجيل إيراد آخر",
+    "partnerTitle": "تسجيل حركة شريك",
+    "newIncome": "إيراد آخر",
+    "receivedIn": "اتحصّل في",
+    "incomeDescription": "البيان",
+    "fundingCash": "من الخزنة / البنك",
+    "fundingPartner": "دفعه شريك من جيبه",
+    "paidByPartner": "الشريك اللي دفع",
+    "partnerFundingMode": "يتسجل إزاي",
+    "modeCurrent": "يضاف لحسابه الجاري",
+    "modeLoan": "قرض منه للمعرض"
   },
   "journal": {
     "title": "دفتر اليومية",
@@ -227,9 +250,63 @@
   "source": {
     "GENERAL_EXPENSE": "مصروف عام",
     "TRANSFER": "تحويل",
-    "OPENING_BALANCE": "أرصدة افتتاحية"
+    "OPENING_BALANCE": "أرصدة افتتاحية",
+    "OTHER_INCOME": "إيراد آخر",
+    "PARTNER_CONTRIBUTION": "مساهمة شريك",
+    "PARTNER_CAPITAL_WITHDRAWAL": "سحب من رأس المال",
+    "PARTNER_DRAWING": "مسحوبات شريك",
+    "PARTNER_LOAN": "سلفة لشريك",
+    "PARTNER_LOAN_REPAYMENT": "سداد سلفة شريك",
+    "PARTNER_LOAN_TO_BUSINESS": "قرض من شريك",
+    "PARTNER_LOAN_TO_BUSINESS_REPAYMENT": "سداد قرض شريك"
   },
   "warnings": {
-    "CASH_NEGATIVE": "تنبيه: رصيد «{{name}}» هيبقى بالسالب ({{balanceAfter}})."
+    "CASH_NEGATIVE": "تنبيه: رصيد «{{name}}» هيبقى بالسالب ({{balanceAfter}}).",
+    "DRAWING_EXCEEDS_BALANCE": "تنبيه: مسحوبات «{{name}}» أكبر من حسابه الجاري (الرصيد بعد السحب {{balanceAfter}}).",
+    "CAPITAL_NEGATIVE": "تنبيه: رأس مال «{{name}}» هيبقى بالسالب ({{balanceAfter}})."
+  },
+  "partners": {
+    "title": "الشركاء",
+    "none": "مفيش شركاء مسجلين لسه. ضيف الشركاء وحدد حصصهم.",
+    "partner": "الشريك",
+    "share": "الحصة",
+    "capital": "رأس المال",
+    "allocatedProfit": "أرباح موزعة",
+    "drawings": "مسحوبات",
+    "current": "الحساب الجاري",
+    "loansTo": "سلف على الشريك",
+    "loansFrom": "قروض من الشريك",
+    "net": "صافي الرصيد",
+    "total": "الإجمالي",
+    "netLegend": "صافي الرصيد = رأس المال + الحساب الجاري + قروض الشريك للمعرض − السلف اللي على الشريك.",
+    "newMovement": "حركة شريك",
+    "changeShares": "تعديل الحصص",
+    "add": "إضافة شريك",
+    "addedHint": "تمت إضافة الشريك. حدّث الحصص علشان تبقى ١٠٠٪.",
+    "phone": "التليفون",
+    "nationalId": "الرقم القومي",
+    "nationalIdHint": "بيتخزن مشفّر، وبيظهر آخر ٤ أرقام بس.",
+    "reveal": "إظهار",
+    "transactionTitle": "تسجيل حركة شريك",
+    "movement": "نوع الحركة",
+    "sharesTitle": "تعديل حصص الشركاء",
+    "sharesHint": "الحصص الجديدة بتبدأ من التاريخ اللي تختاره، والقديمة بتتحفظ في السجل. لازم الإجمالي يكون ١٠٠٪ بالظبط.",
+    "effectiveFrom": "تبدأ من",
+    "splitEqually": "توزيع بالتساوي",
+    "statementTitle": "كشف حساب شريك",
+    "bucket": "البند",
+    "inFavour": "له",
+    "against": "عليه",
+    "bucket_CAPITAL": "رأس المال",
+    "bucket_CURRENT": "جاري",
+    "bucket_LOAN_TO": "سلفة",
+    "bucket_LOAN_FROM": "قرض للمعرض",
+    "kind_CONTRIBUTION": "مساهمة في رأس المال",
+    "kind_CAPITAL_WITHDRAWAL": "سحب من رأس المال",
+    "kind_DRAWING": "مسحوبات من الحصة",
+    "kind_LOAN_TO_PARTNER": "سلفة للشريك",
+    "kind_LOAN_TO_PARTNER_REPAYMENT": "سداد سلفة من الشريك",
+    "kind_LOAN_FROM_PARTNER": "قرض من الشريك للمعرض",
+    "kind_LOAN_FROM_PARTNER_REPAYMENT": "سداد قرض للشريك"
   }
 }

@@ -61,6 +61,16 @@ export const routes: Routes = [
         loadComponent: () => import('./features/settings/finance/finance-settings.page').then((m) => m.FinanceSettingsPage),
       },
       {
+        path: 'partners',
+        canActivate: [permissionGuard('partner.view_all', 'partner.view_own')],
+        loadComponent: () => import('./features/partners/partners.page').then((m) => m.PartnersPage),
+      },
+      {
+        path: 'partners/:partnerId',
+        canActivate: [permissionGuard('partner.view_all', 'partner.view_own')],
+        loadComponent: () => import('./features/partners/partner-statement.page').then((m) => m.PartnerStatementPage),
+      },
+      {
         path: 'soon/:feature',
         loadComponent: () => import('./features/misc/coming-soon.page').then((m) => m.ComingSoonPage),
       },

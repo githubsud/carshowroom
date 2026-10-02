@@ -1,0 +1,92 @@
+@if (context.can('partner.view_all')) {
+  <a class="back" [routerLink]="['/t', context.activeTenantId(), 'partners']">← {{ 'partners.title' | transloco }}</a>
+}
+
+<div class="page-header">
+  <h1 class="page-title" data-testid="statement-title">
+    {{ 'partners.statementTitle' | transloco }}@if (partner(); as p) { — {{ name(p) }} }
+  </h1>
+  @if (partner(); as p) {
+    <p-button *appCan="'partner.transact'" icon="pi pi-wallet" data-testid="statement-new-txn"
+              [label]="'partners.newMovement' | transloco" (onClick)="txnOpen.set(true)"
+              [disabled]="accounts().length === 0 || p.archived" />
+  }
+</div>
+
+@if (partner(); as p) {
+  <p class="meta">
+    {{ 'partners.share' | transloco }}: {{ p.percentage | percent }}
+    @if (p.national_id_masked) {
+      · {{ 'partners.nationalId' | transloco }}: <span dir="ltr">{{ nationalId() ?? p.national_id_masked }}</span>
+      @if (!nationalId()) {
+        <p-button *appCan="'partner.equity.change'" [text]="true" size="small" [label]="'partners.reveal' | transloco"
+                  (onClick)="reveal()" />
+      }
+    }
+  </p>
+}
+
+<div class="toolbar">
+  <label><span>{{ 'finance.from' | transloco }}</span>
+    <input pInputText type="date" [(ngModel)]="dateFrom" (change)="load()" /></label>
+  <label><span>{{ 'finance.to' | transloco }}</span>
+    <input pInputText type="date" [(ngModel)]="dateTo" (change)="load()" /></label>
+  <span class="exports">
+    <p-button icon="pi pi-file-excel" [text]="true" [label]="'finance.excel' | transloco"
+              [loading]="downloading() === 'xlsx'" (onClick)="download('xlsx')" data-testid="statement-xlsx" />
+    <p-button icon="pi pi-file-pdf" [text]="true" label="PDF" [loading]="downloading() === 'pdf'" (onClick)="download('pdf')" />
+  </span>
+</div>
+
+@if (loadError()) {
+  <app-state kind="error" [message]="loadError()" (retry)="load()" />
+} @else if (statement(); as s) {
+  <h2 class="section">{{ 'finance.closing' | transloco }} ({{ s.date_to | appDate }})</h2>
+  <div class="positions" data-testid="closing-position">
+    @for (card of cards(s.closing); track card.key) {
+      <div class="position" [class.net]="card.net">
+        <span>{{ card.key | transloco }}</span>
+        <strong [class.negative]="negative(card.value)">{{ card.value | money }}</strong>
+      </div>
+    }
+  </div>
+
+  <p-table [value]="s.lines" [loading]="loading()" styleClass="p-datatable-sm" data-testid="statement-lines">
+    <ng-template #header>
+      <tr>
+        <th>{{ 'finance.date' | transloco }}</th>
+        <th>{{ 'finance.description' | transloco }}</th>
+        <th>{{ 'partners.bucket' | transloco }}</th>
+        <th class="num">{{ 'partners.inFavour' | transloco }}</th>
+        <th class="num">{{ 'partners.against' | transloco }}</th>
+        <th class="num">{{ 'finance.balance' | transloco }}</th>
+      </tr>
+      <tr class="opening">
+        <td colspan="5">{{ 'finance.opening' | transloco }}</td>
+        <td class="num">{{ s.opening.net | money }}</td>
+      </tr>
+    </ng-template>
+    <ng-template #body let-line>
+      <tr [class.muted]="line.reversed || line.is_reversal">
+        <td>{{ line.entry_date | appDate }}<div class="sub">#{{ line.entry_no }}</div></td>
+        <td>
+          {{ line.description }}
+          @if (line.is_reversal) { <p-tag severity="warn" [value]="'finance.reversal' | transloco" /> }
+          @if (line.reversed) { <p-tag severity="secondary" [value]="'finance.reversed' | transloco" /> }
+        </td>
+        <td>{{ 'partners.bucket_' + line.bucket | transloco }}</td>
+        <td class="num">{{ line.amount_in === '0.00' ? '' : (line.amount_in | money) }}</td>
+        <td class="num">{{ line.amount_out === '0.00' ? '' : (line.amount_out | money) }}</td>
+        <td class="num" [class.negative]="negative(line.running_net)">{{ line.running_net | money }}</td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr><td colspan="6"><app-state kind="empty" [message]="'finance.noMovements' | transloco" /></td></tr>
+    </ng-template>
+  </p-table>
+}
+
+@if (partner(); as p) {
+  <app-partner-transaction-dialog [(visible)]="txnOpen" [partners]="[p]" [accounts]="accounts()"
+                                  [presetPartnerId]="p.id" (posted)="onPosted($event)" />
+}

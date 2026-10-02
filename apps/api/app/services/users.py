@@ -148,12 +148,27 @@ def update_member(
         values["role_id"] = _role_id(conn, changes.role_code)
     if changes.status is not None:
         values["status"] = changes.status
+    if "partner_id" in changes.model_fields_set:
+        if changes.partner_id is not None:
+            exists = conn.execute(
+                text("select 1 from public.partners where id = :id and archived_at is null"),
+                {"id": changes.partner_id},
+            ).first()
+            if exists is None:
+                raise AppError("PARTNER_INVALID", "Unknown or archived partner", status_code=422)
+        values["partner_id"] = changes.partner_id
     if values:
         assignments = ", ".join(f"{column} = :{column}" for column in values)
-        conn.execute(
-            text(f"update public.memberships set {assignments} where id = :membership_id"),  # noqa: S608
-            {**values, "membership_id": membership_id},
-        )
+        try:
+            with conn.begin_nested():
+                conn.execute(
+                    text(f"update public.memberships set {assignments} where id = :membership_id"),  # noqa: S608
+                    {**values, "membership_id": membership_id},
+                )
+        except IntegrityError as exc:
+            raise AppError(
+                "PARTNER_ALREADY_LINKED", "This partner is already linked to another user", status_code=409
+            ) from exc
         record_event(
             conn,
             tenant_id=tenant_id,
@@ -161,6 +176,6 @@ def update_member(
             action="MEMBERSHIP_CHANGED",
             entity_type="memberships",
             entity_id=str(membership_id),
-            details=changes.model_dump(exclude_unset=True),
+            details=changes.model_dump(mode="json", exclude_unset=True),
         )
     return next(m for m in list_members(conn) if m.membership_id == membership_id)

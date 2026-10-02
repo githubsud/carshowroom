@@ -3,6 +3,9 @@
   <div class="header-actions" *appCan="'cash.transact'">
     <p-button icon="pi pi-minus-circle" data-testid="new-expense" [label]="'finance.newExpense' | transloco"
               (onClick)="expenseOpen.set(true)" [disabled]="accounts().length === 0" />
+    <p-button icon="pi pi-plus-circle" severity="secondary" data-testid="new-income"
+              [label]="'finance.newIncome' | transloco" (onClick)="incomeOpen.set(true)"
+              [disabled]="accounts().length === 0" />
     <p-button icon="pi pi-arrow-right-arrow-left" severity="secondary" data-testid="new-transfer"
               [label]="'finance.newTransfer' | transloco" (onClick)="transferOpen.set(true)"
               [disabled]="accounts().length < 2" />
@@ -162,5 +165,7 @@
   }
 }
 
-<app-expense-dialog [(visible)]="expenseOpen" [accounts]="accounts()" [categories]="categories()" (posted)="onPosted($event)" />
+<app-expense-dialog [(visible)]="expenseOpen" [accounts]="accounts()" [categories]="categories()"
+                    [partners]="partners()" (posted)="onPosted($event)" />
+<app-income-dialog [(visible)]="incomeOpen" [accounts]="accounts()" (posted)="onPosted($event)" />
 <app-transfer-dialog [(visible)]="transferOpen" [accounts]="accounts()" (posted)="onPosted($event)" />

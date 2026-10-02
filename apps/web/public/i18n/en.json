@@ -57,7 +57,9 @@
     "yourRole": "Your role",
     "subscription": "Subscription",
     "currency": "Currency",
-    "comingNext": "The money and stock dashboard and the Needs Attention panel will appear here in the next phases."
+    "comingNext": "The money and stock dashboard and the Needs Attention panel will appear here in the next phases.",
+    "myPosition": "My position",
+    "openStatement": "Open my statement"
   },
   "roles": {
     "OWNER": "Owner / Managing partner",
@@ -88,7 +90,9 @@
     "enable": "Enable",
     "sendInvite": "Send invitation",
     "inviteHint": "Someone who already has an account in another showroom is added right away. Others receive an email to set their password.",
-    "invited": "Invitation sent"
+    "invited": "Invitation sent",
+    "partner": "Linked partner",
+    "noPartner": "—"
   },
   "notFound": {
     "title": "Page not found",
@@ -132,7 +136,15 @@
     "CASH_ACCOUNT_NOT_EMPTY": "An account with a balance cannot be archived. Transfer the balance first.",
     "ACCOUNT_LIMIT_REACHED": "The maximum number of accounts in this group has been reached.",
     "PDF_UNAVAILABLE": "PDF is not available on this server right now. Use Excel.",
-    "DATE_RANGE_INVALID": "The start date is after the end date."
+    "DATE_RANGE_INVALID": "The start date is after the end date.",
+    "SHARES_NOT_100": "Shares must total exactly 100%.",
+    "SHARE_DATE_INVALID": "A share change must start after the last one.",
+    "PARTNER_INVALID": "The partner does not exist or is archived.",
+    "PARTNER_NOT_SETTLED": "A partner with a share or an open balance cannot be archived. Settle first.",
+    "PARTNER_ALREADY_LINKED": "This partner is already linked to another user.",
+    "REPAYMENT_EXCEEDS_LOAN": "The repayment is more than what is owed.",
+    "ENCRYPTION_UNAVAILABLE": "National IDs cannot be stored on this server right now.",
+    "DECRYPTION_FAILED": "The stored national ID cannot be read."
   },
   "finance": {
     "cashTitle": "Cash & bank",
@@ -169,7 +181,18 @@
     "confirm": "Confirm and record",
     "posted": "Recorded — entry #{{entryNo}}",
     "reversal": "reversal",
-    "reversed": "reversed"
+    "reversed": "reversed",
+    "incomeTitle": "Record other income",
+    "partnerTitle": "Record a partner movement",
+    "newIncome": "Other income",
+    "receivedIn": "Received in",
+    "incomeDescription": "Description",
+    "fundingCash": "From cash / bank",
+    "fundingPartner": "Paid by a partner",
+    "paidByPartner": "Partner who paid",
+    "partnerFundingMode": "Record as",
+    "modeCurrent": "Credit to current account",
+    "modeLoan": "Loan from the partner"
   },
   "journal": {
     "title": "Journal",
@@ -227,9 +250,63 @@
   "source": {
     "GENERAL_EXPENSE": "General expense",
     "TRANSFER": "Transfer",
-    "OPENING_BALANCE": "Opening balances"
+    "OPENING_BALANCE": "Opening balances",
+    "OTHER_INCOME": "Other income",
+    "PARTNER_CONTRIBUTION": "Partner contribution",
+    "PARTNER_CAPITAL_WITHDRAWAL": "Capital withdrawal",
+    "PARTNER_DRAWING": "Partner drawing",
+    "PARTNER_LOAN": "Loan to partner",
+    "PARTNER_LOAN_REPAYMENT": "Partner loan repayment",
+    "PARTNER_LOAN_TO_BUSINESS": "Loan from partner",
+    "PARTNER_LOAN_TO_BUSINESS_REPAYMENT": "Repayment to partner"
   },
   "warnings": {
-    "CASH_NEGATIVE": "Warning: “{{name}}” will go negative ({{balanceAfter}})."
+    "CASH_NEGATIVE": "Warning: “{{name}}” will go negative ({{balanceAfter}}).",
+    "DRAWING_EXCEEDS_BALANCE": "Warning: “{{name}}” has drawn more than the current account ({{balanceAfter}} after).",
+    "CAPITAL_NEGATIVE": "Warning: “{{name}}” capital will go negative ({{balanceAfter}})."
+  },
+  "partners": {
+    "title": "Partners",
+    "none": "No partners yet. Add the partners and set their shares.",
+    "partner": "Partner",
+    "share": "Share",
+    "capital": "Capital",
+    "allocatedProfit": "Profit allocated",
+    "drawings": "Drawings",
+    "current": "Current account",
+    "loansTo": "Loans to partner",
+    "loansFrom": "Loans from partner",
+    "net": "Net balance",
+    "total": "Total",
+    "netLegend": "Net balance = capital + current account + loans from the partner − loans to the partner.",
+    "newMovement": "Partner movement",
+    "changeShares": "Change shares",
+    "add": "Add partner",
+    "addedHint": "Partner added. Update the shares so they total 100%.",
+    "phone": "Phone",
+    "nationalId": "National ID",
+    "nationalIdHint": "Stored encrypted; only the last 4 digits are shown.",
+    "reveal": "Show",
+    "transactionTitle": "Record a partner movement",
+    "movement": "Movement",
+    "sharesTitle": "Change ownership shares",
+    "sharesHint": "New shares start on the date you choose; the old ones stay in the history. The total must be exactly 100%.",
+    "effectiveFrom": "Effective from",
+    "splitEqually": "Split equally",
+    "statementTitle": "Partner statement",
+    "bucket": "Bucket",
+    "inFavour": "In favour",
+    "against": "Against",
+    "bucket_CAPITAL": "Capital",
+    "bucket_CURRENT": "Current",
+    "bucket_LOAN_TO": "Loan to partner",
+    "bucket_LOAN_FROM": "Loan from partner",
+    "kind_CONTRIBUTION": "Capital contribution",
+    "kind_CAPITAL_WITHDRAWAL": "Capital withdrawal",
+    "kind_DRAWING": "Drawing from share",
+    "kind_LOAN_TO_PARTNER": "Loan to partner",
+    "kind_LOAN_TO_PARTNER_REPAYMENT": "Partner repays loan",
+    "kind_LOAN_FROM_PARTNER": "Partner lends the showroom",
+    "kind_LOAN_FROM_PARTNER_REPAYMENT": "Showroom repays partner"
   }
 }

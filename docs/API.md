@@ -60,6 +60,12 @@ Endpoint status codes: `200` read, `201` created/posted, `204` no content, `400`
 | `PAPER_INVALID_TRANSITION` | 409 | Deferred paper status |
 | `SHARES_NOT_100` | 422 | `details.date`, `details.total` |
 | `PARTNER_INACTIVE` | 422 | |
+| `PARTNER_INVALID` | 422 | Unknown, archived or another showroom's partner |
+| `SHARE_DATE_INVALID` | 422 | New batch not after the latest change (D-64) |
+| `REPAYMENT_EXCEEDS_LOAN` | 422 | More than is owed (D-63) |
+| `PARTNER_NOT_SETTLED` | 409 | Archive refused: open share or balance (D-62) |
+| `PARTNER_ALREADY_LINKED` | 409 | Partner already linked to another user (D-66) |
+| `ENCRYPTION_UNAVAILABLE` | 503 | `NATIONAL_ID_KEY` not configured |
 | `CONSIGNMENT_TERMS_INVALID` | 422 | |
 | `DISTRIBUTION_PERIOD_OVERLAP` | 409 | Period already distributed |
 | `IMPORT_NOT_VALIDATED` / `IMPORT_HAS_ERRORS` | 409 / 422 | |
@@ -116,13 +122,10 @@ Legend: 💰 money-moving (Idempotency-Key, transaction, journal entry); 👁 pr
 | POST/PATCH | `/partners`, `/partners/{id}` | `partner.equity.change` | Master data (name, phone, national_id, notes) |
 | GET | `/partners/shares?as_of=` | `partner.view_all` | Active shares on a date |
 | POST | `/partners/shares` | `partner.equity.change` | `{effective_from, shares: [{partner_id, percentage}]}` → **a batch that must sum to 100.0000** (D-21) |
-| POST 💰👁 | `/partners/{id}/contributions` | `partner.transact` | `{date, amount, cash_account_id, notes}` → rule 1 |
-| POST 💰👁 | `/partners/{id}/withdrawals` | `partner.transact` + `partner.equity.change` | same shape → rule 2 |
-| POST 💰👁 | `/partners/{id}/drawings` | `partner.transact` | same → rule 3; warning `DRAWING_EXCEEDS_BALANCE` (Q-17) |
-| POST 💰👁 | `/partners/{id}/loans` | `partner.transact` | same → rule 4 |
-| POST 💰👁 | `/partners/{id}/loan-repayments` | `partner.transact` | same → rule 5 |
-| POST 💰👁 | `/partners/{id}/loans-to-business` | `partner.transact` | same → rule 28 |
-| POST 💰👁 | `/partners/{id}/loans-to-business/repayments` | `partner.transact` | same → rule 29 |
+| GET | `/partners/shares/history` | `partner.view_all` (or own rows) | Every share row, newest batch first |
+| GET | `/partners/{id}/national-id` | `partner.equity.change` | Full number; audit-logged (D-65) |
+| POST 💰👁 | `/partners/{id}/transactions` (+ `/preview`) | `partner.transact`; `CAPITAL_WITHDRAWAL` also `partner.equity.change` | One endpoint for all seven movements (as built; replaces the per-rule paths of the design). `type` = `CONTRIBUTION` (rule 1), `CAPITAL_WITHDRAWAL` (2), `DRAWING` (3), `LOAN_TO_PARTNER` (4), `LOAN_TO_PARTNER_REPAYMENT` (5), `LOAN_FROM_PARTNER` (28), `LOAN_FROM_PARTNER_REPAYMENT` (29). Warnings `DRAWING_EXCEEDS_BALANCE`, `CAPITAL_NEGATIVE` (D-63) |
+| GET | `/partners/{id}/transactions` | as statement | Posted movements |
 | GET | `/partners/{id}/statement?from=&to=&format=json\|pdf\|xlsx` | `partner.view_all` or (`partner.view_own` and own id) | → `{partner, opening: {capital, current, loans_to, loans_from, net}, lines: [{date, entry_no, description, bucket: CAPITAL\|CURRENT\|LOAN_TO\|LOAN_FROM, amount_in, amount_out, running_net}], closing: {...}}` |
 | GET | `/partners/summary?as_of=` | `partner.view_all` | `[{partner_id, name, percentage, capital, allocated_profit, drawings, loans_outstanding, loans_from_partner, net_balance}]` |
 

@@ -15,6 +15,8 @@ import {
   GeneralExpensePage,
   JournalEntry,
   JournalEntryPage,
+  OtherIncomeInput,
+  OtherIncomePosting,
   Period,
   Preview,
   ReverseInput,
@@ -93,6 +95,18 @@ export class FinanceService {
   recordTransfer(body: TransferInput, idempotencyKey: string): Promise<TransferPosting> {
     return firstValueFrom(
       this.http.post<TransferPosting>(`${this.base}/transfers`, body, { headers: { 'Idempotency-Key': idempotencyKey } }),
+    );
+  }
+
+  previewIncome(body: OtherIncomeInput): Promise<Preview> {
+    return firstValueFrom(this.http.post<Preview>(`${this.base}/other-incomes/preview`, body));
+  }
+
+  recordIncome(body: OtherIncomeInput, idempotencyKey: string): Promise<OtherIncomePosting> {
+    return firstValueFrom(
+      this.http.post<OtherIncomePosting>(`${this.base}/other-incomes`, body, {
+        headers: { 'Idempotency-Key': idempotencyKey },
+      }),
     );
   }
 

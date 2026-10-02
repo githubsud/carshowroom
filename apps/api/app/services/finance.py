@@ -28,6 +28,8 @@ from app.domain.finance import (
     ExpenseCategoryUpdate,
     GeneralExpenseIn,
     GeneralExpenseOut,
+    OtherIncomeIn,
+    OtherIncomeOut,
     Page,
     PaymentMethodOut,
     PostingResult,
@@ -248,13 +250,13 @@ def update_cash_account(conn: Connection, cash_account_id: UUID, changes: CashAc
 
 
 @dataclass(frozen=True)
-class _ActiveCashAccount:
+class ActiveCashAccount:
     ref: CashAccountRef
     name_ar: str
     name_en: str
 
 
-def _active_cash_account(conn: Connection, cash_account_id: UUID) -> _ActiveCashAccount:
+def active_cash_account(conn: Connection, cash_account_id: UUID) -> ActiveCashAccount:
     row = conn.execute(
         text(
             "select id, ledger_account_id, name_ar, name_en from public.cash_accounts "
@@ -269,7 +271,7 @@ def _active_cash_account(conn: Connection, cash_account_id: UUID) -> _ActiveCash
             status_code=422,
             details={"cash_account_id": str(cash_account_id)},
         )
-    return _ActiveCashAccount(
+    return ActiveCashAccount(
         ref=CashAccountRef(cash_account_id=row.id, ledger_account_id=row.ledger_account_id),
         name_ar=row.name_ar,
         name_en=row.name_en or row.name_ar,
@@ -433,41 +435,41 @@ def list_payment_methods(conn: Connection) -> list[PaymentMethodOut]:
 # --- Previews ----------------------------------------------------------------------------------
 
 
-def _preview_lines(conn: Connection, draft: EntryDraft) -> list[PreviewLine]:
+def preview_lines(conn: Connection, draft: EntryDraft) -> list[PreviewLine]:
+    """Debit/credit lines for users with journal access (system-key accounts resolved)."""
+    system = engine.system_accounts(conn)
+    ids = [line.account.resolve(system) for line in draft.lines]
     accounts = {
         row.id: row
         for row in conn.execute(
-            text("select id, code, name_ar, name_en from public.ledger_accounts where id = any(:ids)"),
-            {"ids": [line.account.ledger_account_id for line in draft.lines]},
+            text("select id, code, name_ar, name_en from public.ledger_accounts where id = any(:ids)"), {"ids": ids}
         )
     }
-    lines = []
-    for line in draft.lines:
-        account = accounts[line.account.ledger_account_id]
-        lines.append(
-            PreviewLine(
-                account_code=account.code,
-                account_name_ar=account.name_ar,
-                account_name_en=account.name_en,
-                debit=line.debit,
-                credit=line.credit,
-            )
+    return [
+        PreviewLine(
+            account_code=accounts[account_id].code,
+            account_name_ar=accounts[account_id].name_ar,
+            account_name_en=accounts[account_id].name_en,
+            debit=line.debit,
+            credit=line.credit,
         )
-    return lines
+        for line, account_id in zip(draft.lines, ids, strict=True)
+    ]
 
 
 def _money_texts(amount: Decimal, info: TenantInfo) -> tuple[str, str]:
     return format_money(amount, info.currency, "ar"), format_money(amount, info.currency, "en")
 
 
-# --- General expenses (rule 20) ---------------------------------------------------------------------
+# --- General expenses (rule 20; rule 30 when a partner paid personally) -----------------------------
 
 
 @dataclass(frozen=True)
 class _ExpensePlan:
     draft: EntryDraft
     category: Any
-    cash: _ActiveCashAccount
+    cash: ActiveCashAccount | None
+    partner: Any | None
 
 
 def _plan_expense(conn: Connection, info: TenantInfo, payload: GeneralExpenseIn) -> _ExpensePlan:
@@ -481,16 +483,39 @@ def _plan_expense(conn: Connection, info: TenantInfo, payload: GeneralExpenseIn)
     ).first()
     if category is None or category.kind != "GENERAL":
         raise AppError("CATEGORY_INVALID", "Choose an active general expense category", status_code=422)
-    cash = _active_cash_account(conn, payload.cash_account_id)
+    description = payload.description or category.name_ar
+    expense_account = Account.by_id(category.ledger_account_id)
+
+    if payload.paid_by_partner_id is not None and payload.partner_funding_mode is not None:
+        partner = conn.execute(
+            text("select id, name_ar, name_en from public.partners where id = :id and archived_at is null"),
+            {"id": payload.paid_by_partner_id},
+        ).first()
+        if partner is None:
+            raise AppError("PARTNER_INVALID", "Unknown or archived partner", status_code=422)
+        draft = rules.general_expense_paid_by_partner(
+            entry_date=payload.expense_date,
+            amount=payload.amount,
+            expense_account=expense_account,
+            partner_id=partner.id,
+            mode=payload.partner_funding_mode,
+            description=description,
+            source_id=None,
+        )
+        return _ExpensePlan(draft=draft, category=category, cash=None, partner=partner)
+
+    if payload.cash_account_id is None:  # guarded by the model validator
+        raise AppError("VALIDATION_ERROR", "Choose how the expense was paid", status_code=422)
+    cash = active_cash_account(conn, payload.cash_account_id)
     draft = rules.general_expense(
         entry_date=payload.expense_date,
         amount=payload.amount,
-        expense_account=Account.by_id(category.ledger_account_id),
+        expense_account=expense_account,
         paid_from=cash.ref,
-        description=payload.description or category.name_ar,
+        description=description,
         source_id=None,
     )
-    return _ExpensePlan(draft=draft, category=category, cash=cash)
+    return _ExpensePlan(draft=draft, category=category, cash=cash, partner=None)
 
 
 def preview_expense(conn: Connection, payload: GeneralExpenseIn, *, with_lines: bool) -> Preview:
@@ -499,22 +524,42 @@ def preview_expense(conn: Connection, payload: GeneralExpenseIn, *, with_lines: 
     ensure_period_open(conn, payload.expense_date)
     warnings = check_cash(conn, info, plan.draft.cash_effects(), lock=False)
     amount_ar, amount_en = _money_texts(payload.amount, info)
-    return Preview(
-        summary_ar=(
-            f"سيتم خصم {amount_ar} من «{plan.cash.name_ar}» وتسجيلها كمصروف «{plan.category.name_ar}» "
-            f"بتاريخ {ltr(payload.expense_date.isoformat())}."
-        ),
-        summary_en=(
+    on_ar, on_en = ltr(payload.expense_date.isoformat()), payload.expense_date.isoformat()
+    if plan.partner is not None:
+        partner_en = plan.partner.name_en or plan.partner.name_ar
+        if payload.partner_funding_mode == "LOAN":
+            how_ar, how_en = "ويُسجَّل كقرض منه للمعرض", "recorded as a loan from the partner"
+        else:
+            how_ar, how_en = "ويُضاف لحسابه الجاري", "credited to the partner's current account"
+        summary_ar = (
+            f"سيتم تسجيل مصروف «{plan.category.name_ar}» بقيمة {amount_ar} دفعه الشريك {plan.partner.name_ar} "
+            f"من ماله الخاص {how_ar}، بتاريخ {on_ar}. الخزنة لن تتأثر."
+        )
+        summary_en = (
+            f"A “{plan.category.name_en}” expense of {amount_en} paid personally by partner {partner_en}, "
+            f"{how_en}, on {on_en}. No cash leaves the showroom."
+        )
+        effects: list[PreviewEffect] = []
+    else:
+        assert plan.cash is not None  # noqa: S101 - set whenever partner is None
+        summary_ar = (
+            f"سيتم خصم {amount_ar} من «{plan.cash.name_ar}» وتسجيلها كمصروف «{plan.category.name_ar}» بتاريخ {on_ar}."
+        )
+        summary_en = (
             f"{amount_en} will be paid from “{plan.cash.name_en}” and recorded as a “{plan.category.name_en}” "
-            f"expense on {payload.expense_date.isoformat()}."
-        ),
-        effects=[
+            f"expense on {on_en}."
+        )
+        effects = [
             PreviewEffect(
                 direction="OUT", label_ar=plan.cash.name_ar, label_en=plan.cash.name_en, amount=payload.amount
-            ),
-        ],
+            )
+        ]
+    return Preview(
+        summary_ar=summary_ar,
+        summary_en=summary_en,
+        effects=effects,
         warnings=warnings,
-        lines=_preview_lines(conn, plan.draft) if with_lines else None,
+        lines=preview_lines(conn, plan.draft) if with_lines else None,
     )
 
 
@@ -528,10 +573,11 @@ def record_expense(conn: Connection, payload: GeneralExpenseIn) -> PostingResult
         text(
             """
             insert into public.general_expenses
-              (id, tenant_id, expense_date, category_id, amount, description, cash_account_id, journal_entry_id)
+              (id, tenant_id, expense_date, category_id, amount, description, cash_account_id,
+               paid_by_partner_id, partner_funding_mode, journal_entry_id)
             values
               (:id, private.current_tenant_id(), :expense_date, :category_id, :amount, :description,
-               :cash_account_id, :journal_entry_id)
+               :cash_account_id, :paid_by_partner_id, :partner_funding_mode, :journal_entry_id)
             """
         ),
         {**payload.model_dump(), "id": document_id, "journal_entry_id": posted.id},
@@ -546,11 +592,12 @@ def record_expense(conn: Connection, payload: GeneralExpenseIn) -> PostingResult
 _EXPENSES = """
     select ge.id, ge.expense_date, ge.category_id, ec.name_ar as category_name_ar, ec.name_en as category_name_en,
            ge.amount, ge.description, ge.cash_account_id, ca.name_ar as cash_account_name_ar,
-           ca.name_en as cash_account_name_en, ge.status, je.entry_no, rje.entry_no as reversal_entry_no,
-           ge.created_at
+           ca.name_en as cash_account_name_en, ge.paid_by_partner_id, pa.name_ar as paid_by_partner_name_ar,
+           ge.partner_funding_mode, ge.status, je.entry_no, rje.entry_no as reversal_entry_no, ge.created_at
       from public.general_expenses ge
       join public.expense_categories ec on ec.id = ge.category_id
-      join public.cash_accounts ca on ca.id = ge.cash_account_id
+      left join public.cash_accounts ca on ca.id = ge.cash_account_id
+      left join public.partners pa on pa.id = ge.paid_by_partner_id
       join public.journal_entries je on je.id = ge.journal_entry_id
       left join public.journal_entries rje on rje.id = ge.reversal_entry_id
 """
@@ -597,16 +644,16 @@ def list_expenses(
 @dataclass(frozen=True)
 class _TransferPlan:
     draft: EntryDraft
-    source: _ActiveCashAccount
-    destination: _ActiveCashAccount
+    source: ActiveCashAccount
+    destination: ActiveCashAccount
 
 
 def _plan_transfer(conn: Connection, info: TenantInfo, payload: TransferIn) -> _TransferPlan:
     check_entry_date(info, payload.transfer_date)
     if payload.from_cash_account_id == payload.to_cash_account_id:
         raise AppError("TRANSFER_SAME_ACCOUNT", "Choose two different accounts", status_code=422)
-    source = _active_cash_account(conn, payload.from_cash_account_id)
-    destination = _active_cash_account(conn, payload.to_cash_account_id)
+    source = active_cash_account(conn, payload.from_cash_account_id)
+    destination = active_cash_account(conn, payload.to_cash_account_id)
     draft = rules.transfer(
         entry_date=payload.transfer_date,
         amount=payload.amount,
@@ -648,7 +695,7 @@ def preview_transfer(conn: Connection, payload: TransferIn, *, with_lines: bool)
             ),
         ],
         warnings=warnings,
-        lines=_preview_lines(conn, plan.draft) if with_lines else None,
+        lines=preview_lines(conn, plan.draft) if with_lines else None,
     )
 
 
@@ -715,6 +762,91 @@ def list_transfers(
         page_size=page_size,
         total=total,
     )
+
+
+# --- Other income (P-01, approved 2026-10-02) ---------------------------------------------------------
+
+
+def _plan_income(conn: Connection, info: TenantInfo, payload: OtherIncomeIn) -> tuple[EntryDraft, ActiveCashAccount]:
+    check_entry_date(info, payload.income_date)
+    cash = active_cash_account(conn, payload.cash_account_id)
+    draft = rules.other_income(
+        entry_date=payload.income_date,
+        amount=payload.amount,
+        received_in=cash.ref,
+        description=payload.description,
+        source_id=None,
+    )
+    return draft, cash
+
+
+def preview_income(conn: Connection, payload: OtherIncomeIn, *, with_lines: bool) -> Preview:
+    info = tenant_info(conn)
+    draft, cash = _plan_income(conn, info, payload)
+    ensure_period_open(conn, payload.income_date)
+    amount_ar, amount_en = _money_texts(payload.amount, info)
+    return Preview(
+        summary_ar=(
+            f"سيتم إضافة {amount_ar} إلى «{cash.name_ar}» وتسجيلها كإيراد آخر «{payload.description}» "
+            f"بتاريخ {ltr(payload.income_date.isoformat())}."
+        ),
+        summary_en=(
+            f"{amount_en} will be added to “{cash.name_en}” as other income “{payload.description}” "
+            f"on {payload.income_date.isoformat()}."
+        ),
+        effects=[PreviewEffect(direction="IN", label_ar=cash.name_ar, label_en=cash.name_en, amount=payload.amount)],
+        lines=preview_lines(conn, draft) if with_lines else None,
+    )
+
+
+def record_income(conn: Connection, payload: OtherIncomeIn) -> PostingResult[OtherIncomeOut]:
+    info = tenant_info(conn)
+    draft, _ = _plan_income(conn, info, payload)
+    document_id = uuid4()
+    posted = engine.post(conn, replace(draft, source_id=document_id))
+    conn.execute(
+        text(
+            """
+            insert into public.other_incomes
+              (id, tenant_id, income_date, amount, description, cash_account_id, journal_entry_id)
+            values
+              (:id, private.current_tenant_id(), :income_date, :amount, :description, :cash_account_id,
+               :journal_entry_id)
+            """
+        ),
+        {**payload.model_dump(), "id": document_id, "journal_entry_id": posted.id},
+    )
+    return PostingResult[OtherIncomeOut](
+        document=get_income(conn, document_id),
+        journal_entries=[EntryRef(id=posted.id, entry_no=posted.entry_no)],
+    )
+
+
+_INCOMES = """
+    select oi.id, oi.income_date, oi.amount, oi.description, oi.cash_account_id, ca.name_ar as cash_account_name_ar,
+           ca.name_en as cash_account_name_en, oi.status, je.entry_no, rje.entry_no as reversal_entry_no
+      from public.other_incomes oi
+      join public.cash_accounts ca on ca.id = oi.cash_account_id
+      join public.journal_entries je on je.id = oi.journal_entry_id
+      left join public.journal_entries rje on rje.id = oi.reversal_entry_id
+"""
+
+
+def get_income(conn: Connection, income_id: UUID) -> OtherIncomeOut:
+    row = conn.execute(text(_INCOMES + " where oi.id = :id"), {"id": income_id}).mappings().first()
+    if row is None:
+        raise not_found("other income")
+    return OtherIncomeOut.model_validate(dict(row))
+
+
+def list_incomes(conn: Connection, *, date_from: date | None, date_to: date | None) -> list[OtherIncomeOut]:
+    where = """
+     where (cast(:date_from as date) is null or oi.income_date >= :date_from)
+       and (cast(:date_to as date) is null or oi.income_date <= :date_to)
+     order by oi.income_date desc, je.entry_no desc
+    """
+    rows = conn.execute(text(_INCOMES + where), {"date_from": date_from, "date_to": date_to}).mappings()
+    return [OtherIncomeOut.model_validate(dict(row)) for row in rows]
 
 
 # --- Cash book (SPEC §4.10, §4.12 #3) --------------------------------------------------------------------

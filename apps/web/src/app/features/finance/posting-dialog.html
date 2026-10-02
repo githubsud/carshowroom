@@ -2,7 +2,7 @@
   [visible]="visible()"
   (visibleChange)="visible.set($event)"
   [modal]="true"
-  [header]="(kind === 'expense' ? 'finance.expenseTitle' : 'finance.transferTitle') | transloco"
+  [header]="'finance.' + kind + 'Title' | transloco"
   [style]="{ width: 'min(480px, 96vw)' }"
   [dismissableMask]="!busy()"
 >
@@ -32,36 +32,71 @@
         }
       </div>
 
-      @if (kind === 'expense') {
-        <div class="field">
-          <label for="paid-from">{{ 'finance.paidFrom' | transloco }}</label>
-          <p-select inputId="paid-from" formControlName="cash_account_id" [options]="accountOptions()"
-                    optionLabel="label" optionValue="value" [fluid]="true" />
-        </div>
-      } @else {
-        <div class="field">
-          <label for="from">{{ 'finance.from' | transloco }}</label>
-          <p-select inputId="from" formControlName="from_cash_account_id" [options]="accountOptions()"
-                    optionLabel="label" optionValue="value" [fluid]="true" />
-        </div>
-        <div class="field">
-          <label for="to">{{ 'finance.to' | transloco }}</label>
-          <p-select inputId="to" formControlName="to_cash_account_id" [options]="accountOptions()"
-                    optionLabel="label" optionValue="value" [fluid]="true" />
-        </div>
-        @if (form.hasError('sameAccount')) {
-          <small class="invalid">{{ 'errors.TRANSFER_SAME_ACCOUNT' | transloco }}</small>
+      @switch (kind) {
+        @case ('expense') {
+          @if (partnerOptions().length > 0) {
+            <p-selectbutton
+              [options]="fundingOptions()"
+              [ngModel]="funding()"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="setFunding($event)"
+              optionLabel="label"
+              optionValue="value"
+              [allowEmpty]="false"
+              data-testid="funding"
+            />
+          }
+          @if (funding() === 'cash') {
+            <div class="field">
+              <label for="paid-from">{{ 'finance.paidFrom' | transloco }}</label>
+              <p-select inputId="paid-from" formControlName="cash_account_id" [options]="accountOptions()"
+                        optionLabel="label" optionValue="value" [fluid]="true" />
+            </div>
+          } @else {
+            <div class="field">
+              <label for="partner">{{ 'finance.paidByPartner' | transloco }}</label>
+              <p-select inputId="partner" formControlName="paid_by_partner_id" [options]="partnerOptions()"
+                        optionLabel="label" optionValue="value" [fluid]="true" data-testid="paid-by-partner" />
+            </div>
+            <div class="field">
+              <label for="mode">{{ 'finance.partnerFundingMode' | transloco }}</label>
+              <p-select inputId="mode" formControlName="partner_funding_mode" [options]="modeOptions()"
+                        optionLabel="label" optionValue="value" [fluid]="true" />
+            </div>
+          }
+        }
+        @case ('transfer') {
+          <div class="field">
+            <label for="from">{{ 'finance.from' | transloco }}</label>
+            <p-select inputId="from" formControlName="from_cash_account_id" [options]="accountOptions()"
+                      optionLabel="label" optionValue="value" [fluid]="true" />
+          </div>
+          <div class="field">
+            <label for="to">{{ 'finance.to' | transloco }}</label>
+            <p-select inputId="to" formControlName="to_cash_account_id" [options]="accountOptions()"
+                      optionLabel="label" optionValue="value" [fluid]="true" />
+          </div>
+          @if (form.hasError('sameAccount')) {
+            <small class="invalid">{{ 'errors.TRANSFER_SAME_ACCOUNT' | transloco }}</small>
+          }
+        }
+        @case ('income') {
+          <div class="field">
+            <label for="received-in">{{ 'finance.receivedIn' | transloco }}</label>
+            <p-select inputId="received-in" formControlName="cash_account_id" [options]="accountOptions()"
+                      optionLabel="label" optionValue="value" [fluid]="true" />
+          </div>
         }
       }
 
       <div class="field">
         <label for="date">{{ 'finance.date' | transloco }}</label>
-        <input pInputText id="date" type="date" [formControlName]="kind === 'expense' ? 'expense_date' : 'transfer_date'" />
+        <input pInputText id="date" type="date" [formControlName]="dateControl" />
       </div>
 
       <div class="field">
-        <label for="note">{{ 'finance.note' | transloco }}</label>
-        <input pInputText id="note" [formControlName]="kind === 'expense' ? 'description' : 'notes'" />
+        <label for="note">{{ (kind === 'income' ? 'finance.incomeDescription' : 'finance.note') | transloco }}</label>
+        <input pInputText id="note" [formControlName]="noteControl" data-testid="note" />
       </div>
 
       @if (error()) {

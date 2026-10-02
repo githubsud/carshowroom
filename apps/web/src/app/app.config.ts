@@ -11,6 +11,14 @@ import { LanguageService } from './core/i18n/language.service';
 import { TranslocoHttpLoader } from './core/i18n/transloco.loader';
 import { SayyaraPreset } from './core/theme/theme';
 
+/**
+ * PrimeUI licence key (DECISIONS Q-38, D-61). Injected at build time with
+ * `--define PRIMEUI_LICENSE="'<key>'"` from the PRIMEUI_LICENSE environment
+ * variable (scripts/dev.ps1, Makefile, CI); never committed.
+ */
+declare const PRIMEUI_LICENSE: string | undefined;
+const primeuiLicense = typeof PRIMEUI_LICENSE === 'string' && PRIMEUI_LICENSE ? PRIMEUI_LICENSE : undefined;
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -29,6 +37,7 @@ export const appConfig: ApplicationConfig = {
     }),
     providePrimeNG({
       theme: { preset: SayyaraPreset, options: { darkModeSelector: false, cssLayer: false } },
+      license: primeuiLicense,
     }),
     MessageService,
     // Apply the stored language (and <html dir>) before the first render.

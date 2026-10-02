@@ -1,0 +1,108 @@
+<div class="page-header">
+  <h1 class="page-title">{{ 'partners.title' | transloco }}</h1>
+  <div class="header-actions">
+    <p-button *appCan="'partner.transact'" icon="pi pi-wallet" data-testid="new-partner-txn"
+              [label]="'partners.newMovement' | transloco" (onClick)="txnOpen.set(true)"
+              [disabled]="partners().length === 0 || accounts().length === 0" />
+    <p-button *appCan="'partner.equity.change'" icon="pi pi-percentage" severity="secondary" data-testid="change-shares"
+              [label]="'partners.changeShares' | transloco" (onClick)="sharesOpen.set(true)"
+              [disabled]="partners().length === 0" />
+    <p-button *appCan="'partner.equity.change'" icon="pi pi-user-plus" severity="secondary" data-testid="add-partner"
+              [label]="'partners.add' | transloco" (onClick)="openAdd()" />
+  </div>
+</div>
+
+@switch (state()) {
+  @case ('loading') {
+    <app-state kind="loading" />
+  }
+  @case ('error') {
+    <app-state kind="error" [message]="loadError()" (retry)="load()" />
+  }
+  @default {
+    @if (summary(); as s) {
+      @if (s.rows.length === 0) {
+        <app-state kind="empty" [message]="'partners.none' | transloco" />
+      } @else {
+        <p-table [value]="s.rows" [scrollable]="true" styleClass="p-datatable-sm" data-testid="partners-summary">
+          <ng-template #header>
+            <tr>
+              <th>{{ 'partners.partner' | transloco }}</th>
+              <th class="num">{{ 'partners.share' | transloco }}</th>
+              <th class="num">{{ 'partners.net' | transloco }}</th>
+              <th class="num">{{ 'partners.capital' | transloco }}</th>
+              <th class="num">{{ 'partners.allocatedProfit' | transloco }}</th>
+              <th class="num">{{ 'partners.drawings' | transloco }}</th>
+              <th class="num">{{ 'partners.current' | transloco }}</th>
+              <th class="num">{{ 'partners.loansTo' | transloco }}</th>
+              <th class="num">{{ 'partners.loansFrom' | transloco }}</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-row>
+            <tr class="clickable" (click)="open(row)" [attr.data-testid]="'partner-row-' + row.partner_id">
+              <td class="name">
+                {{ name(row) }}
+                <div class="bar" aria-hidden="true"><span [style.inline-size.%]="row.percentage"></span></div>
+              </td>
+              <td class="num">{{ row.percentage | percent }}</td>
+              <td class="num strong" [class.negative]="negative(row.net)" data-testid="partner-net">{{ row.net | money }}</td>
+              <td class="num">{{ row.capital | money }}</td>
+              <td class="num">{{ row.allocated_profit | money }}</td>
+              <td class="num">{{ row.drawings | money }}</td>
+              <td class="num" [class.negative]="negative(row.current)">{{ row.current | money }}</td>
+              <td class="num">{{ row.loans_to_partner | money }}</td>
+              <td class="num">{{ row.loans_from_partner | money }}</td>
+            </tr>
+          </ng-template>
+          <ng-template #footer>
+            <tr>
+              <td>{{ 'partners.total' | transloco }}</td>
+              <td class="num">{{ s.totals.percentage | percent }}</td>
+              <td class="num strong">{{ s.totals.net | money }}</td>
+              <td class="num">{{ s.totals.capital | money }}</td>
+              <td class="num">{{ s.totals.allocated_profit | money }}</td>
+              <td class="num">{{ s.totals.drawings | money }}</td>
+              <td class="num">{{ s.totals.current | money }}</td>
+              <td class="num">{{ s.totals.loans_to_partner | money }}</td>
+              <td class="num">{{ s.totals.loans_from_partner | money }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <p class="legend">{{ 'partners.netLegend' | transloco }}</p>
+      }
+    }
+  }
+}
+
+<app-partner-transaction-dialog [(visible)]="txnOpen" [partners]="partners()" [accounts]="accounts()"
+                                (posted)="onPosted($event)" />
+<app-share-change-dialog [(visible)]="sharesOpen" [partners]="partners()" [current]="shares()" (saved)="load()" />
+
+<p-dialog [visible]="addOpen()" (visibleChange)="addOpen.set($event)" [modal]="true"
+          [header]="'partners.add' | transloco" [style]="{ width: 'min(440px, 95vw)' }">
+  <form class="dialog-form" [formGroup]="addForm" (ngSubmit)="saveAdd()">
+    <div class="field">
+      <label for="p-name-ar">{{ 'settings.nameAr' | transloco }}</label>
+      <input pInputText id="p-name-ar" formControlName="name_ar" data-testid="partner-name" />
+    </div>
+    <div class="field">
+      <label for="p-name-en">{{ 'settings.nameEn' | transloco }}</label>
+      <input pInputText id="p-name-en" formControlName="name_en" dir="ltr" />
+    </div>
+    <div class="field">
+      <label for="p-phone">{{ 'partners.phone' | transloco }}</label>
+      <input pInputText id="p-phone" formControlName="phone" dir="ltr" inputmode="tel" />
+    </div>
+    <div class="field">
+      <label for="p-nid">{{ 'partners.nationalId' | transloco }}</label>
+      <input pInputText id="p-nid" formControlName="national_id" dir="ltr" inputmode="numeric" />
+      <small class="hint">{{ 'partners.nationalIdHint' | transloco }}</small>
+    </div>
+    @if (addError()) { <p-message severity="error">{{ addError() }}</p-message> }
+    <div class="dialog-actions">
+      <p-button [text]="true" [label]="'common.cancel' | transloco" (onClick)="addOpen.set(false)" />
+      <p-button type="submit" data-testid="partner-save" [label]="'settings.save' | transloco"
+                [loading]="addBusy()" [disabled]="addForm.invalid" />
+    </div>
+  </form>
+</p-dialog>

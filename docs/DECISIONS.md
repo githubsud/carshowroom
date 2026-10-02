@@ -195,6 +195,13 @@
 | D-58 | **Phase 2.** The cash book (and other reports) are exported with the showroom's report file name; the API exposes `Content-Disposition` through CORS so browsers keep it | Found by E2E: downloads were all named cash-book.xlsx |
 | D-59 | **Phase 2.** Rule 21 transfer descriptions default to "تحويل من X إلى Y"; expense descriptions default to the category name. Users can override both | Readable cash book without typing |
 | D-60 | **Phase 2.** Arabic sentences isolate dates and codes with Unicode directional isolates so they are not reordered by right-to-left text | Found by screenshot review |
+| D-61 | **Phase 3.** The PrimeUI licence key is injected at build time from the `PRIMEUI_LICENSE` environment variable (`--define`) and passed to `providePrimeNG`. It is never committed; an empty key builds and runs locally | Q-38 answer: keep PrimeNG |
+| D-62 | **Phase 3.** A partner counts as *active* while they hold an open share. A partner can be archived only with no open share and a zero balance in all four buckets (`PARTNER_NOT_SETTLED`) | Money and ownership must never disappear |
+| D-63 | **Phase 3.** A loan repayment (rules 5 and 29) cannot exceed what is currently owed (`REPAYMENT_EXCEEDS_LOAN`). A drawing above the partner's net position, or a capital withdrawal that makes capital negative, posts with a warning (`DRAWING_EXCEEDS_BALANCE`, `CAPITAL_NEGATIVE`), the same WARN approach as BR-C1 | Overpaying a loan has no accounting meaning; over-drawing is a business choice the owner must see, not a block (Q-17 net formula) |
+| D-64 | **Phase 3.** A share change is a full batch for **all** partners, effective from a date after the latest change. Earlier history cannot be rewritten; a mistake is corrected by a newer batch | Append-only history (FACT); avoids retroactive changes to past distributions |
+| D-65 | **Phase 3.** National IDs are encrypted in the API with AES-256-GCM (`NATIONAL_ID_KEY`, never committed); the row id is bound as associated data so a ciphertext cannot be moved to another row. Lists show only the last 4 digits; revealing the full number needs `partner.equity.change` and is audit-logged (`NATIONAL_ID_VIEWED`) | SPEC §10 "encrypted or masked" (G-17, D-05). Key rotation is a Phase 9 task |
+| D-66 | **Phase 3.** One user can be linked to at most one partner per showroom, and a partner to at most one user (`PARTNER_ALREADY_LINKED`). The link is set in Settings → Users | Partner self-service (3.5) needs an unambiguous "own" record |
+| D-67 | **Phase 3.** An expense paid personally by a partner (rule 30) is a `general_expenses` row with no cash account; the user chooses current account or loan to the business. The cash box is not touched | ERD §3 design, now implemented for general expenses (vehicle expenses in Phase 4) |
 
 ---
 
@@ -262,3 +269,5 @@
 | 2026-10-02 | Q-38 | **Keep PrimeNG** under the PrimeUI licence. The product owner obtains the licence key; the app reads it from configuration and never commits it (D-61) | Product owner |
 | 2026-10-02 | Q-26 | **Candidate posting rules approved** (ACCOUNTING §5) where a candidate exists: P-01 other income, P-02/P-03 (as D-41 options), P-04 expense on a sold car → COGS, P-05 showroom-borne consignment expense, P-06 consignor reimbursement, P-07 bounced-cheque bank charges, P-08 opening-balance-equity clearing by agreement, P-09/P-10 (as D-40 options), P-12 discount at net price. Unchanged: P-11 (no tax, D-39), P-13 (out of MVP), P-14 and P-15 (no candidate; still open). Each is implemented with its phase | Product owner |
 | 2026-10-02 | Phase 3 | Started | Product owner |
+| 2026-10-02 | Phase 3 | Partners delivered (see BACKLOG Phase 3 status); awaiting product-owner acceptance. New decisions D-61 to D-67 need approval | Claude |
+| 2026-10-02 | Phase 3 | **Accepted.** Standing instruction: commit and push each phase, then continue with the next until Phase 9 is finished | Product owner |

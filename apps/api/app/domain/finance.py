@@ -4,7 +4,7 @@ from datetime import date, datetime
 from typing import Annotated, Generic, Literal, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 from app.domain.money import Money, PositiveMoney
 
@@ -112,11 +112,24 @@ class PaymentMethodOut(BaseModel):
 
 
 class GeneralExpenseIn(StrictModel):
+    """Paid from a cash box / bank (rule 20), or personally by a partner (rule 30)."""
+
     expense_date: date
     category_id: UUID
     amount: PositiveMoney
-    cash_account_id: UUID
+    cash_account_id: UUID | None = None
+    paid_by_partner_id: UUID | None = None
+    partner_funding_mode: Literal["CURRENT_ACCOUNT", "LOAN"] | None = None
     description: NoteText | None = None
+
+    @model_validator(mode="after")
+    def _one_funding_source(self) -> "GeneralExpenseIn":
+        by_cash = self.cash_account_id is not None
+        by_partner = self.paid_by_partner_id is not None and self.partner_funding_mode is not None
+        partial_partner = (self.paid_by_partner_id is None) != (self.partner_funding_mode is None)
+        if by_cash == by_partner or partial_partner:
+            raise ValueError("choose either a cash/bank account or a partner with a funding mode")
+        return self
 
 
 class TransferIn(StrictModel):
@@ -135,13 +148,36 @@ class GeneralExpenseOut(BaseModel):
     category_name_en: str
     amount: Money
     description: str | None
+    cash_account_id: UUID | None
+    cash_account_name_ar: str | None
+    cash_account_name_en: str | None
+    paid_by_partner_id: UUID | None
+    paid_by_partner_name_ar: str | None
+    partner_funding_mode: Literal["CURRENT_ACCOUNT", "LOAN"] | None
+    status: Literal["POSTED", "REVERSED"]
+    entry_no: int
+    reversal_entry_no: int | None
+    created_at: datetime
+
+
+class OtherIncomeIn(StrictModel):
+    income_date: date
+    amount: PositiveMoney
+    cash_account_id: UUID
+    description: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
+
+
+class OtherIncomeOut(BaseModel):
+    id: UUID
+    income_date: date
+    amount: Money
+    description: str
     cash_account_id: UUID
     cash_account_name_ar: str
     cash_account_name_en: str | None
     status: Literal["POSTED", "REVERSED"]
     entry_no: int
     reversal_entry_no: int | None
-    created_at: datetime
 
 
 class TransferOut(BaseModel):
