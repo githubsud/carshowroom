@@ -1,0 +1,90 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [header]="(kind === 'expense' ? 'finance.expenseTitle' : 'finance.transferTitle') | transloco"
+  [style]="{ width: 'min(480px, 96vw)' }"
+  [dismissableMask]="!busy()"
+>
+  @if (step() === 'form') {
+    <form class="dialog-form" [formGroup]="form" (ngSubmit)="review()" [attr.data-testid]="kind + '-form'">
+      @if (kind === 'expense') {
+        <div class="field">
+          <label for="category">{{ 'finance.category' | transloco }}</label>
+          <p-select
+            inputId="category"
+            formControlName="category_id"
+            [options]="categoryOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [placeholder]="'finance.chooseCategory' | transloco"
+            [fluid]="true"
+            data-testid="expense-category"
+          />
+        </div>
+      }
+
+      <div class="field">
+        <label for="amount">{{ 'finance.amount' | transloco }}</label>
+        <app-money-input inputId="amount" formControlName="amount" data-testid="amount" />
+        @if (form.controls.amount.touched && form.controls.amount.invalid) {
+          <small class="invalid">{{ 'finance.amountInvalid' | transloco }}</small>
+        }
+      </div>
+
+      @if (kind === 'expense') {
+        <div class="field">
+          <label for="paid-from">{{ 'finance.paidFrom' | transloco }}</label>
+          <p-select inputId="paid-from" formControlName="cash_account_id" [options]="accountOptions()"
+                    optionLabel="label" optionValue="value" [fluid]="true" />
+        </div>
+      } @else {
+        <div class="field">
+          <label for="from">{{ 'finance.from' | transloco }}</label>
+          <p-select inputId="from" formControlName="from_cash_account_id" [options]="accountOptions()"
+                    optionLabel="label" optionValue="value" [fluid]="true" />
+        </div>
+        <div class="field">
+          <label for="to">{{ 'finance.to' | transloco }}</label>
+          <p-select inputId="to" formControlName="to_cash_account_id" [options]="accountOptions()"
+                    optionLabel="label" optionValue="value" [fluid]="true" />
+        </div>
+        @if (form.hasError('sameAccount')) {
+          <small class="invalid">{{ 'errors.TRANSFER_SAME_ACCOUNT' | transloco }}</small>
+        }
+      }
+
+      <div class="field">
+        <label for="date">{{ 'finance.date' | transloco }}</label>
+        <input pInputText id="date" type="date" [formControlName]="kind === 'expense' ? 'expense_date' : 'transfer_date'" />
+      </div>
+
+      <div class="field">
+        <label for="note">{{ 'finance.note' | transloco }}</label>
+        <input pInputText id="note" [formControlName]="kind === 'expense' ? 'description' : 'notes'" />
+      </div>
+
+      @if (error()) {
+        <p-message severity="error" data-testid="dialog-error">{{ error() }}</p-message>
+      }
+
+      <div class="actions">
+        <p-button type="button" [text]="true" [label]="'common.cancel' | transloco" (onClick)="visible.set(false)" />
+        <p-button type="submit" data-testid="review" [label]="'finance.review' | transloco" [loading]="busy()" />
+      </div>
+    </form>
+  } @else {
+    @if (preview(); as p) {
+      <app-posting-preview [preview]="p" />
+    }
+    @if (error()) {
+      <p-message severity="error" data-testid="dialog-error">{{ error() }}</p-message>
+    }
+    <div class="actions">
+      <p-button type="button" [text]="true" icon="pi pi-arrow-right" [label]="'finance.back' | transloco"
+                (onClick)="back()" [disabled]="busy()" />
+      <p-button type="button" data-testid="confirm" icon="pi pi-check" [label]="'finance.confirm' | transloco"
+                [loading]="busy()" (onClick)="confirm()" />
+    </div>
+  }
+</p-dialog>

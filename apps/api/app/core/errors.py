@@ -65,9 +65,7 @@ def permission_denied(permission: str) -> AppError:
 
 
 def tenant_read_only() -> AppError:
-    return AppError(
-        "TENANT_READ_ONLY", "The subscription is suspended; the tenant is read-only", status_code=423
-    )
+    return AppError("TENANT_READ_ONLY", "The subscription is suspended; the tenant is read-only", status_code=423)
 
 
 def not_found(entity: str) -> AppError:
@@ -77,9 +75,7 @@ def not_found(entity: str) -> AppError:
 # --- Handlers --------------------------------------------------------------------
 
 
-def _envelope(
-    code: str, message: str, status_code: int, details: dict[str, Any] | None = None
-) -> JSONResponse:
+def _envelope(code: str, message: str, status_code: int, details: dict[str, Any] | None = None) -> JSONResponse:
     return JSONResponse(
         status_code=status_code,
         content={"error": {"code": code, "message": message, "details": details or {}}},

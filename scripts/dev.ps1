@@ -38,7 +38,8 @@ switch ($Command) {
     $envFile = Join-Path $Api '.env'
     if (-not (Test-Path $envFile)) { Copy-Item (Join-Path $Api '.env.example') $envFile }
     Push-Location $Root
-    try { $status = npx supabase status -o env } finally { Pop-Location }
+    # supabase status lists excluded services on stderr; that is informational, not an error.
+    try { $status = $($ErrorActionPreference = 'Continue'; npx supabase status -o env 2>$null) } finally { Pop-Location }
     $secret = ($status | Where-Object { $_ -like 'SECRET_KEY=*' }) -replace '^SECRET_KEY=', '' -replace '"', ''
     if (-not $secret) { throw 'Local Supabase is not running; run db-start first.' }
     $lines = Get-Content $envFile | ForEach-Object { if ($_ -like 'SUPABASE_SERVICE_ROLE_KEY=*') { "SUPABASE_SERVICE_ROLE_KEY=$secret" } else { $_ } }

@@ -95,9 +95,7 @@ def invite(
     user_id = find_existing_user(conn, str(payload.email))
     is_new_account = user_id is None
     if user_id is None:
-        user_id = auth_admin.invite_user(
-            email=str(payload.email), full_name=payload.full_name, redirect_to=redirect_to
-        )
+        user_id = auth_admin.invite_user(email=str(payload.email), full_name=payload.full_name, redirect_to=redirect_to)
 
     try:
         with conn.begin_nested():

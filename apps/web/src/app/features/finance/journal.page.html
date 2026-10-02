@@ -1,0 +1,131 @@
+<div class="page-header">
+  <h1 class="page-title">{{ 'journal.title' | transloco }}</h1>
+  <form class="search" (ngSubmit)="load(0)">
+    <input pInputText type="text" inputmode="numeric" [(ngModel)]="entryNo" name="entryNo"
+           [placeholder]="'journal.entryNo' | transloco" data-testid="entry-search" />
+    <p-button type="submit" icon="pi pi-search" [text]="true" [ariaLabel]="'journal.search' | transloco" />
+  </form>
+</div>
+
+@if (loadError()) {
+  <app-state kind="error" [message]="loadError()" (retry)="load(first)" />
+} @else {
+  <p-table
+    [value]="entries()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="pageSize"
+    [first]="first"
+    [totalRecords]="total()"
+    [loading]="loading()"
+    (onLazyLoad)="load($event.first ?? 0)"
+    styleClass="p-datatable-sm"
+    data-testid="journal-table"
+  >
+    <ng-template #header>
+      <tr>
+        <th>#</th>
+        <th>{{ 'finance.date' | transloco }}</th>
+        <th>{{ 'finance.description' | transloco }}</th>
+        <th class="num">{{ 'finance.amount' | transloco }}</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-e>
+      <tr class="clickable" (click)="open(e)" [attr.data-testid]="'entry-' + e.entry_no">
+        <td>{{ e.entry_no }}</td>
+        <td>{{ e.entry_date | appDate }}</td>
+        <td>
+          {{ e.description }}
+          @if (e.reversal_of_entry_no) {
+            <p-tag severity="warn" [value]="'journal.reversalOf' | transloco: { no: e.reversal_of_entry_no }" />
+          }
+          @if (e.reversed_by_entry_no) {
+            <p-tag severity="secondary" [value]="'journal.reversedBy' | transloco: { no: e.reversed_by_entry_no }" />
+          }
+          <div class="sub">{{ 'source.' + e.source_type | transloco }}</div>
+        </td>
+        <td class="num">{{ e.total | money }}</td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr><td colspan="4"><app-state kind="empty" /></td></tr>
+    </ng-template>
+  </p-table>
+}
+
+<p-dialog
+  [visible]="detailOpen()"
+  (visibleChange)="detailOpen.set($event)"
+  [modal]="true"
+  [header]="('journal.entry' | transloco) + ' #' + (detail()?.entry_no ?? '')"
+  [style]="{ width: 'min(640px, 96vw)' }"
+>
+  @if (detail(); as d) {
+    <div class="meta">
+      <span>{{ d.entry_date | appDate }}</span>
+      <span>{{ 'source.' + d.source_type | transloco }}</span>
+      @if (d.reversal_reason) {
+        <span>{{ 'journal.reason' | transloco }}: {{ d.reversal_reason }}</span>
+      }
+    </div>
+    <p>{{ d.description }}</p>
+
+    <table class="lines" data-testid="entry-lines">
+      <thead>
+        <tr>
+          <th>{{ 'journal.account' | transloco }}</th>
+          <th class="num">{{ 'journal.debit' | transloco }}</th>
+          <th class="num">{{ 'journal.credit' | transloco }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (line of d.lines ?? []; track line.line_no) {
+          <tr>
+            <td>
+              {{ line.account_code }} — {{ language.language() === 'ar' ? line.account_name_ar : line.account_name_en }}
+              @if (line.cash_account_name_ar) { <div class="sub">{{ line.cash_account_name_ar }}</div> }
+            </td>
+            <td class="num">{{ line.debit === '0.00' ? '' : (line.debit | money) }}</td>
+            <td class="num">{{ line.credit === '0.00' ? '' : (line.credit | money) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <ng-container *appCan="'journal.reverse'">
+      @if (canReverse(d)) {
+        @switch (reverseStep()) {
+          @case (null) {
+            <div class="actions">
+              <p-button severity="danger" [outlined]="true" icon="pi pi-undo" data-testid="reverse-start"
+                        [label]="'journal.reverse' | transloco" (onClick)="startReverse()" />
+            </div>
+          }
+          @case ('reason') {
+            <div class="reverse-box">
+              <label for="reason">{{ 'journal.reasonLabel' | transloco }}</label>
+              <textarea pTextarea id="reason" rows="2" [(ngModel)]="reason" data-testid="reverse-reason"></textarea>
+              @if (reverseError()) { <p-message severity="error">{{ reverseError() }}</p-message> }
+              <div class="actions">
+                <p-button [text]="true" [label]="'common.cancel' | transloco" (onClick)="reverseStep.set(null)" />
+                <p-button data-testid="reverse-review" [label]="'finance.review' | transloco"
+                          [disabled]="reason.trim().length < 3" [loading]="reverseBusy()" (onClick)="previewReverse()" />
+              </div>
+            </div>
+          }
+          @case ('preview') {
+            <div class="reverse-box">
+              @if (reversePreview(); as p) { <app-posting-preview [preview]="p" /> }
+              @if (reverseError()) { <p-message severity="error">{{ reverseError() }}</p-message> }
+              <div class="actions">
+                <p-button [text]="true" [label]="'finance.back' | transloco" (onClick)="reverseStep.set('reason')" />
+                <p-button severity="danger" icon="pi pi-check" data-testid="reverse-confirm"
+                          [label]="'journal.confirmReverse' | transloco" [loading]="reverseBusy()" (onClick)="confirmReverse()" />
+              </div>
+            </div>
+          }
+        }
+      }
+    </ng-container>
+  }
+</p-dialog>

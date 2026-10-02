@@ -122,6 +122,17 @@ def require(*permissions: Permission) -> Callable[[TenantContext], TenantContext
     return dependency
 
 
+def require_any(*permissions: Permission) -> Callable[[TenantContext], TenantContext]:
+    """Dependency factory: the caller must hold at least one of the permissions."""
+
+    def dependency(ctx: TenantContext = Depends(get_tenant_context)) -> TenantContext:
+        if not any(ctx.can(permission) for permission in permissions):
+            raise permission_denied(" | ".join(str(p) for p in permissions))
+        return ctx
+
+    return dependency
+
+
 def require_writable(ctx: TenantContext) -> None:
     """Call before any write: suspended tenants are read-only (SPEC §4.16)."""
     if not ctx.writable:

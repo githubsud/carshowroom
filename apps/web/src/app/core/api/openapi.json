@@ -1,0 +1,4877 @@
+{
+  "components": {
+    "schemas": {
+      "CashAccountIn": {
+        "additionalProperties": false,
+        "properties": {
+          "account_number": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Number"
+          },
+          "bank_name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bank Name"
+          },
+          "iban": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z]{2}[0-9A-Z]{10,32}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iban"
+          },
+          "is_default": {
+            "default": false,
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "CASH_BOX",
+              "BANK"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name_ar": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name Ar",
+            "type": "string"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          }
+        },
+        "required": [
+          "kind",
+          "name_ar"
+        ],
+        "title": "CashAccountIn",
+        "type": "object"
+      },
+      "CashAccountOut": {
+        "properties": {
+          "account_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Number"
+          },
+          "archived": {
+            "title": "Archived",
+            "type": "boolean"
+          },
+          "balance": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Balance",
+            "type": "string"
+          },
+          "bank_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bank Name"
+          },
+          "iban": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iban"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_default": {
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "CASH_BOX",
+              "BANK"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "ledger_account_code": {
+            "title": "Ledger Account Code",
+            "type": "string"
+          },
+          "name_ar": {
+            "title": "Name Ar",
+            "type": "string"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "name_ar",
+          "name_en",
+          "ledger_account_code",
+          "bank_name",
+          "account_number",
+          "iban",
+          "is_default",
+          "archived",
+          "balance"
+        ],
+        "title": "CashAccountOut",
+        "type": "object"
+      },
+      "CashAccountUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "account_number": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Number"
+          },
+          "archived": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived"
+          },
+          "bank_name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bank Name"
+          },
+          "iban": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z]{2}[0-9A-Z]{10,32}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iban"
+          },
+          "is_default": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Default"
+          },
+          "name_ar": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name Ar"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          }
+        },
+        "title": "CashAccountUpdate",
+        "type": "object"
+      },
+      "CashBookMovement": {
+        "properties": {
+          "amount_in": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount In",
+            "type": "string"
+          },
+          "amount_out": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount Out",
+            "type": "string"
+          },
+          "balance": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Balance",
+            "type": "string"
+          },
+          "counterpart_ar": {
+            "title": "Counterpart Ar",
+            "type": "string"
+          },
+          "counterpart_en": {
+            "title": "Counterpart En",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "entry_date": {
+            "format": "date",
+            "title": "Entry Date",
+            "type": "string"
+          },
+          "entry_no": {
+            "title": "Entry No",
+            "type": "integer"
+          },
+          "is_reversal": {
+            "title": "Is Reversal",
+            "type": "boolean"
+          },
+          "reversed": {
+            "title": "Reversed",
+            "type": "boolean"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entry_date",
+          "entry_no",
+          "description",
+          "source_type",
+          "counterpart_ar",
+          "counterpart_en",
+          "amount_in",
+          "amount_out",
+          "balance",
+          "is_reversal",
+          "reversed"
+        ],
+        "title": "CashBookMovement",
+        "type": "object"
+      },
+      "CashBookOut": {
+        "properties": {
+          "cash_account": {
+            "$ref": "#/components/schemas/CashAccountOut"
+          },
+          "closing_balance": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Closing Balance",
+            "type": "string"
+          },
+          "currency_code": {
+            "title": "Currency Code",
+            "type": "string"
+          },
+          "date_from": {
+            "format": "date",
+            "title": "Date From",
+            "type": "string"
+          },
+          "date_to": {
+            "format": "date",
+            "title": "Date To",
+            "type": "string"
+          },
+          "movements": {
+            "items": {
+              "$ref": "#/components/schemas/CashBookMovement"
+            },
+            "title": "Movements",
+            "type": "array"
+          },
+          "opening_balance": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Opening Balance",
+            "type": "string"
+          },
+          "total_in": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Total In",
+            "type": "string"
+          },
+          "total_out": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Total Out",
+            "type": "string"
+          }
+        },
+        "required": [
+          "cash_account",
+          "date_from",
+          "date_to",
+          "currency_code",
+          "opening_balance",
+          "total_in",
+          "total_out",
+          "closing_balance",
+          "movements"
+        ],
+        "title": "CashBookOut",
+        "type": "object"
+      },
+      "EntryRef": {
+        "properties": {
+          "entry_no": {
+            "title": "Entry No",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "entry_no"
+        ],
+        "title": "EntryRef",
+        "type": "object"
+      },
+      "ExpenseCategoryIn": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "VEHICLE",
+              "GENERAL"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name_ar": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name Ar",
+            "type": "string"
+          },
+          "name_en": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name En",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "name_ar",
+          "name_en"
+        ],
+        "title": "ExpenseCategoryIn",
+        "type": "object"
+      },
+      "ExpenseCategoryOut": {
+        "properties": {
+          "archived": {
+            "title": "Archived",
+            "type": "boolean"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_seeded": {
+            "title": "Is Seeded",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "VEHICLE",
+              "GENERAL"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "ledger_account_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ledger Account Code"
+          },
+          "name_ar": {
+            "title": "Name Ar",
+            "type": "string"
+          },
+          "name_en": {
+            "title": "Name En",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "code",
+          "name_ar",
+          "name_en",
+          "ledger_account_code",
+          "is_seeded",
+          "archived"
+        ],
+        "title": "ExpenseCategoryOut",
+        "type": "object"
+      },
+      "ExpenseCategoryUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "archived": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived"
+          },
+          "name_ar": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name Ar"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          }
+        },
+        "title": "ExpenseCategoryUpdate",
+        "type": "object"
+      },
+      "GeneralExpenseIn": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "cash_account_id": {
+            "format": "uuid",
+            "title": "Cash Account Id",
+            "type": "string"
+          },
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "expense_date": {
+            "format": "date",
+            "title": "Expense Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "expense_date",
+          "category_id",
+          "amount",
+          "cash_account_id"
+        ],
+        "title": "GeneralExpenseIn",
+        "type": "object"
+      },
+      "GeneralExpenseOut": {
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "cash_account_id": {
+            "format": "uuid",
+            "title": "Cash Account Id",
+            "type": "string"
+          },
+          "cash_account_name_ar": {
+            "title": "Cash Account Name Ar",
+            "type": "string"
+          },
+          "cash_account_name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Account Name En"
+          },
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "category_name_ar": {
+            "title": "Category Name Ar",
+            "type": "string"
+          },
+          "category_name_en": {
+            "title": "Category Name En",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "entry_no": {
+            "title": "Entry No",
+            "type": "integer"
+          },
+          "expense_date": {
+            "format": "date",
+            "title": "Expense Date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "reversal_entry_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reversal Entry No"
+          },
+          "status": {
+            "enum": [
+              "POSTED",
+              "REVERSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "expense_date",
+          "category_id",
+          "category_name_ar",
+          "category_name_en",
+          "amount",
+          "description",
+          "cash_account_id",
+          "cash_account_name_ar",
+          "cash_account_name_en",
+          "status",
+          "entry_no",
+          "reversal_entry_no",
+          "created_at"
+        ],
+        "title": "GeneralExpenseOut",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "InviteIn": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "role_code": {
+            "enum": [
+              "OWNER",
+              "MANAGER",
+              "ACCOUNTANT",
+              "SALES",
+              "PARTNER",
+              "VIEWER"
+            ],
+            "title": "Role Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "role_code"
+        ],
+        "title": "InviteIn",
+        "type": "object"
+      },
+      "JournalEntryOut": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "entry_date": {
+            "format": "date",
+            "title": "Entry Date",
+            "type": "string"
+          },
+          "entry_no": {
+            "title": "Entry No",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_opening": {
+            "title": "Is Opening",
+            "type": "boolean"
+          },
+          "lines": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/JournalLineOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lines"
+          },
+          "posted_at": {
+            "format": "date-time",
+            "title": "Posted At",
+            "type": "string"
+          },
+          "reversal_of_entry_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reversal Of Entry No"
+          },
+          "reversal_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reversal Reason"
+          },
+          "reversed_by_entry_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reversed By Entry No"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "total": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Total",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "entry_no",
+          "entry_date",
+          "description",
+          "source_type",
+          "source_id",
+          "total",
+          "reversal_of_entry_no",
+          "reversed_by_entry_no",
+          "reversal_reason",
+          "is_opening",
+          "posted_at"
+        ],
+        "title": "JournalEntryOut",
+        "type": "object"
+      },
+      "JournalLineOut": {
+        "properties": {
+          "account_code": {
+            "title": "Account Code",
+            "type": "string"
+          },
+          "account_name_ar": {
+            "title": "Account Name Ar",
+            "type": "string"
+          },
+          "account_name_en": {
+            "title": "Account Name En",
+            "type": "string"
+          },
+          "cash_account_name_ar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Account Name Ar"
+          },
+          "credit": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Credit",
+            "type": "string"
+          },
+          "debit": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Debit",
+            "type": "string"
+          },
+          "line_no": {
+            "title": "Line No",
+            "type": "integer"
+          },
+          "memo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Memo"
+          }
+        },
+        "required": [
+          "line_no",
+          "account_code",
+          "account_name_ar",
+          "account_name_en",
+          "debit",
+          "credit",
+          "cash_account_name_ar",
+          "memo"
+        ],
+        "title": "JournalLineOut",
+        "type": "object"
+      },
+      "LedgerAccountOut": {
+        "properties": {
+          "balance": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Balance",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_postable": {
+            "title": "Is Postable",
+            "type": "boolean"
+          },
+          "name_ar": {
+            "title": "Name Ar",
+            "type": "string"
+          },
+          "name_en": {
+            "title": "Name En",
+            "type": "string"
+          },
+          "normal_side": {
+            "enum": [
+              "DEBIT",
+              "CREDIT"
+            ],
+            "title": "Normal Side",
+            "type": "string"
+          },
+          "parent_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Code"
+          },
+          "subledger": {
+            "title": "Subledger",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "ASSET",
+              "LIABILITY",
+              "EQUITY",
+              "INCOME",
+              "EXPENSE"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "parent_code",
+          "name_ar",
+          "name_en",
+          "type",
+          "normal_side",
+          "is_postable",
+          "subledger",
+          "balance"
+        ],
+        "title": "LedgerAccountOut",
+        "type": "object"
+      },
+      "MeOut": {
+        "properties": {
+          "is_platform_admin": {
+            "title": "Is Platform Admin",
+            "type": "boolean"
+          },
+          "memberships": {
+            "items": {
+              "$ref": "#/components/schemas/MembershipOut"
+            },
+            "title": "Memberships",
+            "type": "array"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserOut"
+          }
+        },
+        "required": [
+          "user",
+          "is_platform_admin",
+          "memberships"
+        ],
+        "title": "MeOut",
+        "type": "object"
+      },
+      "MemberOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "last_sign_in_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Sign In At"
+          },
+          "membership_id": {
+            "format": "uuid",
+            "title": "Membership Id",
+            "type": "string"
+          },
+          "partner_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partner Id"
+          },
+          "role_code": {
+            "title": "Role Code",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "DISABLED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "membership_id",
+          "user_id",
+          "email",
+          "full_name",
+          "role_code",
+          "status",
+          "partner_id",
+          "last_sign_in_at",
+          "created_at"
+        ],
+        "title": "MemberOut",
+        "type": "object"
+      },
+      "MemberUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "role_code": {
+            "anyOf": [
+              {
+                "enum": [
+                  "OWNER",
+                  "MANAGER",
+                  "ACCOUNTANT",
+                  "SALES",
+                  "PARTNER",
+                  "VIEWER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Code"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ACTIVE",
+                  "DISABLED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "title": "MemberUpdate",
+        "type": "object"
+      },
+      "MembershipOut": {
+        "properties": {
+          "country_code": {
+            "title": "Country Code",
+            "type": "string"
+          },
+          "currency_code": {
+            "title": "Currency Code",
+            "type": "string"
+          },
+          "feature_flags": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "title": "Feature Flags",
+            "type": "object"
+          },
+          "partner_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partner Id"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Permissions",
+            "type": "array"
+          },
+          "role_code": {
+            "title": "Role Code",
+            "type": "string"
+          },
+          "subscription_status": {
+            "title": "Subscription Status",
+            "type": "string"
+          },
+          "tenant_id": {
+            "format": "uuid",
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "tenant_name_ar": {
+            "title": "Tenant Name Ar",
+            "type": "string"
+          },
+          "tenant_name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tenant Name En"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "tenant_name_ar",
+          "tenant_name_en",
+          "country_code",
+          "currency_code",
+          "timezone",
+          "role_code",
+          "partner_id",
+          "subscription_status",
+          "permissions",
+          "feature_flags"
+        ],
+        "title": "MembershipOut",
+        "type": "object"
+      },
+      "Page_GeneralExpenseOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GeneralExpenseOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "Page[GeneralExpenseOut]",
+        "type": "object"
+      },
+      "Page_JournalEntryOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/JournalEntryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "Page[JournalEntryOut]",
+        "type": "object"
+      },
+      "Page_TransferOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TransferOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "Page[TransferOut]",
+        "type": "object"
+      },
+      "PaymentMethodOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "default_cash_account_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Cash Account Id"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name_ar": {
+            "title": "Name Ar",
+            "type": "string"
+          },
+          "name_en": {
+            "title": "Name En",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name_ar",
+          "name_en",
+          "default_cash_account_id"
+        ],
+        "title": "PaymentMethodOut",
+        "type": "object"
+      },
+      "PeriodOut": {
+        "properties": {
+          "entry_count": {
+            "title": "Entry Count",
+            "type": "integer"
+          },
+          "locked_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locked At"
+          },
+          "month": {
+            "title": "Month",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "OPEN",
+              "LOCKED"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "month",
+          "status",
+          "locked_at",
+          "entry_count"
+        ],
+        "title": "PeriodOut",
+        "type": "object"
+      },
+      "PostingResult_GeneralExpenseOut_": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/GeneralExpenseOut"
+          },
+          "journal_entries": {
+            "items": {
+              "$ref": "#/components/schemas/EntryRef"
+            },
+            "title": "Journal Entries",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "journal_entries"
+        ],
+        "title": "PostingResult[GeneralExpenseOut]",
+        "type": "object"
+      },
+      "PostingResult_TransferOut_": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/TransferOut"
+          },
+          "journal_entries": {
+            "items": {
+              "$ref": "#/components/schemas/EntryRef"
+            },
+            "title": "Journal Entries",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "journal_entries"
+        ],
+        "title": "PostingResult[TransferOut]",
+        "type": "object"
+      },
+      "PostingWarning": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "PostingWarning",
+        "type": "object"
+      },
+      "Preview": {
+        "properties": {
+          "effects": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewEffect"
+            },
+            "title": "Effects",
+            "type": "array"
+          },
+          "lines": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/PreviewLine"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lines"
+          },
+          "summary_ar": {
+            "title": "Summary Ar",
+            "type": "string"
+          },
+          "summary_en": {
+            "title": "Summary En",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "summary_ar",
+          "summary_en",
+          "effects"
+        ],
+        "title": "Preview",
+        "type": "object"
+      },
+      "PreviewEffect": {
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "IN",
+              "OUT"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "label_ar": {
+            "title": "Label Ar",
+            "type": "string"
+          },
+          "label_en": {
+            "title": "Label En",
+            "type": "string"
+          }
+        },
+        "required": [
+          "direction",
+          "label_ar",
+          "label_en",
+          "amount"
+        ],
+        "title": "PreviewEffect",
+        "type": "object"
+      },
+      "PreviewLine": {
+        "properties": {
+          "account_code": {
+            "title": "Account Code",
+            "type": "string"
+          },
+          "account_name_ar": {
+            "title": "Account Name Ar",
+            "type": "string"
+          },
+          "account_name_en": {
+            "title": "Account Name En",
+            "type": "string"
+          },
+          "credit": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Credit",
+            "type": "string"
+          },
+          "debit": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Debit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "account_code",
+          "account_name_ar",
+          "account_name_en",
+          "debit",
+          "credit"
+        ],
+        "title": "PreviewLine",
+        "type": "object"
+      },
+      "ReverseIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          },
+          "reversal_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reversal Date"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "ReverseIn",
+        "type": "object"
+      },
+      "ReverseOut": {
+        "properties": {
+          "original_entry_no": {
+            "title": "Original Entry No",
+            "type": "integer"
+          },
+          "reversal": {
+            "$ref": "#/components/schemas/EntryRef"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "original_entry_no",
+          "reversal"
+        ],
+        "title": "ReverseOut",
+        "type": "object"
+      },
+      "RoleOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "name_ar": {
+            "title": "Name Ar",
+            "type": "string"
+          },
+          "name_en": {
+            "title": "Name En",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name_ar",
+          "name_en"
+        ],
+        "title": "RoleOut",
+        "type": "object"
+      },
+      "TenantOut": {
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/TenantProfileOut"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/TenantSettingsOut"
+          }
+        },
+        "required": [
+          "profile",
+          "settings"
+        ],
+        "title": "TenantOut",
+        "type": "object"
+      },
+      "TenantProfileOut": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "commercial_reg_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commercial Reg No"
+          },
+          "country_code": {
+            "title": "Country Code",
+            "type": "string"
+          },
+          "currency_code": {
+            "title": "Currency Code",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "logo_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Path"
+          },
+          "name_ar": {
+            "title": "Name Ar",
+            "type": "string"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          },
+          "phones": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Phones",
+            "type": "array"
+          },
+          "tax_reg_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Reg No"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name_ar",
+          "name_en",
+          "country_code",
+          "currency_code",
+          "timezone",
+          "commercial_reg_no",
+          "tax_reg_no",
+          "address",
+          "phones",
+          "logo_path"
+        ],
+        "title": "TenantProfileOut",
+        "type": "object"
+      },
+      "TenantProfileUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "commercial_reg_no": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commercial Reg No"
+          },
+          "name_ar": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name Ar"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          },
+          "phones": {
+            "anyOf": [
+              {
+                "items": {
+                  "pattern": "^\\+?[0-9 ]{6,20}$",
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phones"
+          },
+          "tax_reg_no": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Reg No"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          }
+        },
+        "title": "TenantProfileUpdate",
+        "type": "object"
+      },
+      "TenantSettingsOut": {
+        "properties": {
+          "aging_thresholds": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Aging Thresholds",
+            "type": "array"
+          },
+          "cash_negative_policy": {
+            "enum": [
+              "WARN",
+              "BLOCK"
+            ],
+            "title": "Cash Negative Policy",
+            "type": "string"
+          },
+          "default_language": {
+            "enum": [
+              "ar",
+              "en"
+            ],
+            "title": "Default Language",
+            "type": "string"
+          },
+          "digit_style": {
+            "enum": [
+              "WESTERN",
+              "ARABIC_INDIC"
+            ],
+            "title": "Digit Style",
+            "type": "string"
+          },
+          "distribution_frequency": {
+            "enum": [
+              "AD_HOC",
+              "MONTHLY",
+              "QUARTERLY",
+              "YEARLY"
+            ],
+            "title": "Distribution Frequency",
+            "type": "string"
+          },
+          "expected_cost_categories": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Expected Cost Categories",
+            "type": "array"
+          },
+          "fiscal_year_start_month": {
+            "title": "Fiscal Year Start Month",
+            "type": "integer"
+          },
+          "installment_markup_mode": {
+            "enum": [
+              "A",
+              "B_ENABLED"
+            ],
+            "title": "Installment Markup Mode",
+            "type": "string"
+          },
+          "loss_handling": {
+            "enum": [
+              "ALLOCATE_TO_PARTNERS",
+              "CARRY_FORWARD"
+            ],
+            "title": "Loss Handling",
+            "type": "string"
+          },
+          "overpayment_policy": {
+            "enum": [
+              "BLOCK",
+              "ALLOW_AS_CREDIT"
+            ],
+            "title": "Overpayment Policy",
+            "type": "string"
+          },
+          "partner_sees_summary": {
+            "title": "Partner Sees Summary",
+            "type": "boolean"
+          },
+          "profit_policy": {
+            "enum": [
+              "PERIODIC",
+              "PER_CAR"
+            ],
+            "title": "Profit Policy",
+            "type": "string"
+          },
+          "prorata_method": {
+            "enum": [
+              "DAY_WEIGHTED",
+              "SUB_PERIOD_PROFIT"
+            ],
+            "title": "Prorata Method",
+            "type": "string"
+          },
+          "rounding_remainder": {
+            "enum": [
+              "LARGEST_REMAINDER",
+              "LARGEST_SHARE"
+            ],
+            "title": "Rounding Remainder",
+            "type": "string"
+          },
+          "sale_cancellation_method": {
+            "enum": [
+              "REFUND_LIABILITY",
+              "MIRROR"
+            ],
+            "title": "Sale Cancellation Method",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fiscal_year_start_month",
+          "default_language",
+          "digit_style",
+          "cash_negative_policy",
+          "aging_thresholds",
+          "expected_cost_categories",
+          "partner_sees_summary",
+          "installment_markup_mode",
+          "profit_policy",
+          "distribution_frequency",
+          "loss_handling",
+          "prorata_method",
+          "rounding_remainder",
+          "sale_cancellation_method",
+          "overpayment_policy"
+        ],
+        "title": "TenantSettingsOut",
+        "type": "object"
+      },
+      "TenantSettingsUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "aging_thresholds": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "maxItems": 3,
+                "minItems": 3,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aging Thresholds"
+          },
+          "cash_negative_policy": {
+            "anyOf": [
+              {
+                "enum": [
+                  "WARN",
+                  "BLOCK"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Negative Policy"
+          },
+          "default_language": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ar",
+                  "en"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Language"
+          },
+          "digit_style": {
+            "anyOf": [
+              {
+                "enum": [
+                  "WESTERN",
+                  "ARABIC_INDIC"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Digit Style"
+          },
+          "distribution_frequency": {
+            "anyOf": [
+              {
+                "enum": [
+                  "AD_HOC",
+                  "MONTHLY",
+                  "QUARTERLY",
+                  "YEARLY"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distribution Frequency"
+          },
+          "expected_cost_categories": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 30,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Cost Categories"
+          },
+          "fiscal_year_start_month": {
+            "anyOf": [
+              {
+                "maximum": 12.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fiscal Year Start Month"
+          },
+          "installment_markup_mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "A",
+                  "B_ENABLED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Installment Markup Mode"
+          },
+          "loss_handling": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ALLOCATE_TO_PARTNERS",
+                  "CARRY_FORWARD"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loss Handling"
+          },
+          "overpayment_policy": {
+            "anyOf": [
+              {
+                "enum": [
+                  "BLOCK",
+                  "ALLOW_AS_CREDIT"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overpayment Policy"
+          },
+          "partner_sees_summary": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partner Sees Summary"
+          },
+          "profit_policy": {
+            "anyOf": [
+              {
+                "enum": [
+                  "PERIODIC",
+                  "PER_CAR"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profit Policy"
+          },
+          "prorata_method": {
+            "anyOf": [
+              {
+                "enum": [
+                  "DAY_WEIGHTED",
+                  "SUB_PERIOD_PROFIT"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prorata Method"
+          },
+          "rounding_remainder": {
+            "anyOf": [
+              {
+                "enum": [
+                  "LARGEST_REMAINDER",
+                  "LARGEST_SHARE"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rounding Remainder"
+          },
+          "sale_cancellation_method": {
+            "anyOf": [
+              {
+                "enum": [
+                  "REFUND_LIABILITY",
+                  "MIRROR"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale Cancellation Method"
+          }
+        },
+        "title": "TenantSettingsUpdate",
+        "type": "object"
+      },
+      "TransferIn": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "from_cash_account_id": {
+            "format": "uuid",
+            "title": "From Cash Account Id",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "to_cash_account_id": {
+            "format": "uuid",
+            "title": "To Cash Account Id",
+            "type": "string"
+          },
+          "transfer_date": {
+            "format": "date",
+            "title": "Transfer Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transfer_date",
+          "from_cash_account_id",
+          "to_cash_account_id",
+          "amount"
+        ],
+        "title": "TransferIn",
+        "type": "object"
+      },
+      "TransferOut": {
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "entry_no": {
+            "title": "Entry No",
+            "type": "integer"
+          },
+          "from_cash_account_id": {
+            "format": "uuid",
+            "title": "From Cash Account Id",
+            "type": "string"
+          },
+          "from_name_ar": {
+            "title": "From Name Ar",
+            "type": "string"
+          },
+          "from_name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Name En"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "reversal_entry_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reversal Entry No"
+          },
+          "status": {
+            "enum": [
+              "POSTED",
+              "REVERSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "to_cash_account_id": {
+            "format": "uuid",
+            "title": "To Cash Account Id",
+            "type": "string"
+          },
+          "to_name_ar": {
+            "title": "To Name Ar",
+            "type": "string"
+          },
+          "to_name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Name En"
+          },
+          "transfer_date": {
+            "format": "date",
+            "title": "Transfer Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "transfer_date",
+          "from_cash_account_id",
+          "from_name_ar",
+          "from_name_en",
+          "to_cash_account_id",
+          "to_name_ar",
+          "to_name_en",
+          "amount",
+          "notes",
+          "status",
+          "entry_no",
+          "reversal_entry_no",
+          "created_at"
+        ],
+        "title": "TransferOut",
+        "type": "object"
+      },
+      "UnlockIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "UnlockIn",
+        "type": "object"
+      },
+      "UserOut": {
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "full_name"
+        ],
+        "title": "UserOut",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "SayyaraDMS API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/cash-accounts": {
+      "get": {
+        "operationId": "list_cash_accounts_api_v1_cash_accounts_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "include_archived",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Archived",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CashAccountOut"
+                  },
+                  "title": "Response List Cash Accounts Api V1 Cash Accounts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Cash Accounts",
+        "tags": [
+          "cash"
+        ]
+      },
+      "post": {
+        "operationId": "create_cash_account_api_v1_cash_accounts_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CashAccountIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashAccountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Cash Account",
+        "tags": [
+          "cash"
+        ]
+      }
+    },
+    "/api/v1/cash-accounts/{cash_account_id}": {
+      "patch": {
+        "operationId": "update_cash_account_api_v1_cash_accounts__cash_account_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "cash_account_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Cash Account Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CashAccountUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashAccountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Cash Account",
+        "tags": [
+          "cash"
+        ]
+      }
+    },
+    "/api/v1/expense-categories": {
+      "get": {
+        "operationId": "list_categories_api_v1_expense_categories_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "VEHICLE",
+                    "GENERAL"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_archived",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Archived",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExpenseCategoryOut"
+                  },
+                  "title": "Response List Categories Api V1 Expense Categories Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Categories",
+        "tags": [
+          "settings"
+        ]
+      },
+      "post": {
+        "operationId": "create_category_api_v1_expense_categories_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpenseCategoryIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseCategoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Category",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/expense-categories/{category_id}": {
+      "patch": {
+        "operationId": "update_category_api_v1_expense_categories__category_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Category Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpenseCategoryUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseCategoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Category",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/general-expenses": {
+      "get": {
+        "operationId": "list_expenses_api_v1_general_expenses_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_GeneralExpenseOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Expenses",
+        "tags": [
+          "cash"
+        ]
+      },
+      "post": {
+        "operationId": "record_expense_api_v1_general_expenses_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeneralExpenseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingResult_GeneralExpenseOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Record Expense",
+        "tags": [
+          "cash"
+        ]
+      }
+    },
+    "/api/v1/general-expenses/preview": {
+      "post": {
+        "operationId": "preview_expense_api_v1_general_expenses_preview_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeneralExpenseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Expense",
+        "tags": [
+          "cash"
+        ]
+      }
+    },
+    "/api/v1/journal-entries": {
+      "get": {
+        "operationId": "list_journal_entries_api_v1_journal_entries_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "entry_no",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entry No"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_JournalEntryOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Journal Entries",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/v1/journal-entries/{entry_id}": {
+      "get": {
+        "operationId": "get_journal_entry_api_v1_journal_entries__entry_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Journal Entry",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/v1/journal-entries/{entry_id}/reverse": {
+      "post": {
+        "operationId": "reverse_journal_entry_api_v1_journal_entries__entry_id__reverse_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReverseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReverseOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reverse Journal Entry",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/v1/journal-entries/{entry_id}/reverse/preview": {
+      "post": {
+        "operationId": "preview_reverse_api_v1_journal_entries__entry_id__reverse_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReverseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Reverse",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/v1/ledger-accounts": {
+      "get": {
+        "operationId": "list_ledger_accounts_api_v1_ledger_accounts_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "as_of",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "As Of"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LedgerAccountOut"
+                  },
+                  "title": "Response List Ledger Accounts Api V1 Ledger Accounts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Ledger Accounts",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/v1/me": {
+      "get": {
+        "description": "The signed-in user and every active showroom membership with its permissions.",
+        "operationId": "me_api_v1_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Me",
+        "tags": [
+          "session"
+        ]
+      }
+    },
+    "/api/v1/payment-methods": {
+      "get": {
+        "operationId": "list_payment_methods_api_v1_payment_methods_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentMethodOut"
+                  },
+                  "title": "Response List Payment Methods Api V1 Payment Methods Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Payment Methods",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/periods": {
+      "get": {
+        "operationId": "list_periods_api_v1_periods_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PeriodOut"
+                  },
+                  "title": "Response List Periods Api V1 Periods Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Periods",
+        "tags": [
+          "periods"
+        ]
+      }
+    },
+    "/api/v1/periods/{month}/lock": {
+      "post": {
+        "operationId": "lock_period_api_v1_periods__month__lock_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "month",
+            "required": true,
+            "schema": {
+              "title": "Month",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Lock Period",
+        "tags": [
+          "periods"
+        ]
+      }
+    },
+    "/api/v1/periods/{month}/unlock": {
+      "post": {
+        "operationId": "unlock_period_api_v1_periods__month__unlock_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "month",
+            "required": true,
+            "schema": {
+              "title": "Month",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnlockIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Unlock Period",
+        "tags": [
+          "periods"
+        ]
+      }
+    },
+    "/api/v1/reports/cash-book": {
+      "get": {
+        "operationId": "cash_book_report_endpoint_api_v1_reports_cash_book_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cash_account_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Cash Account Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Date From",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Date To",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "json",
+              "enum": [
+                "json",
+                "xlsx",
+                "pdf"
+              ],
+              "title": "Format",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": "ar",
+              "enum": [
+                "ar",
+                "en"
+              ],
+              "title": "Lang",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashBookOut"
+                }
+              },
+              "application/pdf": {},
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Cash Book Report Endpoint",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/api/v1/roles": {
+      "get": {
+        "operationId": "list_roles_api_v1_roles_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RoleOut"
+                  },
+                  "title": "Response List Roles Api V1 Roles Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Roles",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/tenant": {
+      "get": {
+        "operationId": "get_tenant_api_v1_tenant_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Tenant",
+        "tags": [
+          "tenant"
+        ]
+      }
+    },
+    "/api/v1/tenant/profile": {
+      "patch": {
+        "operationId": "update_profile_api_v1_tenant_profile_patch",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantProfileUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Profile",
+        "tags": [
+          "tenant"
+        ]
+      }
+    },
+    "/api/v1/tenant/settings": {
+      "patch": {
+        "operationId": "update_settings_api_v1_tenant_settings_patch",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantSettingsUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Settings",
+        "tags": [
+          "tenant"
+        ]
+      }
+    },
+    "/api/v1/transfers": {
+      "get": {
+        "operationId": "list_transfers_api_v1_transfers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_TransferOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Transfers",
+        "tags": [
+          "cash"
+        ]
+      },
+      "post": {
+        "operationId": "record_transfer_api_v1_transfers_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingResult_TransferOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Record Transfer",
+        "tags": [
+          "cash"
+        ]
+      }
+    },
+    "/api/v1/transfers/preview": {
+      "post": {
+        "operationId": "preview_transfer_api_v1_transfers_preview_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Transfer",
+        "tags": [
+          "cash"
+        ]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "operationId": "list_users_api_v1_users_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MemberOut"
+                  },
+                  "title": "Response List Users Api V1 Users Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Users",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/invite": {
+      "post": {
+        "operationId": "invite_user_api_v1_users_invite_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Invite User",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/{membership_id}": {
+      "patch": {
+        "operationId": "update_user_api_v1_users__membership_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "membership_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Membership Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update User",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/healthz": {
+      "get": {
+        "operationId": "healthz_healthz_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Healthz Healthz Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Healthz",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/readyz": {
+      "get": {
+        "operationId": "readyz_readyz_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readyz",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  }
+}

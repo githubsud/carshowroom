@@ -50,9 +50,7 @@ def _valid_ip(host: str | None) -> str | None:
 
 
 class RequestContextMiddleware(BaseHTTPMiddleware):
-    async def dispatch(
-        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         info = ClientInfo(
             request_id=_safe_request_id(request.headers.get(REQUEST_ID_HEADER)),
             ip=_valid_ip(request.client.host if request.client else None),

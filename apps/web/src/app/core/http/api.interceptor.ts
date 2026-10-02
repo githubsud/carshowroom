@@ -62,6 +62,24 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
         }),
       );
     }),
-    catchError((error: unknown) => throwError(() => toApiError(error))),
+    catchError((error: unknown) => {
+      // File downloads (responseType: 'blob') carry their JSON error body as a Blob.
+      if (error instanceof HttpErrorResponse && error.error instanceof Blob) {
+        return from(error.error.text()).pipe(
+          switchMap((body) => {
+            let parsed: unknown = null;
+            try {
+              parsed = JSON.parse(body);
+            } catch {
+              // not JSON: fall back to the generic HTTP error
+            }
+            return throwError(() =>
+              toApiError(new HttpErrorResponse({ error: parsed, status: error.status, statusText: error.statusText })),
+            );
+          }),
+        );
+      }
+      return throwError(() => toApiError(error));
+    }),
   );
 };

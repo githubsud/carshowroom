@@ -83,9 +83,7 @@ def test_tenant_endpoint_requires_tenant_header(client: TestClient) -> None:
 
 def test_malformed_tenant_header_is_access_denied(client: TestClient) -> None:
     token = mint_token("00000000-0000-0000-0000-000000000001")
-    response = client.get(
-        "/api/v1/tenant", headers={"Authorization": f"Bearer {token}", "X-Tenant-Id": "not-a-uuid"}
-    )
+    response = client.get("/api/v1/tenant", headers={"Authorization": f"Bearer {token}", "X-Tenant-Id": "not-a-uuid"})
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "TENANT_ACCESS_DENIED"
 
@@ -130,3 +128,10 @@ def test_openapi_is_disabled_in_production() -> None:
     app = create_app(settings, database=_NoDatabase(), token_verifier=make_verifier())  # type: ignore[arg-type]
     with TestClient(app) as test_client:
         assert test_client.get("/api/v1/openapi.json").status_code == 404
+
+
+def test_browser_can_read_report_file_names(client: TestClient) -> None:
+    response = client.get("/healthz", headers={"Origin": "http://localhost:4200"})
+    exposed = response.headers["access-control-expose-headers"].lower()
+    assert "content-disposition" in exposed
+    assert "x-request-id" in exposed

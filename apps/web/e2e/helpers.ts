@@ -20,3 +20,10 @@ export async function expectDirection(page: Page, lang: 'ar' | 'en'): Promise<vo
 export const AS_OWNER = 'e2e/.auth/owner.json';
 export const AS_PARTNER = 'e2e/.auth/partner.json';
 export const AS_SALES = 'e2e/.auth/sales.json';
+export const AS_ACCOUNTANT = 'e2e/.auth/accountant.json';
+
+/** "1,234.50 ج.م" / "EGP -10.00" -> 1234.5 (test arithmetic only; the app never does this). */
+export function amountOf(text: string | null): number {
+  const match = /-?[\d,]+(?:\.\d+)?/.exec(text ?? '');
+  return match ? Number(match[0].replace(/,/g, '')) : Number.NaN;
+}

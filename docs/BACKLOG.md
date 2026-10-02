@@ -59,6 +59,24 @@
 
 **Phase 2 accepted when (FACT):** all posting tests for rules 20, 21 and 24 pass, and unbalanced, locked-period and cross-tenant postings fail **at DB level**.
 
+### Phase 2 status: accepted by the product owner on 2026-10-02
+
+| ID | Status | Notes |
+|---|---|---|
+| 2.1 | ✅ | `coa_template` (41 accounts incl. 2310/3310 from D-40/D-41) seeded into every tenant by trigger; `ledger_accounts`, `cash_accounts`, `expense_categories` (7 general + 10 vehicle seeded), `payment_methods` |
+| 2.2 | ✅ | One-side check, deferred balance trigger, immutability (incl. owner and TRUNCATE), open-period trigger, gapless counter, subledger and postable checks, account identity protection — 34 pgTAP assertions in `05_ledger_integrity` |
+| 2.3 | ✅ | `post_journal_entry` / `reverse_journal_entry` are the only insert path (no write grants); gapless numbering proven with 20 concurrent + 5 rolled-back postings |
+| 2.4 | ✅ | `money.py` (strict Decimal, HALF_UP), drafts, rules 20/21/24 with unit tests written first (30 tests), idempotency, plain-language previews |
+| 2.5 | ✅ | Cash/bank accounts with auto sub-accounts, derived balances, WARN/BLOCK negative-cash policy with row locks |
+| 2.6 | ✅ | General expenses (rule 20) and transfers (rule 21), with previews in Arabic and English. Funding by supplier credit or partner arrives with Phases 3–4 |
+| 2.7 | ✅ | Reversal with reason and preview; month lock (owner) / unlock (owner, reason, audited) |
+| 2.8 | ✅ | Cash book JSON / Excel (everywhere) / PDF (Docker, CI, Linux — D-56), Arabic RTL layout verified |
+| 2.9 | ✅ | Web: Cash & bank (balances, cash book, expenses, transfers, exports), expense and transfer dialogs with preview, Journal with reversal, Month lock, Settings for cash accounts and categories |
+| 2.10 | 🔒 | Other income still waits for approval of P-01 (Q-26) |
+| 1.10 | ✅ | Typed API client generated from OpenAPI; CI drift checks (D-57) |
+| Seed | ✅ | Opening balances, an expense and a transfer for معرض النور; Doha opening balance; `06_seed_balance` checks every tenant balances (SPEC §15) |
+| Tests | ✅ | pgTAP 99 · API 100 (+1 PDF test run in Docker/CI) · web unit 29 · E2E 22 |
+
 ---
 
 ## Phase 3: Partners

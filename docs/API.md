@@ -96,6 +96,7 @@ Legend: 💰 money-moving (Idempotency-Key, transaction, journal entry); 👁 pr
 | GET | `/ledger-accounts` | `journal.view` | Chart of accounts tree with derived balances `?as_of=` |
 | GET | `/journal-entries` | `journal.view` | Filters: date range, source_type, account, entry_no, subledger ids |
 | GET | `/journal-entries/{id}` | `journal.view` | Header + lines + reversal links |
+| POST | `/journal-entries/{id}/reverse/preview` | `journal.reverse` | `{reason, reversal_date?}` → plain-language preview (added in Phase 2) |
 | POST 💰 | `/journal-entries/{id}/reverse` | `journal.reverse` | `{reason (required), reversal_date?}` → reversal entry (rule 24). Reversing a document's entry also marks the document `REVERSED` |
 | GET | `/periods` | `cash.view` | `[{month, status, locked_at, locked_by}]` |
 | POST | `/periods/{yyyy-mm}/lock` | `period.lock` | `{}` → period |

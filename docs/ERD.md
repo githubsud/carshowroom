@@ -674,6 +674,8 @@ Other tables:
 | (none) | added `consignor_settlements`, `external_collections`, `reservations.status` | Required by §4.4/§4.5 |
 | (none) | added `tenant_counters`, `idempotency_keys`, `support_access_grants`, `invitations`, `subscription_invoices`, `import_job_rows`, `platform_admins`, `payment_methods`, `expense_categories` | Implied by spec text, missing from §5 |
 | (none) | added `journal_lines.entry_date` (denormalized) | Date-range indexes on lines without a join |
+| (none) | Phase 2: `coa_template` (reference chart copied into each tenant), `tenant_counters` key `journal_entry` | Seeding by trigger; gapless numbers |
+| `idempotency_keys` (ARCHITECTURE §10) | stores the final response only, written in the operation's transaction (no IN_PROGRESS row) | A failed operation leaves no key, so retries run again |
 
 ---
 

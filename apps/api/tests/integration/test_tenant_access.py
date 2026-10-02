@@ -53,9 +53,7 @@ def test_other_tenant_is_denied(client: TestClient) -> None:
 
 
 def test_unknown_tenant_looks_the_same_as_a_foreign_one(client: TestClient) -> None:
-    response = client.get(
-        "/api/v1/tenant", headers=auth("owner@nour.example", "99999999-9999-9999-9999-999999999999")
-    )
+    response = client.get("/api/v1/tenant", headers=auth("owner@nour.example", "99999999-9999-9999-9999-999999999999"))
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "TENANT_ACCESS_DENIED"
 
@@ -71,9 +69,7 @@ def test_settings_require_permission(client: TestClient) -> None:
         assert error["details"]["permission"] == "tenant.settings.manage"
 
 
-def test_owner_updates_settings_and_it_is_audited(
-    client: TestClient, admin_db: psycopg.Connection[Any]
-) -> None:
+def test_owner_updates_settings_and_it_is_audited(client: TestClient, admin_db: psycopg.Connection[Any]) -> None:
     response = client.patch(
         "/api/v1/tenant/settings",
         headers={**auth("owner@nour.example", NOUR), "X-Request-Id": "it-settings-1"},

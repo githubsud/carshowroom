@@ -34,10 +34,12 @@ export const MENU: readonly MenuItem[] = [
     flag: 'consignment',
   },
   { key: 'partners', icon: 'pi pi-briefcase', path: 'soon/partners', anyOf: ['partner.view_all', 'partner.view_own'] },
-  { key: 'finance', icon: 'pi pi-wallet', path: 'soon/finance', anyOf: ['cash.view'] },
+  { key: 'finance', icon: 'pi pi-wallet', path: 'finance/cash', anyOf: ['cash.view'] },
+  { key: 'journal', icon: 'pi pi-book', path: 'finance/journal', anyOf: ['journal.view'] },
+  { key: 'periods', icon: 'pi pi-calendar-times', path: 'finance/periods', anyOf: ['period.lock', 'journal.view'] },
   { key: 'reports', icon: 'pi pi-chart-bar', path: 'soon/reports', anyOf: ['report.financial'] },
   { key: 'users', icon: 'pi pi-user-plus', path: 'settings/users', anyOf: ['users.manage'] },
-  { key: 'settings', icon: 'pi pi-cog', path: 'soon/settings', anyOf: ['tenant.settings.manage'] },
+  { key: 'settings', icon: 'pi pi-cog', path: 'settings/finance', anyOf: ['tenant.settings.manage'] },
   { key: 'audit', icon: 'pi pi-history', path: 'soon/audit', anyOf: ['audit.view'] },
 ];
 

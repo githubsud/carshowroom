@@ -26,6 +26,11 @@ export class FormatService {
     return value === null || value === undefined ? '—' : formatInteger(value, this.options());
   }
 
+  /** Today as YYYY-MM-DD in the showroom's timezone (the accounting date, D-18). */
+  todayIso(): string {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: this.context.active()?.timezone }).format(new Date());
+  }
+
   date(value: string | Date | null | undefined): string {
     if (!value) {
       return '—';

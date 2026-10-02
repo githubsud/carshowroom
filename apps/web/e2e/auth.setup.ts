@@ -10,6 +10,7 @@ const USERS = {
   owner: { email: 'owner@nour.example', landing: /\/t\/[^/]+\/dashboard$/ },
   partner: { email: 'partner@nour.example', landing: /\/tenants$/ },
   sales: { email: 'sales@nour.example', landing: /\/t\/[^/]+\/dashboard$/ },
+  accountant: { email: 'accountant@nour.example', landing: /\/t\/[^/]+\/dashboard$/ },
 } as const;
 
 for (const [role, user] of Object.entries(USERS)) {

@@ -1,0 +1,128 @@
+<h1 class="page-title">{{ 'settings.financeTitle' | transloco }}</h1>
+
+@switch (state()) {
+  @case ('loading') {
+    <app-state kind="loading" />
+  }
+  @case ('error') {
+    <app-state kind="error" [message]="loadError()" (retry)="load()" />
+  }
+  @default {
+    <div class="section-header">
+      <h2>{{ 'settings.cashAccounts' | transloco }}</h2>
+      <p-button icon="pi pi-plus" data-testid="add-account" [label]="'settings.addAccount' | transloco" (onClick)="openAccount()" />
+    </div>
+    <p-table [value]="accounts()" styleClass="p-datatable-sm" data-testid="accounts-table">
+      <ng-template #header>
+        <tr>
+          <th>{{ 'settings.name' | transloco }}</th>
+          <th>{{ 'settings.code' | transloco }}</th>
+          <th class="num">{{ 'finance.balance' | transloco }}</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-a>
+        <tr>
+          <td>
+            <i [class]="a.kind === 'BANK' ? 'pi pi-building-columns' : 'pi pi-wallet'" aria-hidden="true"></i>
+            {{ name(a) }}
+            @if (a.is_default) { <p-tag [value]="'finance.default' | transloco" /> }
+            @if (a.archived) { <p-tag severity="secondary" [value]="'settings.archived' | transloco" /> }
+            @if (a.bank_name) { <div class="sub">{{ a.bank_name }} {{ a.account_number }}</div> }
+          </td>
+          <td>{{ a.ledger_account_code }}</td>
+          <td class="num">{{ a.balance | money }}</td>
+          <td class="actions">
+            @if (!a.archived && !a.is_default) {
+              <p-button [text]="true" [label]="'settings.makeDefault' | transloco" (onClick)="makeDefault(a)" />
+            }
+            <p-button [text]="true" [severity]="a.archived ? 'secondary' : 'danger'"
+                      [label]="(a.archived ? 'settings.restore' : 'settings.archive') | transloco" (onClick)="toggleAccount(a)" />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <div class="section-header">
+      <h2>{{ 'settings.categories' | transloco }}</h2>
+      <p-button icon="pi pi-plus" data-testid="add-category" [label]="'settings.addCategory' | transloco" (onClick)="openCategory()" />
+    </div>
+    <p-table [value]="categories()" styleClass="p-datatable-sm" data-testid="categories-table">
+      <ng-template #header>
+        <tr>
+          <th>{{ 'settings.name' | transloco }}</th>
+          <th>{{ 'settings.type' | transloco }}</th>
+          <th>{{ 'settings.code' | transloco }}</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-c>
+        <tr>
+          <td>{{ name(c) }} @if (c.archived) { <p-tag severity="secondary" [value]="'settings.archived' | transloco" /> }</td>
+          <td>{{ (c.kind === 'GENERAL' ? 'settings.generalCategory' : 'settings.vehicleCategory') | transloco }}</td>
+          <td>{{ c.ledger_account_code ?? '—' }}</td>
+          <td class="actions">
+            <p-button [text]="true" [severity]="c.archived ? 'secondary' : 'danger'"
+                      [label]="(c.archived ? 'settings.restore' : 'settings.archive') | transloco" (onClick)="toggleCategory(c)" />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+}
+
+<p-dialog [visible]="accountOpen()" (visibleChange)="accountOpen.set($event)" [modal]="true"
+          [header]="'settings.addAccount' | transloco" [style]="{ width: 'min(440px, 95vw)' }">
+  <form class="dialog-form" [formGroup]="accountForm" (ngSubmit)="saveAccount()">
+    <p-selectbutton formControlName="kind" [options]="kindOptions" optionValue="value" [allowEmpty]="false">
+      <ng-template #item let-option>{{ option.key | transloco }}</ng-template>
+    </p-selectbutton>
+    <div class="field">
+      <label for="acc-name-ar">{{ 'settings.nameAr' | transloco }}</label>
+      <input pInputText id="acc-name-ar" formControlName="name_ar" data-testid="account-name-ar" />
+    </div>
+    <div class="field">
+      <label for="acc-name-en">{{ 'settings.nameEn' | transloco }}</label>
+      <input pInputText id="acc-name-en" formControlName="name_en" dir="ltr" />
+    </div>
+    @if (accountForm.controls.kind.value === 'BANK') {
+      <div class="field">
+        <label for="acc-bank">{{ 'settings.bankName' | transloco }}</label>
+        <input pInputText id="acc-bank" formControlName="bank_name" />
+      </div>
+      <div class="field">
+        <label for="acc-number">{{ 'settings.accountNumber' | transloco }}</label>
+        <input pInputText id="acc-number" formControlName="account_number" dir="ltr" />
+      </div>
+    }
+    <label><input type="checkbox" formControlName="is_default" /> {{ 'settings.makeDefault' | transloco }}</label>
+    @if (dialogError()) { <p-message severity="error">{{ dialogError() }}</p-message> }
+    <div class="dialog-actions">
+      <p-button [text]="true" [label]="'common.cancel' | transloco" (onClick)="accountOpen.set(false)" />
+      <p-button type="submit" data-testid="save-account" [label]="'settings.save' | transloco"
+                [loading]="busy()" [disabled]="accountForm.invalid" />
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog [visible]="categoryOpen()" (visibleChange)="categoryOpen.set($event)" [modal]="true"
+          [header]="'settings.addCategory' | transloco" [style]="{ width: 'min(440px, 95vw)' }">
+  <form class="dialog-form" [formGroup]="categoryForm" (ngSubmit)="saveCategory()">
+    <p-selectbutton formControlName="kind" [options]="categoryKindOptions" optionValue="value" [allowEmpty]="false">
+      <ng-template #item let-option>{{ option.key | transloco }}</ng-template>
+    </p-selectbutton>
+    <div class="field">
+      <label for="cat-name-ar">{{ 'settings.nameAr' | transloco }}</label>
+      <input pInputText id="cat-name-ar" formControlName="name_ar" />
+    </div>
+    <div class="field">
+      <label for="cat-name-en">{{ 'settings.nameEn' | transloco }}</label>
+      <input pInputText id="cat-name-en" formControlName="name_en" dir="ltr" />
+    </div>
+    @if (dialogError()) { <p-message severity="error">{{ dialogError() }}</p-message> }
+    <div class="dialog-actions">
+      <p-button [text]="true" [label]="'common.cancel' | transloco" (onClick)="categoryOpen.set(false)" />
+      <p-button type="submit" [label]="'settings.save' | transloco" [loading]="busy()" [disabled]="categoryForm.invalid" />
+    </div>
+  </form>
+</p-dialog>

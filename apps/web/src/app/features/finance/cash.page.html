@@ -1,0 +1,166 @@
+<div class="page-header">
+  <h1 class="page-title">{{ 'finance.cashTitle' | transloco }}</h1>
+  <div class="header-actions" *appCan="'cash.transact'">
+    <p-button icon="pi pi-minus-circle" data-testid="new-expense" [label]="'finance.newExpense' | transloco"
+              (onClick)="expenseOpen.set(true)" [disabled]="accounts().length === 0" />
+    <p-button icon="pi pi-arrow-right-arrow-left" severity="secondary" data-testid="new-transfer"
+              [label]="'finance.newTransfer' | transloco" (onClick)="transferOpen.set(true)"
+              [disabled]="accounts().length < 2" />
+  </div>
+</div>
+
+@switch (state()) {
+  @case ('loading') {
+    <app-state kind="loading" />
+  }
+  @case ('error') {
+    <app-state kind="error" [message]="loadError()" (retry)="load()" />
+  }
+  @default {
+    @if (accounts().length === 0) {
+      <app-state kind="empty" [message]="'finance.noAccounts' | transloco" />
+    } @else {
+      <div class="balances" data-testid="balances">
+        @for (account of accounts(); track account.id) {
+          <button
+            type="button"
+            class="balance-card"
+            [class.selected]="account.id === selectedId()"
+            (click)="select(account)"
+            [attr.data-testid]="'balance-' + account.ledger_account_code"
+          >
+            <span class="kind">
+              <i [class]="account.kind === 'BANK' ? 'pi pi-building-columns' : 'pi pi-wallet'" aria-hidden="true"></i>
+              {{ name(account) }}
+            </span>
+            <strong class="amount" [class.negative]="account.balance.startsWith('-')">{{ account.balance | money }}</strong>
+            <span class="code">{{ account.ledger_account_code }}@if (account.is_default) { · {{ 'finance.default' | transloco }} }</span>
+          </button>
+        }
+      </div>
+
+      <div class="toolbar">
+        <p-selectbutton
+          [options]="viewOptions()"
+          [ngModel]="view()"
+          (ngModelChange)="setView($event)"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          data-testid="view-switch"
+        />
+        <div class="dates">
+          <label>
+            <span>{{ 'finance.from' | transloco }}</span>
+            <input pInputText type="date" [(ngModel)]="dateFrom" (change)="refreshView()" data-testid="date-from" />
+          </label>
+          <label>
+            <span>{{ 'finance.to' | transloco }}</span>
+            <input pInputText type="date" [(ngModel)]="dateTo" (change)="refreshView()" data-testid="date-to" />
+          </label>
+        </div>
+      </div>
+
+      @switch (view()) {
+        @case ('book') {
+          @if (book(); as b) {
+            <div class="book-summary">
+              <span>{{ 'finance.opening' | transloco }}: <strong>{{ b.opening_balance | money }}</strong></span>
+              <span>{{ 'finance.totalIn' | transloco }}: <strong class="in">{{ b.total_in | money }}</strong></span>
+              <span>{{ 'finance.totalOut' | transloco }}: <strong class="out">{{ b.total_out | money }}</strong></span>
+              <span>{{ 'finance.closing' | transloco }}: <strong data-testid="closing">{{ b.closing_balance | money }}</strong></span>
+              <span class="exports">
+                <p-button icon="pi pi-file-excel" [text]="true" [label]="'finance.excel' | transloco"
+                          [loading]="downloading() === 'xlsx'" (onClick)="download('xlsx')" data-testid="export-xlsx" />
+                <p-button icon="pi pi-file-pdf" [text]="true" label="PDF"
+                          [loading]="downloading() === 'pdf'" (onClick)="download('pdf')" data-testid="export-pdf" />
+              </span>
+            </div>
+            <p-table [value]="b.movements" [loading]="bookLoading()" styleClass="p-datatable-sm" data-testid="cash-book">
+              <ng-template #header>
+                <tr>
+                  <th>{{ 'finance.date' | transloco }}</th>
+                  <th>{{ 'finance.description' | transloco }}</th>
+                  <th class="num">{{ 'finance.in' | transloco }}</th>
+                  <th class="num">{{ 'finance.out' | transloco }}</th>
+                  <th class="num">{{ 'finance.balance' | transloco }}</th>
+                </tr>
+              </ng-template>
+              <ng-template #body let-m>
+                <tr [class.muted]="m.reversed || m.is_reversal">
+                  <td>{{ m.entry_date | appDate }}<div class="sub">#{{ m.entry_no }}</div></td>
+                  <td>
+                    {{ m.description }}
+                    @if (m.is_reversal) { <p-tag severity="warn" [value]="'finance.reversal' | transloco" /> }
+                    @if (m.reversed) { <p-tag severity="secondary" [value]="'finance.reversed' | transloco" /> }
+                    <div class="sub">{{ language.language() === 'ar' ? m.counterpart_ar : m.counterpart_en }}</div>
+                  </td>
+                  <td class="num in">{{ m.amount_in === '0.00' ? '' : (m.amount_in | money) }}</td>
+                  <td class="num out">{{ m.amount_out === '0.00' ? '' : (m.amount_out | money) }}</td>
+                  <td class="num">{{ m.balance | money }}</td>
+                </tr>
+              </ng-template>
+              <ng-template #emptymessage>
+                <tr><td colspan="5"><app-state kind="empty" [message]="'finance.noMovements' | transloco" /></td></tr>
+              </ng-template>
+            </p-table>
+          }
+        }
+        @case ('expenses') {
+          <p-table [value]="expenses()" [loading]="bookLoading()" styleClass="p-datatable-sm" data-testid="expenses-table">
+            <ng-template #header>
+              <tr>
+                <th>{{ 'finance.date' | transloco }}</th>
+                <th>{{ 'finance.category' | transloco }}</th>
+                <th>{{ 'finance.paidFrom' | transloco }}</th>
+                <th class="num">{{ 'finance.amount' | transloco }}</th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-e>
+              <tr [class.muted]="e.status === 'REVERSED'">
+                <td>{{ e.expense_date | appDate }}<div class="sub">#{{ e.entry_no }}</div></td>
+                <td>{{ language.language() === 'ar' ? e.category_name_ar : e.category_name_en }}
+                  @if (e.description) { <div class="sub">{{ e.description }}</div> }</td>
+                <td>{{ language.language() === 'ar' ? e.cash_account_name_ar : (e.cash_account_name_en ?? e.cash_account_name_ar) }}</td>
+                <td class="num">{{ e.amount | money }}</td>
+                <td>@if (e.status === 'REVERSED') { <p-tag severity="secondary" [value]="'finance.reversed' | transloco" /> }</td>
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <tr><td colspan="5"><app-state kind="empty" /></td></tr>
+            </ng-template>
+          </p-table>
+        }
+        @case ('transfers') {
+          <p-table [value]="transfers()" [loading]="bookLoading()" styleClass="p-datatable-sm" data-testid="transfers-table">
+            <ng-template #header>
+              <tr>
+                <th>{{ 'finance.date' | transloco }}</th>
+                <th>{{ 'finance.from' | transloco }}</th>
+                <th>{{ 'finance.to' | transloco }}</th>
+                <th class="num">{{ 'finance.amount' | transloco }}</th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-t>
+              <tr [class.muted]="t.status === 'REVERSED'">
+                <td>{{ t.transfer_date | appDate }}<div class="sub">#{{ t.entry_no }}</div></td>
+                <td>{{ language.language() === 'ar' ? t.from_name_ar : (t.from_name_en ?? t.from_name_ar) }}</td>
+                <td>{{ language.language() === 'ar' ? t.to_name_ar : (t.to_name_en ?? t.to_name_ar) }}</td>
+                <td class="num">{{ t.amount | money }}</td>
+                <td>@if (t.status === 'REVERSED') { <p-tag severity="secondary" [value]="'finance.reversed' | transloco" /> }</td>
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <tr><td colspan="5"><app-state kind="empty" /></td></tr>
+            </ng-template>
+          </p-table>
+        }
+      }
+    }
+  }
+}
+
+<app-expense-dialog [(visible)]="expenseOpen" [accounts]="accounts()" [categories]="categories()" (posted)="onPosted($event)" />
+<app-transfer-dialog [(visible)]="transferOpen" [accounts]="accounts()" (posted)="onPosted($event)" />

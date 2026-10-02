@@ -23,9 +23,7 @@ def test_only_user_managers_list_users(client: TestClient) -> None:
     }
 
 
-def test_invite_existing_account_adds_membership(
-    client: TestClient, admin_db: psycopg.Connection[Any]
-) -> None:
+def test_invite_existing_account_adds_membership(client: TestClient, admin_db: psycopg.Connection[Any]) -> None:
     # owner@doha.example already has an account (another showroom): no new account.
     response = client.post(
         "/api/v1/users/invite",
@@ -53,8 +51,7 @@ def test_invite_existing_account_adds_membership(
         assert event == ("false",)
     finally:
         admin_db.execute(
-            "delete from public.memberships where tenant_id = %s "
-            "and user_id = 'b0000000-0000-0000-0000-000000000001'",
+            "delete from public.memberships where tenant_id = %s and user_id = 'b0000000-0000-0000-0000-000000000001'",
             (NOUR,),
         )
 

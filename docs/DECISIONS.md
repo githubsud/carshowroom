@@ -83,6 +83,7 @@
 | **R-14** | Owner and accountant accounts hold full financial power; 2FA is optional | Medium / High | Recommend enforcing TOTP for those roles (Q-37) |
 | **R-15** | With no tax rules (D-39), a tenant that is in fact obliged to issue e-receipts or charge VAT gets no help from the product | Medium / Medium | Tax and e-invoicing remain extension points (CountryPack, ETA adapter); revisit with the first paying Egyptian tenants |
 | **R-16** | **PrimeNG licence changed.** Every PrimeNG version that supports Angular 22 is under the commercial *PrimeUI License*. The free Community License covers organisations with < $1M revenue, < 5 developers, < 10 employees and < $3M outside funding, needs a licence key and annual renewal. Larger organisations pay per developer. Without a key the app shows an *Invalid PrimeUI License* badge to every user | High / High | Q-38: decide before any pilot; options listed there |
+| **R-17** | The deferred balance check would only fire at commit; the API forces it to run immediately after each posting (`SET CONSTRAINTS ALL IMMEDIATE`) so errors surface inside the service. A code path that posts without the engine would still be caught at commit, just with a less friendly error | Low / Low | All postings go through `engine.post` / `engine.reverse` |
 
 ---
 
@@ -185,6 +186,15 @@
 | D-49 | **Phase 1.** Local development runs a reduced Supabase stack (Postgres, Auth, REST, Storage, Mailpit; no Studio/analytics) | The full stack was unstable on a developer laptop |
 | D-50 | **Phase 1.** The API role needs no access to the `auth` schema: the acting user is read from the request settings, and two narrow SECURITY DEFINER functions expose member emails to user management | Least privilege |
 | D-51 | **Phase 1.** Initial JS bundle budget raised to 1 MB warning / 2 MB error (actual: 842 kB raw, 193 kB compressed), mainly PrimeNG + supabase-js | Revisit in Phase 9 performance work |
+| D-52 | **Phase 2.** No posting may be dated after today in the showroom's timezone (back-dating into open months is allowed) | Prevents typos like 2062; post-dated cheques are recorded on collection (A-10). Configurable later if needed |
+| D-53 | **Phase 2.** A cash box or bank account can be archived only with a zero balance | Money must never disappear from the balance sheet |
+| D-54 | **Phase 2.** Journal tables have no row-change audit triggers: the ledger is append-only and stores `created_by`, so it is its own audit trail. Accounting-period changes and documents are audited | Avoids duplicating every line in audit_log |
+| D-55 | **Phase 2.** The ledger functions are owned by the migration owner (`postgres`) rather than a separate `ledger_owner` role (ARCHITECTURE §3). Effect is the same: client roles have no write grants on journal tables and reach them only through `post_journal_entry` / `reverse_journal_entry` | One fewer role to manage on Supabase |
+| D-56 | **Phase 2.** PDF reports render where WeasyPrint's native Pango libraries exist (Docker image, CI, Linux). On a Windows dev machine without them, the PDF endpoint returns `PDF_UNAVAILABLE` (503); Excel works everywhere | WeasyPrint is fixed by SPEC §2; GTK on Windows is fragile |
+| D-57 | **Phase 2.** Angular API types are generated from the FastAPI OpenAPI schema (`npm run api:types`). `openapi-typescript` runs in an isolated `npx` environment with TypeScript 5 because it does not yet support the TypeScript 6 used by Angular 22. CI fails if the committed schema or types drift from the API | Single source of truth for contracts (BACKLOG 1.10) |
+| D-58 | **Phase 2.** The cash book (and other reports) are exported with the showroom's report file name; the API exposes `Content-Disposition` through CORS so browsers keep it | Found by E2E: downloads were all named cash-book.xlsx |
+| D-59 | **Phase 2.** Rule 21 transfer descriptions default to "تحويل من X إلى Y"; expense descriptions default to the category name. Users can override both | Readable cash book without typing |
+| D-60 | **Phase 2.** Arabic sentences isolate dates and codes with Unicode directional isolates so they are not reordered by right-to-left text | Found by screenshot review |
 
 ---
 
@@ -247,3 +257,8 @@
 | 2026-10-02 | Phase 0 | Design approved; **Phase 1 started** | Product owner |
 | 2026-10-02 | Phase 1 | Foundation delivered (see BACKLOG Phase 1 status); awaiting product-owner acceptance | Claude |
 | 2026-10-02 | Phase 1 | **Accepted.** Q-38 (PrimeNG licence) remains open and must be decided before any pilot | Product owner |
+| 2026-10-02 | Phase 2 | Ledger core delivered (see BACKLOG Phase 2 status); awaiting product-owner acceptance. P-01 other income still awaits approval (Q-26) | Claude |
+| 2026-10-02 | Phase 2 | **Accepted** | Product owner |
+| 2026-10-02 | Q-38 | **Keep PrimeNG** under the PrimeUI licence. The product owner obtains the licence key; the app reads it from configuration and never commits it (D-61) | Product owner |
+| 2026-10-02 | Q-26 | **Candidate posting rules approved** (ACCOUNTING §5) where a candidate exists: P-01 other income, P-02/P-03 (as D-41 options), P-04 expense on a sold car → COGS, P-05 showroom-borne consignment expense, P-06 consignor reimbursement, P-07 bounced-cheque bank charges, P-08 opening-balance-equity clearing by agreement, P-09/P-10 (as D-40 options), P-12 discount at net price. Unchanged: P-11 (no tax, D-39), P-13 (out of MVP), P-14 and P-15 (no candidate; still open). Each is implemented with its phase | Product owner |
+| 2026-10-02 | Phase 3 | Started | Product owner |

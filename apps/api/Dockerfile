@@ -7,6 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /srv
 
+# Native libraries for WeasyPrint (PDF reports, SPEC §2) and an Arabic-capable fallback font.
+RUN apt-get update  && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-noto-core  && rm -rf /var/lib/apt/lists/*
+
 COPY pyproject.toml ./
 COPY app ./app
 RUN pip install --upgrade pip && pip install .

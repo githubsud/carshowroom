@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import health, session
+from app.api.routers import finance, health, session
 from app.core.config import API_PREFIX, PRODUCT_NAME, Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
@@ -37,9 +37,7 @@ def create_app(
     app.state.token_verifier = token_verifier or build_token_verifier(
         jwks_url=settings.jwks_url,
         audience=settings.jwt_audience,
-        hs256_secret=settings.supabase_jwt_secret.get_secret_value()
-        if settings.supabase_jwt_secret
-        else None,
+        hs256_secret=settings.supabase_jwt_secret.get_secret_value() if settings.supabase_jwt_secret else None,
     )
     if auth_admin is None:
         auth_admin = (
@@ -59,10 +57,12 @@ def create_app(
         allow_credentials=False,
         allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE"],
         allow_headers=["Authorization", "Content-Type", "X-Tenant-Id", "Idempotency-Key", REQUEST_ID_HEADER],
-        expose_headers=[REQUEST_ID_HEADER],
+        # Content-Disposition carries report file names; the browser hides it unless exposed.
+        expose_headers=[REQUEST_ID_HEADER, "Content-Disposition", "Idempotent-Replay"],
     )
     register_error_handlers(app)
 
     app.include_router(health.router)
     app.include_router(session.router, prefix=API_PREFIX)
+    app.include_router(finance.router, prefix=API_PREFIX)
     return app
