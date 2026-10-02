@@ -24,7 +24,7 @@
 
 **Phase 1 accepted when (FACT):** a user logs in, sees only their tenant, switches language with correct RTL, and the cross-tenant tests pass (pgTAP + API).
 
-### Phase 1 status (2026-10-02): built, awaiting acceptance
+### Phase 1 status: accepted by the product owner on 2026-10-02
 
 | ID | Status | Notes |
 |---|---|---|

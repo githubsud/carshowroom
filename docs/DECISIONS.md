@@ -246,3 +246,4 @@
 | 2026-10-02 | Q-12, Q-13 | Cancellation method and overpayment handling are tenant options with defaults (D-41) | Product owner |
 | 2026-10-02 | Phase 0 | Design approved; **Phase 1 started** | Product owner |
 | 2026-10-02 | Phase 1 | Foundation delivered (see BACKLOG Phase 1 status); awaiting product-owner acceptance | Claude |
+| 2026-10-02 | Phase 1 | **Accepted.** Q-38 (PrimeNG licence) remains open and must be decided before any pilot | Product owner |
