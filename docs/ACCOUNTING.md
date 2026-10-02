@@ -521,9 +521,9 @@ The spec has no rule for each event below. The **candidate treatment** is a prop
 | ID | Event / gap | Candidate treatment (to confirm) | Link |
 |---|---|---|---|
 | P-01 | Other income received (§4.10 module, no rule) | Dr Cash/Bank / Cr 4900 Other income | G-01. **Approved (Q-26); implemented in Phase 3** |
-| P-02 | Customer overpayment kept as credit (business rule 3) | **Approved as tenant option (D-41)**: `BLOCK` (default) or `ALLOW_AS_CREDIT` → Dr Cash / Cr 2310 (customer); later applied or refunded (Dr 2310 / Cr Cash) | G-02, Q-13 |
-| P-03 | Sale cancellation without an immediate refund (fixes C-06) | **Approved as tenant option (D-41)**: `REFUND_LIABILITY` (default) reverses revenue and cost, and all amounts received move to 2310; the refund is posted separately. `MIRROR` = literal rule 33 | C-06, Q-12 |
-| P-04 | Expense recorded on a car that is already SOLD | Dr 5000 COGS (vehicle) / Cr Cash; the car's profit is recalculated | G-03, Q-14 |
+| P-02 | Customer overpayment kept as credit (business rule 3) | **Refund leg implemented in Phase 4; overpayment as credit arrives with Phase 5 payments.** **Approved as tenant option (D-41)**: `BLOCK` (default) or `ALLOW_AS_CREDIT` → Dr Cash / Cr 2310 (customer); later applied or refunded (Dr 2310 / Cr Cash) | G-02, Q-13 |
+| P-03 | Sale cancellation without an immediate refund (fixes C-06) | **Implemented in Phase 4 (both methods).** **Approved as tenant option (D-41)**: `REFUND_LIABILITY` (default) reverses revenue and cost, and all amounts received move to 2310; the refund is posted separately. `MIRROR` = literal rule 33 | C-06, Q-12 |
+| P-04 | Expense recorded on a car that is already SOLD | Dr 5000 COGS (vehicle) / Cr Cash; the car's profit is recalculated | G-03, Q-14. **Approved (Q-26); implemented in Phase 4** |
 | P-05 | Expense on a consigned-in car **borne by the showroom** (terms: showroom/shared) | Dr a showroom expense account (not specified in the COA) / Cr Cash; for the shared portion, split between 1430 and the expense | G-10, Q-15 |
 | P-06 | Consignor reimburses recoverable expenses when the car is returned unsold (§4.4 "settle any recoverable expenses") | Dr Cash / Cr 1430 (consignor) | G-10 |
 | P-07 | Bank charges on a bounced cheque, possibly recharged to the customer | Dr bank-charges expense (no account in the COA) / Cr Bank; optionally Dr 1410 (customer) | Q-20 |
@@ -531,7 +531,7 @@ The spec has no rule for each event below. The **candidate treatment** is a prop
 | P-09 | Distribution of a **loss** | **Approved as tenant option (D-40)**: `ALLOCATE_TO_PARTNERS` (default) Dr 3200 per partner / Cr 3300 by %; or `CARRY_FORWARD` (stays in 3300) | G-07 |
 | P-10 | Per-car distribution (policy 2): rule 22 debits 3300 before the period is closed | **Approved as tenant option (D-40)**: on each sale, Dr 3310 Profit allocated in advance / Cr 3200 per partner; at close, 3310 is netted against 3300 | C-04, Q-10 |
 | P-11 | VAT / tax on vehicle sales, consignment commission, invoices | **Decided (D-39): no tax rules.** Account 2500 is seeded but unused | G-08, Q-11, Q-06 |
-| P-12 | Sale discount | Default: post the net price (sale price after discount) to 4100 and store the discount on the document only | Q-22 |
+| P-12 | Sale discount | Default: post the net price (sale price after discount) to 4100 and store the discount on the document only | Q-22. **Approved (Q-26); implemented in Phase 4** |
 | P-13 | Late fees, early settlement discount (mode b), repossession, bad-debt write-off | Out of MVP scope until requested | G-12, G-13 |
 | P-14 | Consigned-in car sold on installments / deferred: when the consignor's payable becomes due | No candidate | G-10, Q-15 |
 | P-15 | Capital withdrawal (rule 2) and ownership % | No candidate. Percentages stay manual; withdrawal does not change % automatically | Q-19 |

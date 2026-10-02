@@ -5,11 +5,11 @@ from datetime import date
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Request
+from fastapi import APIRouter, Depends, Header
 from fastapi.responses import JSONResponse, Response
 from sqlalchemy import Connection, text
 
-from app.api.deps import TenantContext, get_database, require, require_any, require_writable
+from app.api.deps import TenantContext, get_cipher, get_database, require, require_any, require_writable
 from app.core.crypto import FieldCipher
 from app.core.errors import permission_denied
 from app.db.session import Database
@@ -38,11 +38,6 @@ _XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 def _tx(db: Database, ctx: TenantContext) -> AbstractContextManager[Connection]:
     return db.transaction(user_id=ctx.user.id, tenant_id=ctx.tenant_id)
-
-
-def get_cipher(request: Request) -> FieldCipher:
-    cipher: FieldCipher = request.app.state.cipher
-    return cipher
 
 
 def _can_see_partner(ctx: TenantContext, partner_id: UUID) -> bool:

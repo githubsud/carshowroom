@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import finance, health, partners, session
+from app.api.routers import customers, finance, health, partners, sales, session, suppliers, vehicles
 from app.core.config import API_PREFIX, PRODUCT_NAME, Settings, get_settings
 from app.core.crypto import FieldCipher
 from app.core.errors import register_error_handlers
@@ -11,6 +11,7 @@ from app.core.logging import configure_logging
 from app.core.request_context import REQUEST_ID_HEADER, RequestContextMiddleware
 from app.core.security import TokenVerifier, build_token_verifier
 from app.db.session import Database, create_db_engine
+from app.integrations.storage import DisabledStorage, Storage, SupabaseStorage
 from app.integrations.supabase_auth_admin import AuthAdmin, DisabledAuthAdmin, SupabaseAuthAdmin
 
 
@@ -20,6 +21,7 @@ def create_app(
     database: Database | None = None,
     token_verifier: TokenVerifier | None = None,
     auth_admin: AuthAdmin | None = None,
+    storage: Storage | None = None,
 ) -> FastAPI:
     """Build the app. Tests pass their own database, verifier and auth admin."""
     settings = settings or get_settings()
@@ -50,6 +52,17 @@ def create_app(
             else DisabledAuthAdmin()
         )
     app.state.auth_admin = auth_admin
+    if storage is None:
+        storage = (
+            SupabaseStorage(
+                supabase_url=settings.supabase_url,
+                public_url=settings.supabase_public_url or settings.supabase_url,
+                service_role_key=settings.supabase_service_role_key.get_secret_value(),
+            )
+            if settings.supabase_service_role_key
+            else DisabledStorage()
+        )
+    app.state.storage = storage
     app.state.cipher = FieldCipher(settings.national_id_key.get_secret_value() if settings.national_id_key else None)
 
     app.add_middleware(RequestContextMiddleware)
@@ -68,4 +81,8 @@ def create_app(
     app.include_router(session.router, prefix=API_PREFIX)
     app.include_router(finance.router, prefix=API_PREFIX)
     app.include_router(partners.router, prefix=API_PREFIX)
+    app.include_router(customers.router, prefix=API_PREFIX)
+    app.include_router(suppliers.router, prefix=API_PREFIX)
+    app.include_router(vehicles.router, prefix=API_PREFIX)
+    app.include_router(sales.router, prefix=API_PREFIX)
     return app

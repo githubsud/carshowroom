@@ -112,7 +112,8 @@ class PaymentMethodOut(BaseModel):
 
 
 class GeneralExpenseIn(StrictModel):
-    """Paid from a cash box / bank (rule 20), or personally by a partner (rule 30)."""
+    """Paid from a cash box / bank (rule 20), personally by a partner (rule 30),
+    or on credit from a supplier (rule 31)."""
 
     expense_date: date
     category_id: UUID
@@ -120,15 +121,17 @@ class GeneralExpenseIn(StrictModel):
     cash_account_id: UUID | None = None
     paid_by_partner_id: UUID | None = None
     partner_funding_mode: Literal["CURRENT_ACCOUNT", "LOAN"] | None = None
+    supplier_id: UUID | None = None
     description: NoteText | None = None
 
     @model_validator(mode="after")
     def _one_funding_source(self) -> "GeneralExpenseIn":
         by_cash = self.cash_account_id is not None
         by_partner = self.paid_by_partner_id is not None and self.partner_funding_mode is not None
+        by_supplier = self.supplier_id is not None
         partial_partner = (self.paid_by_partner_id is None) != (self.partner_funding_mode is None)
-        if by_cash == by_partner or partial_partner:
-            raise ValueError("choose either a cash/bank account or a partner with a funding mode")
+        if [by_cash, by_partner, by_supplier].count(True) != 1 or partial_partner:
+            raise ValueError("choose one of: a cash/bank account, a partner with a funding mode, or a supplier")
         return self
 
 
@@ -154,6 +157,8 @@ class GeneralExpenseOut(BaseModel):
     paid_by_partner_id: UUID | None
     paid_by_partner_name_ar: str | None
     partner_funding_mode: Literal["CURRENT_ACCOUNT", "LOAN"] | None
+    supplier_id: UUID | None = None
+    supplier_name: str | None = None
     status: Literal["POSTED", "REVERSED"]
     entry_no: int
     reversal_entry_no: int | None

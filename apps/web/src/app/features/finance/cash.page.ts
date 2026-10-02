@@ -25,7 +25,7 @@ import { LanguageService } from '../../core/i18n/language.service';
 import { CanDirective } from '../../core/permissions/can.directive';
 import { StateComponent } from '../../shared/components/state.component';
 import { ErrorMessageService } from '../../shared/error-message.service';
-import { translationsLoaded } from '../../shared/translated';
+import { loaded, translationsLoaded } from '../../shared/translated';
 import { TenantContextService } from '../../core/tenant/tenant-context.service';
 import { PartnersService } from '../partners/partners.service';
 import { ExpenseDialogComponent } from './expense-dialog.component';
@@ -78,7 +78,9 @@ export class CashPage implements OnInit {
 
   protected readonly view = signal<View>('book');
   protected readonly viewOptions = computed(() => {
-    this.translations(); // re-translate once loaded and on language change
+    if (!loaded(this.translations())) {
+      return [];
+    }
     return (['book', 'expenses', 'transfers'] as const).map((value) => ({
       value,
       label: this.transloco.translate(`finance.view_${value}`),

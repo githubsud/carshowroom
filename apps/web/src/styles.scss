@@ -69,3 +69,173 @@ app-shell .topbar .p-button-text:not(:disabled):hover {
   color: var(--color-on-primary);
   background: rgb(255 255 255 / 12%);
 }
+
+// Fields of a money dialog, projected into app-posting-shell.
+.dialog-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .invalid {
+    color: var(--color-danger);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+
+    > * {
+      flex: 1 1 10rem;
+    }
+  }
+}
+
+// --- Page building blocks shared by list and record pages (Phase 4) ---------------------
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: var(--space-3);
+}
+
+.header-actions,
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.filters {
+  margin-block-end: var(--space-3);
+
+  input[type='search'] {
+    flex: 1 1 12rem;
+  }
+}
+
+.back {
+  display: inline-block;
+  margin-block-end: var(--space-2);
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--color-text-muted);
+}
+
+.card {
+  padding: var(--space-3);
+  margin-block-end: var(--space-3);
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+
+  h2 {
+    margin: 0 0 var(--space-2);
+    font-size: 1rem;
+  }
+}
+
+.figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-block-end: var(--space-2);
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+
+  span {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+
+  strong {
+    font-size: 1.25rem;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.negative {
+  color: var(--color-danger);
+}
+
+.sub {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.muted td {
+  opacity: 0.6;
+}
+
+.opening td {
+  font-weight: 600;
+  background: var(--color-background);
+}
+
+// Days in stock against the tenant's aging thresholds (default 30/60/90).
+.days {
+  display: inline-block;
+  min-inline-size: 2.5rem;
+  padding: 2px 6px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.aging-FRESH {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.aging-AGING {
+  color: #854d0e;
+  background: #fef9c3;
+}
+
+.aging-OLD {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.aging-STALE {
+  color: #991b1b;
+  background: #fee2e2;
+}

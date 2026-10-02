@@ -255,3 +255,174 @@ begin
   perform set_config('app.tenant_id', '', true);
 end
 $$;
+
+-- =============================================================================
+-- Phase 4: customers, a workshop, five cars and their money (معرض النور).
+--   Elantra 2019   bought 09-03 for 400,000 (bank), paint 15,000 (cash)        AVAILABLE
+--   Corolla 2020   bought 09-04 for 520,000: 400,000 bank + 120,000 owed Karim  AVAILABLE
+--   Sportage 2021  bought 09-08 for 650,000 (bank); Sara's deposit 20,000 cash  RESERVED
+--   Sunny 2018     bought 09-05 for 220,000 (cash), maintenance 8,000 on credit
+--                  from ورشة الأمل; sold 09-25 to Hassan for 260,000 cash        SOLD (profit 32,000)
+--   Optra 2016     bought 09-28 for 150,000 (bank)                             IN_PREPARATION
+--   Cash 250,000 -220,000 -15,000 +260,000 +20,000 = 295,000
+--   Bank 1,725,000 -400,000 -400,000 -650,000 -150,000 = 125,000
+-- =============================================================================
+do $$
+declare
+  v_nour    constant uuid := '11111111-1111-1111-1111-111111111111';
+  v_cash    constant uuid := 'c0000000-0000-0000-0000-000000000001';
+  v_bank    constant uuid := 'c0000000-0000-0000-0000-000000000002';
+  v_owner   constant uuid := 'a0000000-0000-0000-0000-000000000001';
+  v_karim   constant uuid := 'd0000000-0000-0000-0000-000000000001';
+  v_hassan  constant uuid := 'd0000000-0000-0000-0000-000000000002';
+  v_sara    constant uuid := 'd0000000-0000-0000-0000-000000000003';
+  v_garage  constant uuid := 'd1000000-0000-0000-0000-000000000001';
+  v_elantra constant uuid := 'e1000000-0000-0000-0000-000000000001';
+  v_corolla constant uuid := 'e1000000-0000-0000-0000-000000000002';
+  v_sport   constant uuid := 'e1000000-0000-0000-0000-000000000003';
+  v_sunny   constant uuid := 'e1000000-0000-0000-0000-000000000004';
+  v_optra   constant uuid := 'e1000000-0000-0000-0000-000000000005';
+  v_sale    constant uuid := 'd2000000-0000-0000-0000-000000000001';
+  v_inv     uuid;
+  v_payable uuid;
+  v_supp    uuid;
+  v_dep     uuid;
+  v_sales   uuid;
+  v_cogs    uuid;
+  p         record;
+  v_entry   record;
+  v_cost    record;
+  v_doc     uuid;
+begin
+  perform set_config('app.tenant_id', v_nour::text, true);
+  select id into v_inv from public.ledger_accounts where tenant_id = v_nour and system_key = 'VEHICLE_INVENTORY';
+  select id into v_payable from public.ledger_accounts where tenant_id = v_nour and system_key = 'SELLER_PAYABLE';
+  select id into v_supp from public.ledger_accounts where tenant_id = v_nour and system_key = 'SUPPLIER_PAYABLE';
+  select id into v_dep from public.ledger_accounts where tenant_id = v_nour and system_key = 'CUSTOMER_DEPOSITS';
+  select id into v_sales from public.ledger_accounts where tenant_id = v_nour and system_key = 'VEHICLE_SALES';
+  select id into v_cogs from public.ledger_accounts where tenant_id = v_nour and system_key = 'COST_OF_VEHICLES_SOLD';
+
+  insert into public.customers (id, tenant_id, name, phone_primary, is_seller, is_buyer) values
+    (v_karim,  v_nour, 'كريم محمود',    '+201001112233', true,  false),
+    (v_hassan, v_nour, 'حسن علي',       '+201002223344', false, true),
+    (v_sara,   v_nour, 'سارة إبراهيم',  '+201003334455', false, false);
+  insert into public.suppliers (id, tenant_id, name, kind, phone)
+  values (v_garage, v_nour, 'ورشة الأمل', 'WORKSHOP', '+201004445566');
+
+  insert into public.vehicles (id, tenant_id, make, model, year, color_ext, transmission, fuel, mileage_km, vin,
+                               plate_no, asking_price, min_price, current_location_id)
+  select v.id, v_nour, v.make, v.model, v.year, v.color, 'AUTOMATIC', 'PETROL', v.km, v.vin, v.plate, v.asking, v.min_price,
+         (select id from public.locations where tenant_id = v_nour and is_default)
+    from (values
+      (v_elantra, 'Hyundai',   'Elantra',  2019, 'أبيض',  62000, 'KMHD841CBKU123456', 'ط ص ع 1234', 480000.00, 460000.00),
+      (v_corolla, 'Toyota',    'Corolla',  2020, 'فضي',   48000, 'JTDBR32E720045678', 'ن ب ل 5678', 590000.00, 570000.00),
+      (v_sport,   'Kia',       'Sportage', 2021, 'أسود',  31000, 'KNAPM81AAM7012345', 'س ق ر 9012', 720000.00, 700000.00),
+      (v_sunny,   'Nissan',    'Sunny',    2018, 'أحمر',  95000, '3N1CN7AP5JL801234', 'م ع ل 3456', 270000.00, 255000.00),
+      (v_optra,   'Chevrolet', 'Optra',    2016, 'رمادي', 140000, 'KL1JF6969GK567890', 'ه د و 7890', 185000.00, 170000.00)
+    ) as v (id, make, model, year, color, km, vin, plate, asking, min_price);
+
+  -- Purchases (rules 6, 7)
+  for p in
+    select * from (values
+      (v_elantra, '2026-09-03'::date, 400000.00, 400000.00, v_bank, 'هيونداي إلنترا 2019'),
+      (v_corolla, '2026-09-04'::date, 520000.00, 400000.00, v_bank, 'تويوتا كورولا 2020'),
+      (v_sunny,   '2026-09-05'::date, 220000.00, 220000.00, v_cash, 'نيسان صني 2018'),
+      (v_sport,   '2026-09-08'::date, 650000.00, 650000.00, v_bank, 'كيا سبورتاج 2021'),
+      (v_optra,   '2026-09-28'::date, 150000.00, 150000.00, v_bank, 'شيفروليه أوبترا 2016')
+    ) as x (vehicle_id, d, price, paid, cash_id, label)
+  loop
+    v_doc := gen_random_uuid();
+    select * into v_entry from private.post_journal_entry(jsonb_build_object(
+      'entry_date', p.d, 'description', 'شراء ' || p.label || ' من كريم محمود',
+      'source_type', 'VEHICLE_PURCHASE', 'source_id', v_doc,
+      'lines', jsonb_build_array(
+        jsonb_build_object('ledger_account_id', v_inv, 'debit', p.price::text, 'vehicle_id', p.vehicle_id),
+        jsonb_build_object('ledger_account_id', (select ledger_account_id from public.cash_accounts where id = p.cash_id),
+                           'credit', p.paid::text, 'cash_account_id', p.cash_id))
+      || case when p.price > p.paid then jsonb_build_array(
+        jsonb_build_object('ledger_account_id', v_payable, 'credit', (p.price - p.paid)::text,
+                           'customer_id', v_karim, 'vehicle_id', p.vehicle_id))
+         else '[]'::jsonb end));
+    insert into public.vehicle_purchases
+      (id, tenant_id, vehicle_id, seller_customer_id, purchase_date, price, deferred_amount, journal_entry_id)
+    values (v_doc, v_nour, p.vehicle_id, v_karim, p.d, p.price, p.price - p.paid, v_entry.journal_entry_id);
+    insert into public.purchase_payments (tenant_id, purchase_id, cash_account_id, amount)
+    values (v_nour, v_doc, p.cash_id, p.paid);
+    update public.vehicles set stock_date = p.d, status = 'IN_PREPARATION' where id = p.vehicle_id;
+  end loop;
+
+  -- Expenses: rule 9 (cash) and rule 31 (on credit from the workshop)
+  v_doc := gen_random_uuid();
+  select * into v_entry from private.post_journal_entry(jsonb_build_object(
+    'entry_date', '2026-09-06', 'description', 'دهان — هيونداي إلنترا 2019', 'source_type', 'VEHICLE_EXPENSE',
+    'source_id', v_doc,
+    'lines', jsonb_build_array(
+      jsonb_build_object('ledger_account_id', v_inv, 'debit', '15000.00', 'vehicle_id', v_elantra, 'memo', 'دهان'),
+      jsonb_build_object('ledger_account_id', (select ledger_account_id from public.cash_accounts where id = v_cash),
+                         'credit', '15000.00', 'cash_account_id', v_cash))));
+  insert into public.vehicle_expenses
+    (id, tenant_id, vehicle_id, category_id, expense_date, amount, funding, cash_account_id, journal_entry_id)
+  values (v_doc, v_nour, v_elantra,
+          (select id from public.expense_categories where tenant_id = v_nour and kind = 'VEHICLE' and code = 'paint'),
+          '2026-09-06', 15000.00, 'CASH_ACCOUNT', v_cash, v_entry.journal_entry_id);
+
+  v_doc := gen_random_uuid();
+  select * into v_entry from private.post_journal_entry(jsonb_build_object(
+    'entry_date', '2026-09-07', 'description', 'صيانة — نيسان صني 2018', 'source_type', 'VEHICLE_EXPENSE',
+    'source_id', v_doc,
+    'lines', jsonb_build_array(
+      jsonb_build_object('ledger_account_id', v_inv, 'debit', '8000.00', 'vehicle_id', v_sunny, 'memo', 'صيانة'),
+      jsonb_build_object('ledger_account_id', v_supp, 'credit', '8000.00', 'supplier_id', v_garage))));
+  insert into public.vehicle_expenses
+    (id, tenant_id, vehicle_id, category_id, expense_date, amount, funding, supplier_id, journal_entry_id)
+  values (v_doc, v_nour, v_sunny,
+          (select id from public.expense_categories where tenant_id = v_nour and kind = 'VEHICLE' and code = 'maintenance'),
+          '2026-09-07', 8000.00, 'SUPPLIER_CREDIT', v_garage, v_entry.journal_entry_id);
+
+  update public.vehicles set status = 'AVAILABLE' where id in (v_elantra, v_corolla, v_sport, v_sunny);
+
+  -- Sara reserves the Sportage (rule 11)
+  v_doc := gen_random_uuid();
+  select * into v_entry from private.post_journal_entry(jsonb_build_object(
+    'entry_date', '2026-09-28', 'description', 'عربون كيا سبورتاج 2021 من سارة إبراهيم', 'source_type', 'DEPOSIT',
+    'source_id', v_doc,
+    'lines', jsonb_build_array(
+      jsonb_build_object('ledger_account_id', (select ledger_account_id from public.cash_accounts where id = v_cash),
+                         'debit', '20000.00', 'cash_account_id', v_cash),
+      jsonb_build_object('ledger_account_id', v_dep, 'credit', '20000.00', 'customer_id', v_sara, 'vehicle_id', v_sport))));
+  insert into public.reservations
+    (id, tenant_id, vehicle_id, customer_id, reservation_date, deposit_amount, cash_account_id, expires_on,
+     journal_entry_id)
+  values (v_doc, v_nour, v_sport, v_sara, '2026-09-28', 20000.00, v_cash, '2026-10-12', v_entry.journal_entry_id);
+  update public.vehicles set status = 'RESERVED' where id = v_sport;
+
+  -- Hassan buys the Sunny for 260,000 cash (rule 12 + cost recognition, D-28)
+  insert into public.tenant_counters (tenant_id, counter_key, last_value) values
+    (v_nour, 'sale-2026', 1), (v_nour, 'invoice-2026', 1);
+  insert into public.sales (id, tenant_id, sale_no, vehicle_id, buyer_customer_id, sale_date, list_price, discount,
+                            sale_price, created_by)
+  values (v_sale, v_nour, 'S-2026-0001', v_sunny, v_hassan, '2026-09-25', 270000.00, 10000.00, 260000.00, v_owner);
+  insert into public.sale_payments (tenant_id, sale_id, cash_account_id, amount)
+  values (v_nour, v_sale, v_cash, 260000.00);
+  select * into v_entry from private.post_journal_entry(jsonb_build_object(
+    'entry_date', '2026-09-25', 'description', 'بيع نيسان صني 2018 إلى حسن علي — S-2026-0001', 'source_type', 'SALE',
+    'source_id', v_sale,
+    'lines', jsonb_build_array(
+      jsonb_build_object('ledger_account_id', (select ledger_account_id from public.cash_accounts where id = v_cash),
+                         'debit', '260000.00', 'cash_account_id', v_cash),
+      jsonb_build_object('ledger_account_id', v_sales, 'credit', '260000.00', 'vehicle_id', v_sunny))));
+  select * into v_cost from private.post_journal_entry(jsonb_build_object(
+    'entry_date', '2026-09-25', 'description', 'تكلفة نيسان صني 2018 — S-2026-0001', 'source_type', 'SALE_COST',
+    'source_id', v_sale,
+    'lines', jsonb_build_array(
+      jsonb_build_object('ledger_account_id', v_cogs, 'debit', '228000.00', 'vehicle_id', v_sunny),
+      jsonb_build_object('ledger_account_id', v_inv, 'credit', '228000.00', 'vehicle_id', v_sunny))));
+  update public.sales
+     set status = 'POSTED', posted_at = now(), posted_by = v_owner, journal_entry_id = v_entry.journal_entry_id,
+         cost_journal_entry_id = v_cost.journal_entry_id, invoice_no = 'INV-2026-00001', einvoice_status = 'NOT_SUBMITTED'
+   where id = v_sale;
+  update public.vehicles set status = 'SOLD' where id = v_sunny;
+
+  perform set_config('app.tenant_id', '', true);
+end
+$$;

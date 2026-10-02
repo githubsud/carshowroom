@@ -54,6 +54,7 @@
           <th>{{ 'settings.type' | transloco }}</th>
           <th>{{ 'settings.code' | transloco }}</th>
           <th></th>
+          <th></th>
         </tr>
       </ng-template>
       <ng-template #body let-c>
@@ -61,6 +62,15 @@
           <td>{{ name(c) }} @if (c.archived) { <p-tag severity="secondary" [value]="'settings.archived' | transloco" /> }</td>
           <td>{{ (c.kind === 'GENERAL' ? 'settings.generalCategory' : 'settings.vehicleCategory') | transloco }}</td>
           <td>{{ c.ledger_account_code ?? '—' }}</td>
+          <td>
+            @if (c.kind === 'VEHICLE' && !c.archived) {
+              <label class="expected">
+                <input type="checkbox" [checked]="expected().includes(c.code)" (change)="toggleExpected(c.code)"
+                       [attr.data-testid]="'expected-' + c.code" />
+                {{ 'settings.expectedCost' | transloco }}
+              </label>
+            }
+          </td>
           <td class="actions">
             <p-button [text]="true" [severity]="c.archived ? 'secondary' : 'danger'"
                       [label]="(c.archived ? 'settings.restore' : 'settings.archive') | transloco" (onClick)="toggleCategory(c)" />
@@ -68,6 +78,36 @@
         </tr>
       </ng-template>
     </p-table>
+    <p class="sub">{{ 'settings.expectedCostHint' | transloco }}</p>
+
+    <div class="section-header">
+      <h2>{{ 'settings.locations' | transloco }}</h2>
+    </div>
+    <ul class="locations" data-testid="locations">
+      @for (l of locations(); track l.id) {
+        <li>
+          <i class="pi pi-map-marker" aria-hidden="true"></i> {{ name(l) }}
+          <span class="sub">{{ 'settings.location_' + l.type | transloco }}</span>
+          @if (l.is_default) { <p-tag [value]="'finance.default' | transloco" /> }
+          @if (l.archived) { <p-tag severity="secondary" [value]="'settings.archived' | transloco" /> }
+          @if (!l.is_default) {
+            <p-button [text]="true" size="small" [severity]="l.archived ? 'secondary' : 'danger'"
+                      [label]="(l.archived ? 'settings.restore' : 'settings.archive') | transloco" (onClick)="toggleLocation(l)" />
+          }
+        </li>
+      }
+    </ul>
+    <div class="add-location">
+      <input pInputText [(ngModel)]="newLocation" [placeholder]="'settings.newLocation' | transloco"
+             [attr.aria-label]="'settings.newLocation' | transloco" data-testid="new-location" />
+      <select [(ngModel)]="newLocationType" [attr.aria-label]="'settings.type' | transloco">
+        @for (type of locationTypes; track type) {
+          <option [value]="type">{{ 'settings.location_' + type | transloco }}</option>
+        }
+      </select>
+      <p-button icon="pi pi-plus" [label]="'settings.addLocation' | transloco" (onClick)="addLocation()"
+                [disabled]="!newLocation.trim()" />
+    </div>
   }
 }
 

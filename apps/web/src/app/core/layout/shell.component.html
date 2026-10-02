@@ -18,6 +18,10 @@
     }
   </a>
 
+  @if (context.can('vehicle.view') || context.can('customer.view')) {
+    <app-global-search />
+  }
+
   <span class="spacer"></span>
 
   <p-button

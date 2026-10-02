@@ -46,7 +46,25 @@
 | BR-P7 | National IDs are stored encrypted, shown masked, and every reveal is audited (D-65) | `core/crypto.py`; `partners.reveal_national_id` | `test_crypto.py`; `test_partners.py` (national ID) ✅ |
 | BR-P8 | An expense paid by a partner leaves the cash box untouched (rule 30, D-67) | `finance._plan_expense`; DB check `general_expenses_one_funding` | `test_partners.py` (rule 30) ✅ |
 
-## Access (Phases 1–3)
+## Vehicles and sales (Phase 4)
+
+| ID | Rule | Enforced in | Proven by |
+|---|---|---|---|
+| BR-V1 | A car follows the lifecycle of SPEC §4.3; SOLD only with a posted sale, back to AVAILABLE only after the sale is cancelled | `vehicles.change_status` / flows (D-70); DB trigger `vehicle_before_update` (SR020) | pgTAP 08; `test_vehicles_sales.py::test_vehicle_rules_through_the_api` ✅ |
+| BR-V2 | One VIN per car still with the showroom (D-69) | `vehicles._check_vin_free`; partial unique index | pgTAP 08; `test_vin_must_be_unique_in_stock` ✅ |
+| BR-V3 | Status, location and price history are never edited or deleted | DB triggers | pgTAP 08 ✅ |
+| BR-V4 | Cost is derived from the ledger; profit uses recorded costs only (D-71, business rule 5) | `vehicles.cost_totals`; `VEHICLE_COST_MISSING` | `test_purchase_expenses_sale_cycle_matches_hand_calculation` ✅ |
+| BR-V5 | Sales staff never receive cost, profit or minimum price through the API, the Supabase client, search or documents | `api/masking.py`; RLS on base tables; `vehicles_catalog`; `documents.sensitivity` | pgTAP 08; `test_sales_staff_never_receive_cost_data`; E2E sales staff ✅ |
+| BR-V6 | An expense on a sold car goes to cost of sales (P-04); a capitalised cost of a sold car cannot be reversed (D-75) | `rules.vehicle_expense`; `journal._guard_document` | unit `test_p04_*`; `test_sale_entries_are_undone_only_by_cancelling` ✅ |
+| BR-S1 | A vehicle can be sold only once, unless its sale was cancelled | `sales._plan_post`; partial unique index `sales_one_posted_per_vehicle_idx` | pgTAP 08; cycle test ✅ |
+| BR-S2 | A cancelled sale never changes and takes no new payments | DB trigger `sale_before_change` | pgTAP 08 ✅ (installment payments: Phase 5) |
+| BR-S6 | Payments + deposit + trade-in equal the sale price (D-73) | `rules.sale`; `SALE_AMOUNTS_MISMATCH` | unit `test_sale_amounts_must_add_up_to_the_price` ✅ |
+| BR-S7 | A sale is posted only by `sale.post`; staff edit only their own drafts (D-78) | routers + `sales._editable_draft` | `sold_car` fixture (403 for sales) ✅ |
+| BR-S8 | A delivered sale, or one whose trade-in car has been used, cannot be cancelled (Q-30, D-76) | `sales._plan_cancel` | `test_vehicle_rules_through_the_api` ✅ |
+| BR-R1 | A deposit reserves an available car only; it is applied to that buyer's sale, or refunded or forfeited in full (D-72) | `sales._plan_reservation`, `_plan_settle`, `_plan_post` | `test_deposit_refund_frees_the_car`, MIRROR test ✅ |
+| BR-M1 | Payments to sellers and suppliers and refunds of credit never exceed what is owed (D-79) | `vehicles`, `suppliers`, `customers` services | cycle test, trade-in test ✅ |
+
+## Access (Phases 1–4)
 
 | ID | Rule | Enforced in | Proven by |
 |---|---|---|---|
@@ -61,8 +79,5 @@
 
 | ID | Rule | Phase |
 |---|---|---|
-| BR-S1 | A vehicle can be sold only once, unless its sale was cancelled | ⏳ 4 |
-| BR-S2 | No new payments against a cancelled sale | ⏳ 4 |
 | BR-S3 | A payment cannot exceed the outstanding amount unless the excess is recorded as customer credit (setting D-41) | ⏳ 5 |
 | BR-S4 | Installment remaining = amount due − payments, always derived | ⏳ 5 |
-| BR-S5 | Profit uses recorded costs only; manually entered profit is never accepted | ⏳ 4 |

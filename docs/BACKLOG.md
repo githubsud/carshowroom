@@ -130,6 +130,27 @@
 
 **Phase 4 accepted when (FACT):** the full purchase → expenses → sale cycle posts correctly and the vehicle file shows exact cost and profit.
 
+### Phase 4 status: delivered (2026-10-03); continuing per the standing instruction
+
+| ID | Status | Notes |
+|---|---|---|
+| 4.1 | ✅ | Vehicles with stock numbers, VIN normalisation and uniqueness (D-69), state machine in the service **and** a DB trigger (SR020), status/location/price history (append-only), all writes via the API |
+| 4.2 | ✅ | `vehicles_catalog` view without minimum price; base table only with cost + minimum-price permission; cost keys absent from every sales-role response (API JSON walk over vehicle, list, search, sale, customer, documents); cost documents hidden (pgTAP + API + E2E) |
+| 4.3 | ✅ | Photos via signed URLs (D-74) with camera capture and client-side WebP compression; documents with `sensitivity` (purchase contracts and seller receipts are always COST) |
+| 4.4 | ✅ | Customers via the API (D-68): E.164 phones, duplicate-phone check, flags, encrypted national ID; global quick search (stock no., plate, VIN last digits, make/model, name, phone) |
+| 4.5 | ✅ | Rules 6, 7, 8 (tests first); seller payables on the customer page; add-car wizard = details → purchase with preview |
+| 4.6 | ✅ | Suppliers, rule 31 (vehicle and general expenses on credit), rule 32, supplier statement |
+| 4.7 | ✅ | Rules 9, 30, 31 and P-04 on sold cars; quick expense dialog timed at **3.8 s** on a phone viewport (E2E < 15 s); cost completeness from the tenant checklist (Settings) |
+| 4.8 | ✅ | Vehicle file (cost breakdown, profit, history, photos, documents); inventory with filters, sorting, server pagination, days in stock and aging colours (D-81) |
+| 4.9 | ✅ | Rules 11, 34, 35; RESERVED status; expiry shown (D-72) |
+| 4.10 | ✅ | Draft → post by `sale.post`; rule 12 + cost entry (D-28); cash + bank legs; deposit applied; business rule 1 in the service and a partial unique index |
+| 4.11 | ✅ | Rule 26: the trade-in becomes a car with its own cost file at the agreed value; profit test |
+| 4.12 | ✅ | Invoice numbering per country pack at posting (D-77); Arabic/English invoice and contract PDF (D-56, D-80); ETA stub fields; no tax lines (D-39) |
+| 4.13 | ✅ | Both cancellation methods (D-41): REFUND_LIABILITY (P-03) and MIRROR (rule 33); trade-in handled per D-76; delivered sales refused (Q-30); refund of customer credit (P-02) |
+| 4.14 | ✅ | New sale screen (vehicle, buyer, discount, deposit, trade-in, split payments, live "remaining"), sales list, sale record with print and cancel |
+| Seed | ✅ | Five cars in معرض النور (available, owed-to-seller, reserved, sold, in preparation), customers, a workshop; the balance check still holds |
+| Tests | ✅ | pgTAP 132 · API 184 (+1 PDF test in Docker/CI) · web unit 42 · E2E 33 |
+
 ---
 
 ## Phase 5: Installments

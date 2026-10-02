@@ -39,6 +39,162 @@ export interface paths {
         patch: operations["update_cash_account_api_v1_cash_accounts__cash_account_id__patch"];
         trace?: never;
     };
+    "/api/v1/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Customers */
+        get: operations["list_customers_api_v1_customers_get"];
+        put?: never;
+        /** Create Customer */
+        post: operations["create_customer_api_v1_customers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customers/{customer_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Customer */
+        get: operations["get_customer_api_v1_customers__customer_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Customer */
+        patch: operations["update_customer_api_v1_customers__customer_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/customers/{customer_id}/national-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reveal National Id */
+        get: operations["reveal_national_id_api_v1_customers__customer_id__national_id_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customers/{customer_id}/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Refund */
+        post: operations["record_refund_api_v1_customers__customer_id__refunds_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customers/{customer_id}/refunds/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Refund */
+        post: operations["preview_refund_api_v1_customers__customer_id__refunds_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Documents */
+        get: operations["list_documents_api_v1_documents_get"];
+        put?: never;
+        /** Register Document */
+        post: operations["register_document_api_v1_documents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Document Upload Url */
+        post: operations["document_upload_url_api_v1_documents_upload_url_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/{document_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Document */
+        delete: operations["remove_document_api_v1_documents__document_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/{document_id}/url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Document Url */
+        get: operations["document_url_api_v1_documents__document_id__url_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/expense-categories": {
         parameters: {
             query?: never;
@@ -192,6 +348,41 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Locations */
+        get: operations["list_locations_api_v1_locations_get"];
+        put?: never;
+        /** Create Location */
+        post: operations["create_location_api_v1_locations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/locations/{location_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Location */
+        patch: operations["update_location_api_v1_locations__location_id__patch"];
         trace?: never;
     };
     "/api/v1/me": {
@@ -491,6 +682,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reservations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Reservations */
+        get: operations["list_reservations_api_v1_reservations_get"];
+        put?: never;
+        /** Create Reservation */
+        post: operations["create_reservation_api_v1_reservations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reservations/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Reservation */
+        post: operations["preview_reservation_api_v1_reservations_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reservations/{reservation_id}/settle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Settle Reservation */
+        post: operations["settle_reservation_api_v1_reservations__reservation_id__settle_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reservations/{reservation_id}/settle/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Settle */
+        post: operations["preview_settle_api_v1_reservations__reservation_id__settle_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/roles": {
         parameters: {
             query?: never;
@@ -500,6 +760,231 @@ export interface paths {
         };
         /** List Roles */
         get: operations["list_roles_api_v1_roles_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Sales */
+        get: operations["list_sales_api_v1_sales_get"];
+        put?: never;
+        /** Create Sale */
+        post: operations["create_sale_api_v1_sales_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/{sale_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Sale */
+        get: operations["get_sale_api_v1_sales__sale_id__get"];
+        /** Update Sale */
+        put: operations["update_sale_api_v1_sales__sale_id__put"];
+        post?: never;
+        /** Delete Sale */
+        delete: operations["delete_sale_api_v1_sales__sale_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/{sale_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Sale */
+        post: operations["cancel_sale_api_v1_sales__sale_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/{sale_id}/cancel/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Cancel */
+        post: operations["preview_cancel_api_v1_sales__sale_id__cancel_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/{sale_id}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sale Document */
+        get: operations["sale_document_api_v1_sales__sale_id__document_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/{sale_id}/post": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Sale */
+        post: operations["post_sale_api_v1_sales__sale_id__post_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sales/{sale_id}/post/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Post */
+        post: operations["preview_post_api_v1_sales__sale_id__post_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Quick Search */
+        get: operations["quick_search_api_v1_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/suppliers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Suppliers */
+        get: operations["list_suppliers_api_v1_suppliers_get"];
+        put?: never;
+        /** Create Supplier */
+        post: operations["create_supplier_api_v1_suppliers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/suppliers/{supplier_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Supplier */
+        patch: operations["update_supplier_api_v1_suppliers__supplier_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/suppliers/{supplier_id}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Payment */
+        post: operations["record_payment_api_v1_suppliers__supplier_id__payments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/suppliers/{supplier_id}/payments/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Payment */
+        post: operations["preview_payment_api_v1_suppliers__supplier_id__payments_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/suppliers/{supplier_id}/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Supplier Statement */
+        get: operations["supplier_statement_api_v1_suppliers__supplier_id__statement_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -645,6 +1130,230 @@ export interface paths {
         patch: operations["update_user_api_v1_users__membership_id__patch"];
         trace?: never;
     };
+    "/api/v1/vehicles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Vehicles */
+        get: operations["list_vehicles_api_v1_vehicles_get"];
+        put?: never;
+        /** Create Vehicle */
+        post: operations["create_vehicle_api_v1_vehicles_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Vehicle */
+        get: operations["get_vehicle_api_v1_vehicles__vehicle_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Vehicle */
+        patch: operations["update_vehicle_api_v1_vehicles__vehicle_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/expenses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Expenses */
+        get: operations["list_expenses_api_v1_vehicles__vehicle_id__expenses_get"];
+        put?: never;
+        /** Record Expense */
+        post: operations["record_expense_api_v1_vehicles__vehicle_id__expenses_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/expenses/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Expense */
+        post: operations["preview_expense_api_v1_vehicles__vehicle_id__expenses_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register Media */
+        post: operations["register_media_api_v1_vehicles__vehicle_id__media_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/media/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Media Upload Url */
+        post: operations["media_upload_url_api_v1_vehicles__vehicle_id__media_upload_url_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/media/{media_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Media */
+        delete: operations["remove_media_api_v1_vehicles__vehicle_id__media__media_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Move Vehicle */
+        post: operations["move_vehicle_api_v1_vehicles__vehicle_id__move_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/purchase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Purchase */
+        post: operations["record_purchase_api_v1_vehicles__vehicle_id__purchase_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/purchase/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Purchase */
+        post: operations["preview_purchase_api_v1_vehicles__vehicle_id__purchase_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/seller-payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Seller Payment */
+        post: operations["record_seller_payment_api_v1_vehicles__vehicle_id__seller_payments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/seller-payments/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Seller Payment */
+        post: operations["preview_seller_payment_api_v1_vehicles__vehicle_id__seller_payments_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicles/{vehicle_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Change Status */
+        post: operations["change_status_api_v1_vehicles__vehicle_id__status_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/healthz": {
         parameters: {
             query?: never;
@@ -683,6 +1392,35 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActiveReservation */
+        ActiveReservation: {
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Customer Name */
+            customer_name: string;
+            /**
+             * Deposit Amount
+             * @example 25000.00
+             */
+            deposit_amount: string;
+            /** Expired */
+            expired: boolean;
+            /** Expires On */
+            expires_on: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Reservation Date
+             * Format: date
+             */
+            reservation_date: string;
+        };
         /** CashAccountIn */
         CashAccountIn: {
             /** Account Number */
@@ -832,6 +1570,306 @@ export interface components {
              */
             total_out: string;
         };
+        /** CashLegIn */
+        CashLegIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+        };
+        /** CostLine */
+        CostLine: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /** Entry No */
+            entry_no: number;
+            /** Is Reversal */
+            is_reversal: boolean;
+            /** Label */
+            label: string;
+            /** Reversed */
+            reversed: boolean;
+            /** Source Type */
+            source_type: string;
+        };
+        /**
+         * CustomerBalances
+         * @description Money the showroom holds for, or owes to, the customer (cash.view).
+         */
+        CustomerBalances: {
+            /**
+             * Credit Owed
+             * @example 25000.00
+             */
+            credit_owed: string;
+            /**
+             * Deposits Held
+             * @example 25000.00
+             */
+            deposits_held: string;
+        };
+        /** CustomerDetail */
+        CustomerDetail: {
+            balances?: components["schemas"]["CustomerBalances"] | null;
+            customer: components["schemas"]["CustomerOut"];
+            /** Seller Payables */
+            seller_payables?: components["schemas"]["SellerPayable"][] | null;
+        };
+        /** CustomerHit */
+        CustomerHit: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Phone Primary */
+            phone_primary: string | null;
+        };
+        /** CustomerIn */
+        CustomerIn: {
+            /** Address */
+            address?: string | null;
+            /**
+             * Is Buyer
+             * @default false
+             */
+            is_buyer: boolean;
+            /**
+             * Is Seller
+             * @default false
+             */
+            is_seller: boolean;
+            /** Name */
+            name: string;
+            /** National Id */
+            national_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Other Phones */
+            other_phones?: string[];
+            /** Phone */
+            phone?: string | null;
+        };
+        /** CustomerOut */
+        CustomerOut: {
+            /** Address */
+            address: string | null;
+            /** Archived */
+            archived: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Buyer */
+            is_buyer: boolean;
+            /** Is Consignor */
+            is_consignor: boolean;
+            /** Is Seller */
+            is_seller: boolean;
+            /** Name */
+            name: string;
+            /** National Id Masked */
+            national_id_masked: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Phone Primary */
+            phone_primary: string | null;
+            /** Phones */
+            phones: string[];
+        };
+        /** CustomerRefundIn */
+        CustomerRefundIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Refund Date
+             * Format: date
+             */
+            refund_date: string;
+        };
+        /** CustomerRefundOut */
+        CustomerRefundOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Refund Date
+             * Format: date
+             */
+            refund_date: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED";
+        };
+        /** CustomerUpdate */
+        CustomerUpdate: {
+            /** Address */
+            address?: string | null;
+            /** Archived */
+            archived?: boolean | null;
+            /** Is Buyer */
+            is_buyer?: boolean | null;
+            /** Is Seller */
+            is_seller?: boolean | null;
+            /** Name */
+            name?: string | null;
+            /** National Id */
+            national_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Other Phones */
+            other_phones?: string[] | null;
+            /** Phone */
+            phone?: string | null;
+        };
+        /** DocumentOut */
+        DocumentOut: {
+            /** Content Type */
+            content_type: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Doc Type
+             * @enum {string}
+             */
+            doc_type: "LICENSE" | "PURCHASE_CONTRACT" | "SELLER_RECEIPT" | "INSPECTION_REPORT" | "SALE_CONTRACT" | "ID_COPY" | "OTHER";
+            /**
+             * Entity Id
+             * Format: uuid
+             */
+            entity_id: string;
+            /**
+             * Entity Type
+             * @enum {string}
+             */
+            entity_type: "VEHICLE" | "CUSTOMER" | "SALE" | "SUPPLIER";
+            /** File Name */
+            file_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Sensitivity
+             * @enum {string}
+             */
+            sensitivity: "NORMAL" | "COST";
+            /** Size Bytes */
+            size_bytes: number;
+        };
+        /** DocumentRegisterIn */
+        DocumentRegisterIn: {
+            /**
+             * Content Type
+             * @enum {string}
+             */
+            content_type: "application/pdf" | "image/webp" | "image/jpeg" | "image/png";
+            /**
+             * Doc Type
+             * @enum {string}
+             */
+            doc_type: "LICENSE" | "PURCHASE_CONTRACT" | "SELLER_RECEIPT" | "INSPECTION_REPORT" | "SALE_CONTRACT" | "ID_COPY" | "OTHER";
+            /**
+             * Entity Id
+             * Format: uuid
+             */
+            entity_id: string;
+            /**
+             * Entity Type
+             * @enum {string}
+             */
+            entity_type: "VEHICLE" | "CUSTOMER" | "SALE" | "SUPPLIER";
+            /** File Name */
+            file_name: string;
+            /** Size Bytes */
+            size_bytes: number;
+            /** Storage Path */
+            storage_path: string;
+        };
+        /** DocumentUploadIn */
+        DocumentUploadIn: {
+            /**
+             * Content Type
+             * @enum {string}
+             */
+            content_type: "application/pdf" | "image/webp" | "image/jpeg" | "image/png";
+            /**
+             * Doc Type
+             * @enum {string}
+             */
+            doc_type: "LICENSE" | "PURCHASE_CONTRACT" | "SELLER_RECEIPT" | "INSPECTION_REPORT" | "SALE_CONTRACT" | "ID_COPY" | "OTHER";
+            /**
+             * Entity Id
+             * Format: uuid
+             */
+            entity_id: string;
+            /**
+             * Entity Type
+             * @enum {string}
+             */
+            entity_type: "VEHICLE" | "CUSTOMER" | "SALE" | "SUPPLIER";
+            /** File Name */
+            file_name: string;
+            /** Size Bytes */
+            size_bytes: number;
+        };
         /** EntryRef */
         EntryRef: {
             /** Entry No */
@@ -890,7 +1928,8 @@ export interface components {
         };
         /**
          * GeneralExpenseIn
-         * @description Paid from a cash box / bank (rule 20), or personally by a partner (rule 30).
+         * @description Paid from a cash box / bank (rule 20), personally by a partner (rule 30),
+         *     or on credit from a supplier (rule 31).
          */
         GeneralExpenseIn: {
             /**
@@ -916,6 +1955,8 @@ export interface components {
             paid_by_partner_id?: string | null;
             /** Partner Funding Mode */
             partner_funding_mode?: ("CURRENT_ACCOUNT" | "LOAN") | null;
+            /** Supplier Id */
+            supplier_id?: string | null;
         };
         /** GeneralExpenseOut */
         GeneralExpenseOut: {
@@ -971,6 +2012,10 @@ export interface components {
              * @enum {string}
              */
             status: "POSTED" | "REVERSED";
+            /** Supplier Id */
+            supplier_id?: string | null;
+            /** Supplier Name */
+            supplier_name?: string | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1093,6 +2138,69 @@ export interface components {
              */
             type: "ASSET" | "LIABILITY" | "EQUITY" | "INCOME" | "EXPENSE";
         };
+        /** LocationChange */
+        LocationChange: {
+            /** From Name Ar */
+            from_name_ar: string | null;
+            /**
+             * Moved At
+             * Format: date-time
+             */
+            moved_at: string;
+            /** Reason */
+            reason: string | null;
+            /** To Name Ar */
+            to_name_ar: string | null;
+        };
+        /** LocationIn */
+        LocationIn: {
+            /**
+             * Is Default
+             * @default false
+             */
+            is_default: boolean;
+            /** Name Ar */
+            name_ar: string;
+            /** Name En */
+            name_en?: string | null;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "BRANCH_YARD" | "OUTDOOR_LOT" | "WORKSHOP" | "EXTERNAL_SHOWROOM" | "CUSTOMER";
+        };
+        /** LocationOut */
+        LocationOut: {
+            /** Archived */
+            archived: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Default */
+            is_default: boolean;
+            /** Name Ar */
+            name_ar: string;
+            /** Name En */
+            name_en: string | null;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "BRANCH_YARD" | "OUTDOOR_LOT" | "WORKSHOP" | "EXTERNAL_SHOWROOM" | "CUSTOMER";
+        };
+        /** LocationUpdate */
+        LocationUpdate: {
+            /** Archived */
+            archived?: boolean | null;
+            /** Is Default */
+            is_default?: boolean | null;
+            /** Name Ar */
+            name_ar?: string | null;
+            /** Name En */
+            name_en?: string | null;
+        };
         /** MeOut */
         MeOut: {
             /** Is Platform Admin */
@@ -1100,6 +2208,40 @@ export interface components {
             /** Memberships */
             memberships: components["schemas"]["MembershipOut"][];
             user: components["schemas"]["UserOut"];
+        };
+        /** MediaOut */
+        MediaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Sort Order */
+            sort_order: number;
+            /** Url */
+            url: string | null;
+        };
+        /** MediaRegisterIn */
+        MediaRegisterIn: {
+            /**
+             * Content Type
+             * @enum {string}
+             */
+            content_type: "image/webp" | "image/jpeg" | "image/png";
+            /** Size Bytes */
+            size_bytes: number;
+            /** Storage Path */
+            storage_path: string;
+        };
+        /** MediaUploadIn */
+        MediaUploadIn: {
+            /**
+             * Content Type
+             * @enum {string}
+             */
+            content_type: "image/webp" | "image/jpeg" | "image/png";
+            /** Size Bytes */
+            size_bytes: number;
         };
         /** MemberOut */
         MemberOut: {
@@ -1235,6 +2377,17 @@ export interface components {
              * @enum {string}
              */
             status: "POSTED" | "REVERSED";
+        };
+        /** Page[CustomerOut] */
+        Page_CustomerOut_: {
+            /** Items */
+            items: components["schemas"]["CustomerOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
         };
         /** Page[GeneralExpenseOut] */
         Page_GeneralExpenseOut_: {
@@ -1536,6 +2689,14 @@ export interface components {
              */
             status: "OPEN" | "LOCKED";
         };
+        /** PostingResult[CustomerRefundOut] */
+        PostingResult_CustomerRefundOut_: {
+            document: components["schemas"]["CustomerRefundOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
         /** PostingResult[GeneralExpenseOut] */
         PostingResult_GeneralExpenseOut_: {
             document: components["schemas"]["GeneralExpenseOut"];
@@ -1560,9 +2721,57 @@ export interface components {
             /** Warnings */
             warnings?: components["schemas"]["PostingWarning"][];
         };
+        /** PostingResult[PurchaseOut] */
+        PostingResult_PurchaseOut_: {
+            document: components["schemas"]["PurchaseOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[ReservationOut] */
+        PostingResult_ReservationOut_: {
+            document: components["schemas"]["ReservationOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[SaleOut] */
+        PostingResult_SaleOut_: {
+            document: components["schemas"]["SaleOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[SellerPaymentOut] */
+        PostingResult_SellerPaymentOut_: {
+            document: components["schemas"]["SellerPaymentOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[SupplierPaymentOut] */
+        PostingResult_SupplierPaymentOut_: {
+            document: components["schemas"]["SupplierPaymentOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
         /** PostingResult[TransferOut] */
         PostingResult_TransferOut_: {
             document: components["schemas"]["TransferOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[VehicleExpenseOut] */
+        PostingResult_VehicleExpenseOut_: {
+            document: components["schemas"]["VehicleExpenseOut"];
             /** Journal Entries */
             journal_entries: components["schemas"]["EntryRef"][];
             /** Warnings */
@@ -1626,6 +2835,230 @@ export interface components {
              */
             debit: string;
         };
+        /** PriceChange */
+        PriceChange: {
+            /** Asking Price */
+            asking_price: string | null;
+            /**
+             * Changed At
+             * Format: date-time
+             */
+            changed_at: string;
+            /** Min Price */
+            min_price?: string | null;
+        };
+        /** PurchaseIn */
+        PurchaseIn: {
+            /** Notes */
+            notes?: string | null;
+            /** Payments */
+            payments?: components["schemas"]["CashLegIn"][];
+            /**
+             * Price
+             * @example 25000.00
+             */
+            price: string;
+            /**
+             * Purchase Date
+             * Format: date
+             */
+            purchase_date: string;
+            /**
+             * Ready For Sale
+             * @default false
+             */
+            ready_for_sale: boolean;
+            /**
+             * Seller Customer Id
+             * Format: uuid
+             */
+            seller_customer_id: string;
+        };
+        /** PurchaseOut */
+        PurchaseOut: {
+            /**
+             * Deferred Amount
+             * @example 25000.00
+             */
+            deferred_amount: string;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Price
+             * @example 25000.00
+             */
+            price: string;
+            /**
+             * Purchase Date
+             * Format: date
+             */
+            purchase_date: string;
+            /**
+             * Seller Customer Id
+             * Format: uuid
+             */
+            seller_customer_id: string;
+            /** Seller Name */
+            seller_name: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED";
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+        };
+        /** PurchaseSummary */
+        PurchaseSummary: {
+            /**
+             * Deferred Amount
+             * @example 25000.00
+             */
+            deferred_amount: string;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Outstanding
+             * @example 25000.00
+             */
+            outstanding: string;
+            /**
+             * Price
+             * @example 25000.00
+             */
+            price: string;
+            /**
+             * Purchase Date
+             * Format: date
+             */
+            purchase_date: string;
+            /**
+             * Seller Customer Id
+             * Format: uuid
+             */
+            seller_customer_id: string;
+            /** Seller Name */
+            seller_name: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "PURCHASE" | "TRADE_IN";
+        };
+        /** ReservationIn */
+        ReservationIn: {
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /**
+             * Deposit Amount
+             * @example 25000.00
+             */
+            deposit_amount: string;
+            /** Expires On */
+            expires_on?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Reservation Date
+             * Format: date
+             */
+            reservation_date: string;
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+        };
+        /** ReservationOut */
+        ReservationOut: {
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Customer Name */
+            customer_name: string;
+            /**
+             * Deposit Amount
+             * @example 25000.00
+             */
+            deposit_amount: string;
+            /** Entry No */
+            entry_no: number;
+            /** Expired */
+            expired: boolean;
+            /** Expires On */
+            expires_on: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Reservation Date
+             * Format: date
+             */
+            reservation_date: string;
+            /** Sale Id */
+            sale_id: string | null;
+            /** Settled On */
+            settled_on: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ACTIVE" | "RELEASED" | "APPLIED" | "REFUNDED" | "FORFEITED";
+            /** Stock No */
+            stock_no: string;
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+            /** Vehicle Label */
+            vehicle_label: string;
+        };
+        /** ReservationSettleIn */
+        ReservationSettleIn: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "REFUND" | "FORFEIT";
+            /** Cash Account Id */
+            cash_account_id?: string | null;
+            /**
+             * Settle Date
+             * Format: date
+             */
+            settle_date: string;
+        };
         /** ReverseIn */
         ReverseIn: {
             /** Reason */
@@ -1649,6 +3082,334 @@ export interface components {
             name_ar: string;
             /** Name En */
             name_en: string;
+        };
+        /** SaleCancelIn */
+        SaleCancelIn: {
+            /** Cancel Date */
+            cancel_date?: string | null;
+            /** Reason */
+            reason: string;
+        };
+        /** SaleDraftIn */
+        SaleDraftIn: {
+            /**
+             * Buyer Customer Id
+             * Format: uuid
+             */
+            buyer_customer_id: string;
+            /**
+             * Discount
+             * @default 0
+             * @example 25000.00
+             */
+            discount: string;
+            /**
+             * List Price
+             * @example 25000.00
+             */
+            list_price: string;
+            /** Notes */
+            notes?: string | null;
+            /** Payments */
+            payments?: components["schemas"]["SalePaymentIn"][];
+            /** Reservation Id */
+            reservation_id?: string | null;
+            /**
+             * Sale Date
+             * Format: date
+             */
+            sale_date: string;
+            trade_in?: components["schemas"]["TradeInIn"] | null;
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+        };
+        /** SaleListRow */
+        SaleListRow: {
+            /** Buyer Name */
+            buyer_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Invoice No */
+            invoice_no: string | null;
+            /**
+             * Sale Date
+             * Format: date
+             */
+            sale_date: string;
+            /** Sale No */
+            sale_no: string;
+            /**
+             * Sale Price
+             * @example 25000.00
+             */
+            sale_price: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "POSTED" | "CANCELLED";
+            /** Stock No */
+            stock_no: string;
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+            /** Vehicle Label */
+            vehicle_label: string;
+        };
+        /** SaleOut */
+        SaleOut: {
+            /**
+             * Buyer Customer Id
+             * Format: uuid
+             */
+            buyer_customer_id: string;
+            /** Buyer Name */
+            buyer_name: string;
+            /** Buyer Phone */
+            buyer_phone: string | null;
+            /** Cancel Date */
+            cancel_date: string | null;
+            /** Cancel Reason */
+            cancel_reason: string | null;
+            /** Cancellation Method */
+            cancellation_method: ("REFUND_LIABILITY" | "MIRROR") | null;
+            /** Cost Entry No */
+            cost_entry_no: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By Me */
+            created_by_me: boolean;
+            /**
+             * Deposit Applied
+             * @example 25000.00
+             */
+            deposit_applied: string;
+            /**
+             * Discount
+             * @example 25000.00
+             */
+            discount: string;
+            /** Einvoice Status */
+            einvoice_status: string;
+            /** Entry No */
+            entry_no: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Invoice No */
+            invoice_no: string | null;
+            /**
+             * List Price
+             * @example 25000.00
+             */
+            list_price: string;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Paid Total
+             * @example 25000.00
+             */
+            paid_total: string;
+            /** Payments */
+            payments: components["schemas"]["SalePaymentOut"][];
+            profit?: components["schemas"]["SaleProfit"] | null;
+            /**
+             * Remaining
+             * @example 25000.00
+             */
+            remaining: string;
+            /** Reservation Id */
+            reservation_id: string | null;
+            /**
+             * Sale Date
+             * Format: date
+             */
+            sale_date: string;
+            /** Sale No */
+            sale_no: string;
+            /**
+             * Sale Price
+             * @example 25000.00
+             */
+            sale_price: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "POSTED" | "CANCELLED";
+            /** Stock No */
+            stock_no: string;
+            trade_in: components["schemas"]["TradeInIn"] | null;
+            /**
+             * Trade In Value
+             * @example 25000.00
+             */
+            trade_in_value: string;
+            /** Trade In Vehicle Id */
+            trade_in_vehicle_id: string | null;
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+            /** Vehicle Label */
+            vehicle_label: string;
+        };
+        /** SalePage */
+        SalePage: {
+            /** Items */
+            items: components["schemas"]["SaleListRow"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** SalePaymentIn */
+        SalePaymentIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Payment Method Id */
+            payment_method_id?: string | null;
+            /** Reference */
+            reference?: string | null;
+        };
+        /** SalePaymentOut */
+        SalePaymentOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Cash Account Name Ar */
+            cash_account_name_ar: string;
+            /** Cash Account Name En */
+            cash_account_name_en: string | null;
+            /** Payment Method Id */
+            payment_method_id: string | null;
+            /** Reference */
+            reference: string | null;
+        };
+        /** SaleProfit */
+        SaleProfit: {
+            /**
+             * Cost
+             * @example 25000.00
+             */
+            cost: string;
+            /**
+             * Gross Profit
+             * @example 25000.00
+             */
+            gross_profit: string;
+            /** Profit Pct */
+            profit_pct: string;
+        };
+        /** SearchOut */
+        SearchOut: {
+            /** Customers */
+            customers: components["schemas"]["CustomerHit"][];
+            /** Vehicles */
+            vehicles: components["schemas"]["VehicleHit"][];
+        };
+        /** SellerPayable */
+        SellerPayable: {
+            /**
+             * Outstanding
+             * @example 25000.00
+             */
+            outstanding: string;
+            /** Stock No */
+            stock_no: string;
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+            /** Vehicle Label */
+            vehicle_label: string;
+        };
+        /** SellerPaymentIn */
+        SellerPaymentIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Payment Date
+             * Format: date
+             */
+            payment_date: string;
+        };
+        /** SellerPaymentOut */
+        SellerPaymentOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Payment Date
+             * Format: date
+             */
+            payment_date: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED";
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
         };
         /** ShareChangeIn */
         ShareChangeIn: {
@@ -1691,6 +3452,11 @@ export interface components {
             /** Percentage */
             percentage: string;
         };
+        /** SignedUrlOut */
+        SignedUrlOut: {
+            /** Url */
+            url: string;
+        };
         /** StatementLine */
         StatementLine: {
             /**
@@ -1728,6 +3494,193 @@ export interface components {
             running_net: string;
             /** Source Type */
             source_type: string;
+        };
+        /** StatementRow */
+        StatementRow: {
+            /**
+             * Amount Owed
+             * @example 25000.00
+             */
+            amount_owed: string;
+            /**
+             * Amount Paid
+             * @example 25000.00
+             */
+            amount_paid: string;
+            /**
+             * Balance
+             * @example 25000.00
+             */
+            balance: string;
+            /** Description */
+            description: string;
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /** Entry No */
+            entry_no: number;
+            /** Is Reversal */
+            is_reversal: boolean;
+            /** Reversed */
+            reversed: boolean;
+            /** Source Type */
+            source_type: string;
+        };
+        /** StatusChange */
+        StatusChange: {
+            /**
+             * Changed At
+             * Format: date-time
+             */
+            changed_at: string;
+            /** From Status */
+            from_status: ("DRAFT" | "IN_PREPARATION" | "AVAILABLE" | "RESERVED" | "SOLD" | "DELIVERED" | "AT_OTHER_SHOWROOM" | "RETURNED_TO_OWNER" | "ARCHIVED") | null;
+            /** Reason */
+            reason: string | null;
+            /**
+             * To Status
+             * @enum {string}
+             */
+            to_status: "DRAFT" | "IN_PREPARATION" | "AVAILABLE" | "RESERVED" | "SOLD" | "DELIVERED" | "AT_OTHER_SHOWROOM" | "RETURNED_TO_OWNER" | "ARCHIVED";
+        };
+        /** SupplierIn */
+        SupplierIn: {
+            /**
+             * Kind
+             * @default OTHER
+             * @enum {string}
+             */
+            kind: "WORKSHOP" | "TRANSPORT" | "PARTS" | "AD_AGENCY" | "OTHER";
+            /** Name */
+            name: string;
+            /** Notes */
+            notes?: string | null;
+            /** Phone */
+            phone?: string | null;
+        };
+        /** SupplierOut */
+        SupplierOut: {
+            /** Archived */
+            archived: boolean;
+            /**
+             * Balance
+             * @example 25000.00
+             */
+            balance: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "WORKSHOP" | "TRANSPORT" | "PARTS" | "AD_AGENCY" | "OTHER";
+            /** Name */
+            name: string;
+            /** Notes */
+            notes: string | null;
+            /** Phone */
+            phone: string | null;
+        };
+        /** SupplierPaymentIn */
+        SupplierPaymentIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Payment Date
+             * Format: date
+             */
+            payment_date: string;
+        };
+        /** SupplierPaymentOut */
+        SupplierPaymentOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Payment Date
+             * Format: date
+             */
+            payment_date: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED";
+            /**
+             * Supplier Id
+             * Format: uuid
+             */
+            supplier_id: string;
+        };
+        /** SupplierStatementOut */
+        SupplierStatementOut: {
+            /**
+             * Closing Balance
+             * @example 25000.00
+             */
+            closing_balance: string;
+            /** Currency Code */
+            currency_code: string;
+            /**
+             * Date From
+             * Format: date
+             */
+            date_from: string;
+            /**
+             * Date To
+             * Format: date
+             */
+            date_to: string;
+            /** Lines */
+            lines: components["schemas"]["StatementRow"][];
+            /**
+             * Opening Balance
+             * @example 25000.00
+             */
+            opening_balance: string;
+            supplier: components["schemas"]["SupplierOut"];
+        };
+        /** SupplierUpdate */
+        SupplierUpdate: {
+            /** Archived */
+            archived?: boolean | null;
+            /** Kind */
+            kind?: ("WORKSHOP" | "TRANSPORT" | "PARTS" | "AD_AGENCY" | "OTHER") | null;
+            /** Name */
+            name?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Phone */
+            phone?: string | null;
         };
         /** TenantOut */
         TenantOut: {
@@ -1878,6 +3831,35 @@ export interface components {
             /** Sale Cancellation Method */
             sale_cancellation_method?: ("REFUND_LIABILITY" | "MIRROR") | null;
         };
+        /**
+         * TradeInIn
+         * @description The buyer's own car taken as part payment (rule 26).
+         */
+        TradeInIn: {
+            /**
+             * Agreed Value
+             * @example 25000.00
+             */
+            agreed_value: string;
+            /** Color Ext */
+            color_ext?: string | null;
+            /** Fuel */
+            fuel?: ("PETROL" | "DIESEL" | "HYBRID" | "ELECTRIC" | "NATURAL_GAS" | "OTHER") | null;
+            /** Make */
+            make: string;
+            /** Mileage Km */
+            mileage_km?: number | null;
+            /** Model */
+            model: string;
+            /** Plate No */
+            plate_no?: string | null;
+            /** Transmission */
+            transmission?: ("AUTOMATIC" | "MANUAL" | "CVT" | "OTHER") | null;
+            /** Vin */
+            vin?: string | null;
+            /** Year */
+            year?: number | null;
+        };
         /** TransferIn */
         TransferIn: {
             /**
@@ -1960,6 +3942,16 @@ export interface components {
             /** Reason */
             reason: string;
         };
+        /**
+         * UploadTicket
+         * @description PUT the file to upload_url (valid 15 minutes), then register storage_path.
+         */
+        UploadTicket: {
+            /** Storage Path */
+            storage_path: string;
+            /** Upload Url */
+            upload_url: string;
+        };
         /** UserOut */
         UserOut: {
             /** Email */
@@ -1984,6 +3976,451 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /** VehicleCost */
+        VehicleCost: {
+            /** Cost Complete */
+            cost_complete: boolean;
+            /** Lines */
+            lines: components["schemas"]["CostLine"][];
+            /** Missing Categories */
+            missing_categories: string[];
+            /**
+             * Total Cost
+             * @example 25000.00
+             */
+            total_cost: string;
+        };
+        /** VehicleDetail */
+        VehicleDetail: {
+            /**
+             * Acquisition Source
+             * @enum {string}
+             */
+            acquisition_source: "DIRECT_PURCHASE" | "TRADE_IN" | "CONSIGNMENT_IN" | "AUCTION" | "IMPORT";
+            /** Aging */
+            aging: ("FRESH" | "AGING" | "OLD" | "STALE") | null;
+            /** Archived */
+            archived: boolean;
+            /** Asking Price */
+            asking_price: string | null;
+            /** Body Type */
+            body_type: string | null;
+            /** Color Ext */
+            color_ext: string | null;
+            /** Color Int */
+            color_int: string | null;
+            cost?: components["schemas"]["VehicleCost"] | null;
+            /** Current Location Id */
+            current_location_id: string | null;
+            /** Days In Stock */
+            days_in_stock: number | null;
+            /** Days Since Price Change */
+            days_since_price_change: number | null;
+            /** Documents */
+            documents: components["schemas"]["DocumentOut"][];
+            /** Engine Cc */
+            engine_cc: number | null;
+            /** Fuel */
+            fuel: ("PETROL" | "DIESEL" | "HYBRID" | "ELECTRIC" | "NATURAL_GAS" | "OTHER") | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** License Expiry */
+            license_expiry: string | null;
+            /** License Governorate */
+            license_governorate: string | null;
+            /** Location History */
+            location_history: components["schemas"]["LocationChange"][];
+            /** Location Name Ar */
+            location_name_ar: string | null;
+            /** Location Name En */
+            location_name_en: string | null;
+            /** Make */
+            make: string;
+            /** Media */
+            media: components["schemas"]["MediaOut"][];
+            /** Mileage Km */
+            mileage_km: number | null;
+            /** Min Price */
+            min_price?: string | null;
+            /** Model */
+            model: string;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Ownership Type
+             * @enum {string}
+             */
+            ownership_type: "OWNED" | "CONSIGNED_IN";
+            /** Plate No */
+            plate_no: string | null;
+            /** Price History */
+            price_history: components["schemas"]["PriceChange"][];
+            profit?: components["schemas"]["VehicleProfit"] | null;
+            purchase?: components["schemas"]["PurchaseSummary"] | null;
+            reservation: components["schemas"]["ActiveReservation"] | null;
+            sale: components["schemas"]["VehicleSaleInfo"] | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "IN_PREPARATION" | "AVAILABLE" | "RESERVED" | "SOLD" | "DELIVERED" | "AT_OTHER_SHOWROOM" | "RETURNED_TO_OWNER" | "ARCHIVED";
+            /** Status History */
+            status_history: components["schemas"]["StatusChange"][];
+            /** Stock Date */
+            stock_date: string | null;
+            /** Stock No */
+            stock_no: string;
+            /** Transmission */
+            transmission: ("AUTOMATIC" | "MANUAL" | "CVT" | "OTHER") | null;
+            /** Trim */
+            trim: string | null;
+            /** Vin */
+            vin: string | null;
+            /** Year */
+            year: number | null;
+        };
+        /** VehicleExpenseIn */
+        VehicleExpenseIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /** Cash Account Id */
+            cash_account_id?: string | null;
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Expense Date
+             * Format: date
+             */
+            expense_date: string;
+            /**
+             * Funding
+             * @default CASH_ACCOUNT
+             * @enum {string}
+             */
+            funding: "CASH_ACCOUNT" | "SUPPLIER_CREDIT" | "PARTNER";
+            /** Paid By Partner Id */
+            paid_by_partner_id?: string | null;
+            /** Partner Funding Mode */
+            partner_funding_mode?: ("CURRENT_ACCOUNT" | "LOAN") | null;
+            /** Supplier Id */
+            supplier_id?: string | null;
+        };
+        /** VehicleExpenseOut */
+        VehicleExpenseOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /** Cash Account Name Ar */
+            cash_account_name_ar: string | null;
+            /** Category Code */
+            category_code: string;
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Category Name Ar */
+            category_name_ar: string;
+            /** Category Name En */
+            category_name_en: string;
+            /** Description */
+            description: string | null;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Expense Date
+             * Format: date
+             */
+            expense_date: string;
+            /**
+             * Funding
+             * @enum {string}
+             */
+            funding: "CASH_ACCOUNT" | "SUPPLIER_CREDIT" | "PARTNER";
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Paid By Partner Name Ar */
+            paid_by_partner_name_ar: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED";
+            /** Supplier Name */
+            supplier_name: string | null;
+            /**
+             * Treatment
+             * @enum {string}
+             */
+            treatment: "CAPITALIZE" | "COGS";
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+        };
+        /** VehicleHit */
+        VehicleHit: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+            /** Plate No */
+            plate_no: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "IN_PREPARATION" | "AVAILABLE" | "RESERVED" | "SOLD" | "DELIVERED" | "AT_OTHER_SHOWROOM" | "RETURNED_TO_OWNER" | "ARCHIVED";
+            /** Stock No */
+            stock_no: string;
+            /** Vin */
+            vin: string | null;
+        };
+        /** VehicleIn */
+        VehicleIn: {
+            /**
+             * Acquisition Source
+             * @default DIRECT_PURCHASE
+             * @enum {string}
+             */
+            acquisition_source: "DIRECT_PURCHASE" | "AUCTION" | "IMPORT";
+            /** Asking Price */
+            asking_price?: string | null;
+            /** Body Type */
+            body_type?: string | null;
+            /** Color Ext */
+            color_ext?: string | null;
+            /** Color Int */
+            color_int?: string | null;
+            /** Current Location Id */
+            current_location_id?: string | null;
+            /** Engine Cc */
+            engine_cc?: number | null;
+            /** Fuel */
+            fuel?: ("PETROL" | "DIESEL" | "HYBRID" | "ELECTRIC" | "NATURAL_GAS" | "OTHER") | null;
+            /** License Expiry */
+            license_expiry?: string | null;
+            /** License Governorate */
+            license_governorate?: string | null;
+            /** Make */
+            make: string;
+            /** Mileage Km */
+            mileage_km?: number | null;
+            /** Min Price */
+            min_price?: string | null;
+            /** Model */
+            model: string;
+            /** Notes */
+            notes?: string | null;
+            /** Plate No */
+            plate_no?: string | null;
+            /** Transmission */
+            transmission?: ("AUTOMATIC" | "MANUAL" | "CVT" | "OTHER") | null;
+            /** Trim */
+            trim?: string | null;
+            /** Vin */
+            vin?: string | null;
+            /** Year */
+            year?: number | null;
+        };
+        /** VehicleMoveIn */
+        VehicleMoveIn: {
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** VehiclePage */
+        VehiclePage: {
+            /** Items */
+            items: components["schemas"]["VehicleRow"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** VehicleProfit */
+        VehicleProfit: {
+            /**
+             * Cost
+             * @example 25000.00
+             */
+            cost: string;
+            /** Estimate */
+            estimate: boolean;
+            /**
+             * Gross Profit
+             * @example 25000.00
+             */
+            gross_profit: string;
+            /** Profit Pct */
+            profit_pct: string;
+            /**
+             * Sale Price
+             * @example 25000.00
+             */
+            sale_price: string;
+        };
+        /**
+         * VehicleRow
+         * @description One inventory row. Cost fields only with vehicle.view_cost.
+         */
+        VehicleRow: {
+            /** Aging */
+            aging: ("FRESH" | "AGING" | "OLD" | "STALE") | null;
+            /** Asking Price */
+            asking_price: string | null;
+            /** Color Ext */
+            color_ext: string | null;
+            /** Cost Complete */
+            cost_complete?: boolean | null;
+            /** Days In Stock */
+            days_in_stock: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Location Name Ar */
+            location_name_ar: string | null;
+            /** Location Name En */
+            location_name_en: string | null;
+            /** Make */
+            make: string;
+            /** Min Price */
+            min_price?: string | null;
+            /** Model */
+            model: string;
+            /**
+             * Ownership Type
+             * @enum {string}
+             */
+            ownership_type: "OWNED" | "CONSIGNED_IN";
+            /** Photo Url */
+            photo_url: string | null;
+            /** Plate No */
+            plate_no: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "IN_PREPARATION" | "AVAILABLE" | "RESERVED" | "SOLD" | "DELIVERED" | "AT_OTHER_SHOWROOM" | "RETURNED_TO_OWNER" | "ARCHIVED";
+            /** Stock Date */
+            stock_date: string | null;
+            /** Stock No */
+            stock_no: string;
+            /** Total Cost */
+            total_cost?: string | null;
+            /** Trim */
+            trim: string | null;
+            /** Vin */
+            vin: string | null;
+            /** Year */
+            year: number | null;
+        };
+        /** VehicleSaleInfo */
+        VehicleSaleInfo: {
+            /**
+             * Buyer Customer Id
+             * Format: uuid
+             */
+            buyer_customer_id: string;
+            /** Buyer Name */
+            buyer_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Invoice No */
+            invoice_no: string | null;
+            /**
+             * Sale Date
+             * Format: date
+             */
+            sale_date: string;
+            /** Sale No */
+            sale_no: string;
+            /**
+             * Sale Price
+             * @example 25000.00
+             */
+            sale_price: string;
+        };
+        /** VehicleStatusIn */
+        VehicleStatusIn: {
+            /** Reason */
+            reason?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "IN_PREPARATION" | "AVAILABLE" | "RESERVED" | "SOLD" | "DELIVERED" | "AT_OTHER_SHOWROOM" | "RETURNED_TO_OWNER" | "ARCHIVED";
+        };
+        /** VehicleUpdate */
+        VehicleUpdate: {
+            /** Asking Price */
+            asking_price?: string | null;
+            /** Body Type */
+            body_type?: string | null;
+            /** Color Ext */
+            color_ext?: string | null;
+            /** Color Int */
+            color_int?: string | null;
+            /** Engine Cc */
+            engine_cc?: number | null;
+            /** Fuel */
+            fuel?: ("PETROL" | "DIESEL" | "HYBRID" | "ELECTRIC" | "NATURAL_GAS" | "OTHER") | null;
+            /** License Expiry */
+            license_expiry?: string | null;
+            /** License Governorate */
+            license_governorate?: string | null;
+            /** Make */
+            make?: string | null;
+            /** Mileage Km */
+            mileage_km?: number | null;
+            /** Min Price */
+            min_price?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Plate No */
+            plate_no?: string | null;
+            /** Transmission */
+            transmission?: ("AUTOMATIC" | "MANUAL" | "CVT" | "OTHER") | null;
+            /** Trim */
+            trim?: string | null;
+            /** Vin */
+            vin?: string | null;
+            /** Year */
+            year?: number | null;
         };
     };
     responses: never;
@@ -2086,6 +4523,424 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CashAccountOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_customers_api_v1_customers_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                role?: ("BUYER" | "SELLER" | "CONSIGNOR") | null;
+                include_archived?: boolean;
+                page?: number;
+                page_size?: number;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_CustomerOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_customer_api_v1_customers_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_customer_api_v1_customers__customer_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                customer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_customer_api_v1_customers__customer_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                customer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reveal_national_id_api_v1_customers__customer_id__national_id_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                customer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NationalIdOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_refund_api_v1_customers__customer_id__refunds_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                customer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerRefundIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_CustomerRefundOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_refund_api_v1_customers__customer_id__refunds_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                customer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerRefundIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_documents_api_v1_documents_get: {
+        parameters: {
+            query: {
+                entity_type: "VEHICLE" | "CUSTOMER" | "SALE" | "SUPPLIER";
+                entity_id: string;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_document_api_v1_documents_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentRegisterIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    document_upload_url_api_v1_documents_upload_url_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentUploadIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadTicket"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_document_api_v1_documents__document_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    document_url_api_v1_documents__document_id__url_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignedUrlOut"];
                 };
             };
             /** @description Validation Error */
@@ -2479,6 +5334,111 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LedgerAccountOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_locations_api_v1_locations_get: {
+        parameters: {
+            query?: {
+                include_archived?: boolean;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocationOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_location_api_v1_locations_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LocationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_location_api_v1_locations__location_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LocationUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocationOut"];
                 };
             };
             /** @description Validation Error */
@@ -3239,6 +6199,186 @@ export interface operations {
             };
         };
     };
+    list_reservations_api_v1_reservations_get: {
+        parameters: {
+            query?: {
+                status?: ("ACTIVE" | "RELEASED" | "APPLIED" | "REFUNDED" | "FORFEITED") | null;
+                vehicle_id?: string | null;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_reservation_api_v1_reservations_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReservationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_ReservationOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_reservation_api_v1_reservations_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReservationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    settle_reservation_api_v1_reservations__reservation_id__settle_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReservationSettleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_ReservationOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_settle_api_v1_reservations__reservation_id__settle_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReservationSettleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_roles_api_v1_roles_get: {
         parameters: {
             query?: never;
@@ -3257,6 +6397,607 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RoleOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_sales_api_v1_sales_get: {
+        parameters: {
+            query?: {
+                status?: ("DRAFT" | "POSTED" | "CANCELLED") | null;
+                q?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalePage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_sale_api_v1_sales_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaleDraftIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_sale_api_v1_sales__sale_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                sale_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_sale_api_v1_sales__sale_id__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                sale_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaleDraftIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_sale_api_v1_sales__sale_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                sale_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_sale_api_v1_sales__sale_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                sale_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaleCancelIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_SaleOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_cancel_api_v1_sales__sale_id__cancel_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                sale_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaleCancelIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sale_document_api_v1_sales__sale_id__document_get: {
+        parameters: {
+            query?: {
+                kind?: "invoice" | "contract";
+                lang?: "ar" | "en";
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                sale_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_sale_api_v1_sales__sale_id__post_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                sale_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_SaleOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_post_api_v1_sales__sale_id__post_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                sale_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quick_search_api_v1_search_get: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_suppliers_api_v1_suppliers_get: {
+        parameters: {
+            query?: {
+                include_archived?: boolean;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplierOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_supplier_api_v1_suppliers_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupplierIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplierOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_supplier_api_v1_suppliers__supplier_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupplierUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplierOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_payment_api_v1_suppliers__supplier_id__payments_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupplierPaymentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_SupplierPaymentOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_payment_api_v1_suppliers__supplier_id__payments_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupplierPaymentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    supplier_statement_api_v1_suppliers__supplier_id__statement_get: {
+        parameters: {
+            query: {
+                date_from: string;
+                date_to: string;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplierStatementOut"];
                 };
             };
             /** @description Validation Error */
@@ -3568,6 +7309,591 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_vehicles_api_v1_vehicles_get: {
+        parameters: {
+            query?: {
+                status?: ("DRAFT" | "IN_PREPARATION" | "AVAILABLE" | "RESERVED" | "SOLD" | "DELIVERED" | "AT_OTHER_SHOWROOM" | "RETURNED_TO_OWNER" | "ARCHIVED")[] | null;
+                make?: string | null;
+                year?: number | null;
+                location_id?: string | null;
+                ownership_type?: ("OWNED" | "CONSIGNED_IN") | null;
+                aging?: ("FRESH" | "AGING" | "OLD" | "STALE") | null;
+                q?: string | null;
+                sort?: "stock_date" | "-stock_date" | "price" | "-price" | "make" | "-created";
+                page?: number;
+                page_size?: number;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VehiclePage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_vehicle_api_v1_vehicles_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VehicleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VehicleDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_vehicle_api_v1_vehicles__vehicle_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VehicleDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_vehicle_api_v1_vehicles__vehicle_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VehicleUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VehicleDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_expenses_api_v1_vehicles__vehicle_id__expenses_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VehicleExpenseOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_expense_api_v1_vehicles__vehicle_id__expenses_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VehicleExpenseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_VehicleExpenseOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_expense_api_v1_vehicles__vehicle_id__expenses_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VehicleExpenseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_media_api_v1_vehicles__vehicle_id__media_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MediaRegisterIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    media_upload_url_api_v1_vehicles__vehicle_id__media_upload_url_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MediaUploadIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadTicket"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_media_api_v1_vehicles__vehicle_id__media__media_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+                media_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    move_vehicle_api_v1_vehicles__vehicle_id__move_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VehicleMoveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VehicleDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_purchase_api_v1_vehicles__vehicle_id__purchase_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_PurchaseOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_purchase_api_v1_vehicles__vehicle_id__purchase_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_seller_payment_api_v1_vehicles__vehicle_id__seller_payments_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SellerPaymentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_SellerPaymentOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_seller_payment_api_v1_vehicles__vehicle_id__seller_payments_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SellerPaymentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_status_api_v1_vehicles__vehicle_id__status_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VehicleStatusIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VehicleDetail"];
                 };
             };
             /** @description Validation Error */

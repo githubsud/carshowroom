@@ -470,6 +470,7 @@ class _ExpensePlan:
     category: Any
     cash: ActiveCashAccount | None
     partner: Any | None
+    supplier_name: str | None = None
 
 
 def _plan_expense(conn: Connection, info: TenantInfo, payload: GeneralExpenseIn) -> _ExpensePlan:
@@ -503,6 +504,23 @@ def _plan_expense(conn: Connection, info: TenantInfo, payload: GeneralExpenseIn)
             source_id=None,
         )
         return _ExpensePlan(draft=draft, category=category, cash=None, partner=partner)
+
+    if payload.supplier_id is not None:
+        supplier = conn.execute(
+            text("select id, name from public.suppliers where id = :id and archived_at is null"),
+            {"id": payload.supplier_id},
+        ).first()
+        if supplier is None:
+            raise AppError("SUPPLIER_INVALID", "Unknown or archived supplier", status_code=422)
+        draft = rules.general_expense_on_credit(
+            entry_date=payload.expense_date,
+            amount=payload.amount,
+            expense_account=expense_account,
+            supplier_id=supplier.id,
+            description=description,
+            source_id=None,
+        )
+        return _ExpensePlan(draft=draft, category=category, cash=None, partner=None, supplier_name=supplier.name)
 
     if payload.cash_account_id is None:  # guarded by the model validator
         raise AppError("VALIDATION_ERROR", "Choose how the expense was paid", status_code=422)
@@ -540,6 +558,16 @@ def preview_expense(conn: Connection, payload: GeneralExpenseIn, *, with_lines: 
             f"{how_en}, on {on_en}. No cash leaves the showroom."
         )
         effects: list[PreviewEffect] = []
+    elif plan.supplier_name is not None:
+        summary_ar = (
+            f"سيتم تسجيل مصروف «{plan.category.name_ar}» بقيمة {amount_ar} على الحساب للمورد {plan.supplier_name} "
+            f"بتاريخ {on_ar}. الخزنة لن تتأثر حتى يتم السداد."
+        )
+        summary_en = (
+            f"A “{plan.category.name_en}” expense of {amount_en} on credit from {plan.supplier_name}, on {on_en}. "
+            "No cash leaves the showroom until the supplier is paid."
+        )
+        effects = []
     else:
         assert plan.cash is not None  # noqa: S101 - set whenever partner is None
         summary_ar = (
@@ -574,10 +602,10 @@ def record_expense(conn: Connection, payload: GeneralExpenseIn) -> PostingResult
             """
             insert into public.general_expenses
               (id, tenant_id, expense_date, category_id, amount, description, cash_account_id,
-               paid_by_partner_id, partner_funding_mode, journal_entry_id)
+               paid_by_partner_id, partner_funding_mode, supplier_id, journal_entry_id)
             values
               (:id, private.current_tenant_id(), :expense_date, :category_id, :amount, :description,
-               :cash_account_id, :paid_by_partner_id, :partner_funding_mode, :journal_entry_id)
+               :cash_account_id, :paid_by_partner_id, :partner_funding_mode, :supplier_id, :journal_entry_id)
             """
         ),
         {**payload.model_dump(), "id": document_id, "journal_entry_id": posted.id},
@@ -593,8 +621,10 @@ _EXPENSES = """
     select ge.id, ge.expense_date, ge.category_id, ec.name_ar as category_name_ar, ec.name_en as category_name_en,
            ge.amount, ge.description, ge.cash_account_id, ca.name_ar as cash_account_name_ar,
            ca.name_en as cash_account_name_en, ge.paid_by_partner_id, pa.name_ar as paid_by_partner_name_ar,
-           ge.partner_funding_mode, ge.status, je.entry_no, rje.entry_no as reversal_entry_no, ge.created_at
+           ge.partner_funding_mode, ge.supplier_id, su.name as supplier_name, ge.status, je.entry_no,
+           rje.entry_no as reversal_entry_no, ge.created_at
       from public.general_expenses ge
+      left join public.suppliers su on su.id = ge.supplier_id
       join public.expense_categories ec on ec.id = ge.category_id
       left join public.cash_accounts ca on ca.id = ge.cash_account_id
       left join public.partners pa on pa.id = ge.paid_by_partner_id

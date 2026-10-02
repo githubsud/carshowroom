@@ -12,6 +12,7 @@ from fastapi import Depends, Header, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import text
 
+from app.core.crypto import FieldCipher
 from app.core.errors import (
     auth_invalid_token,
     permission_denied,
@@ -22,6 +23,7 @@ from app.core.errors import (
 from app.core.security import AuthenticatedUser, TokenVerifier
 from app.db.session import Database
 from app.domain.permissions import Permission
+from app.integrations.storage import Storage
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -29,6 +31,16 @@ _bearer = HTTPBearer(auto_error=False)
 def get_database(request: Request) -> Database:
     db: Database = request.app.state.database
     return db
+
+
+def get_cipher(request: Request) -> FieldCipher:
+    cipher: FieldCipher = request.app.state.cipher
+    return cipher
+
+
+def get_storage(request: Request) -> Storage:
+    storage: Storage = request.app.state.storage
+    return storage
 
 
 def get_token_verifier(request: Request) -> TokenVerifier:

@@ -1,0 +1,41 @@
+.photo {
+  inline-size: 64px;
+
+  img {
+    display: block;
+    inline-size: 56px;
+    block-size: 42px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .pi {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+  }
+}
+
+.name,
+.car {
+  font-weight: 600;
+}
+
+.estimate {
+  margin-inline-start: var(--space-1);
+  color: #b45309;
+}
+
+.tags {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+@media (width <= 640px) {
+  .hide-sm {
+    display: none;
+  }
+}

@@ -2,9 +2,10 @@
 one screen, matching hand-calculated values (SPEC §13)."""
 
 import uuid
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import psycopg
 import pytest
@@ -22,7 +23,8 @@ YOUSEF_DOHA = uuid.UUID("f0000000-0000-0000-0000-000000000013")
 AHMED = "f0000000-0000-0000-0000-000000000001"
 MONA = "f0000000-0000-0000-0000-000000000002"
 YOUSEF = "f0000000-0000-0000-0000-000000000003"
-TODAY = "2026-10-02"
+# Accounting dates are in the showroom's timezone (D-18); معرض النور is in Cairo.
+TODAY = datetime.now(ZoneInfo("Africa/Cairo")).date().isoformat()
 
 
 class _Rollback(Exception):

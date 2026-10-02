@@ -65,6 +65,20 @@ Endpoint status codes: `200` read, `201` created/posted, `204` no content, `400`
 | `REPAYMENT_EXCEEDS_LOAN` | 422 | More than is owed (D-63) |
 | `PARTNER_NOT_SETTLED` | 409 | Archive refused: open share or balance (D-62) |
 | `PARTNER_ALREADY_LINKED` | 409 | Partner already linked to another user (D-66) |
+| `VEHICLE_INVALID_TRANSITION` | 409 | `details.from`, `details.to`; also raised by the database (SR020) |
+| `VEHICLE_NOT_AVAILABLE` / `VEHICLE_RESERVED` / `VEHICLE_ARCHIVED` | 409 | The car's status does not allow the action |
+| `VEHICLE_HAS_COST` | 409 | A car with recorded cost cannot be archived (D-70) |
+| `VEHICLE_COST_MISSING` | 422 | Record the purchase before selling (business rule 5) |
+| `VIN_INVALID` | 422 | |
+| `CUSTOMER_PHONE_EXISTS` | 409 | `details.customer_id`, `details.name` (D-68) |
+| `PHONE_INVALID` / `CUSTOMER_INVALID` / `SUPPLIER_INVALID` / `LOCATION_INVALID` | 422 | |
+| `PAYMENT_EXCEEDS_BALANCE` / `REFUND_EXCEEDS_CREDIT` / `NOTHING_OWED` | 422 | More than is owed (D-79) |
+| `PURCHASE_PAYMENTS_EXCEED_PRICE` | 422 | |
+| `RESERVATION_NOT_ACTIVE` / `RESERVATION_MISMATCH` | 409 / 422 | |
+| `SALE_NOT_POSTED` / `SALE_DISCOUNT_INVALID` | 409 / 422 | |
+| `SALE_DELIVERED` / `SALE_TRADE_IN_USED` | 409 | Cancellation refused (Q-30, D-76) |
+| `USE_DOCUMENT_ACTION` / `PURCHASE_HAS_PAYMENTS` | 409 | Journal reversal refused; use the sale or deposit screen (D-75) |
+| `UPLOAD_INVALID` / `UPLOAD_MISSING` / `STORAGE_UNAVAILABLE` | 422 / 422 / 503 | Signed-URL uploads (D-74) |
 | `ENCRYPTION_UNAVAILABLE` | 503 | `NATIONAL_ID_KEY` not configured |
 | `CONSIGNMENT_TERMS_INVALID` | 422 | |
 | `DISTRIBUTION_PERIOD_OVERLAP` | 409 | Period already distributed |
@@ -131,48 +145,57 @@ Legend: 💰 money-moving (Idempotency-Key, transaction, journal entry); 👁 pr
 
 ### 3.4 Vehicles
 
+As built in Phase 4. Every vehicle response passes through cost masking (ARCHITECTURE §5): without `vehicle.view_cost` the keys `cost`, `total_cost`, `cost_complete`, `missing_categories`, `profit` and `purchase` are absent (not null); without `vehicle.view_min_price`, `min_price` is absent.
+
 | Method | Path | Perm | Request → Response |
 |---|---|---|---|
-| GET | `/vehicles` | `vehicle.view` | Filters: status, make, model, year, location_id, ownership_type, aging bucket, `q`. Items include `days_in_stock`, `aging_level`. Cost fields (`total_cost`, `estimated_profit`, `cost_complete`) only with `vehicle.view_cost` |
-| POST | `/vehicles` | `vehicle.manage` | `{make, model, trim, year, colors, body_type, transmission, fuel, engine_cc, mileage_km, vin, plate_no, license_expiry, license_governorate, ownership_type, acquisition_source, location_id, asking_price, min_price?, notes}` → vehicle (DRAFT, stock_no assigned) |
-| GET | `/vehicles/{id}` | `vehicle.view` | Vehicle file: details, status/location/price history, media, documents (filtered by sensitivity), sale summary. With `vehicle.view_cost`: `cost_breakdown: [{date, category, amount, source}]`, `total_cost`, `missing_cost_categories`, `profit: {amount, pct, is_estimate}` |
-| PATCH | `/vehicles/{id}` | `vehicle.manage` (`min_price` needs `vehicle.view_min_price`) | Master data only (no status); price changes create history rows |
-| POST | `/vehicles/{id}/transitions` | `vehicle.manage` | `{to_status: IN_PREPARATION\|AVAILABLE\|ARCHIVED\|RETURNED_TO_OWNER, reason}`. Transitions to SOLD, RESERVED and AT_OTHER_SHOWROOM happen only through their commands |
-| POST | `/vehicles/{id}/moves` | `vehicle.manage` | `{to_location_id, date, reason}` |
-| POST 💰👁 | `/vehicles/{id}/purchase` | `vehicle.purchase` | `{seller_customer_id, purchase_date, price, payments: [{cash_account_id, payment_method_id, amount}], deferred_amount}` (Σ payments + deferred = price) → rule 6/7 |
-| POST 💰👁 | `/vehicles/{id}/seller-payments` | `vehicle.purchase` | `{date, amount, cash_account_id}` → rule 8 |
-| POST 💰👁 | `/vehicles/{id}/expenses` | `vehicle.expense.record` | `{date, category_id, amount, funding (as general expenses), supplier_id?, notes, attachment_ids[]}` → rule 9 / 10 / 30 / 31, chosen by ownership type and funding. On a SOLD vehicle: `422` until Q-14 is answered |
-| POST | `/vehicles/{id}/media/upload-url` | `vehicle.manage` | `{content_type}` → `{path, signed_url}`; then `POST /vehicles/{id}/media {path}` |
-| POST | `/vehicles/{id}/consign-out` | `consignment.manage` | `{external_showroom_id, date, commission_type, commission_value, expected_price}` → status AT_OTHER_SHOWROOM (no journal entry) |
-| POST | `/vehicles/{id}/return-from-external` | `consignment.manage` | `{date, to_location_id}` → AVAILABLE |
-| GET | `/search?q=` | member | Global quick search → `{vehicles: [VehicleOut], customers: [...]}` (VIN full or last digits, plate, make/model, name, phone) |
+| GET | `/vehicles` | `vehicle.view` | Filters: `status` (repeatable), `make`, `year`, `location_id`, `ownership_type`, `aging` (FRESH/AGING/OLD/STALE), `q` (stock no., plate, VIN, make/model), `sort`, page. Rows: `days_in_stock`, `aging`, first photo URL; with cost permission `total_cost`, `cost_complete` |
+| POST | `/vehicles` | `vehicle.manage` | Master data → vehicle file (DRAFT, stock no. `V-YYYY-NNNN`). `min_price` needs `vehicle.view_min_price` |
+| GET | `/vehicles/{id}` | `vehicle.view` | Vehicle file: details, status/location/price history, photos (signed URLs), documents (cost-sensitive ones only with `vehicle.view_cost`), active reservation, posted sale, days in stock. With `vehicle.view_cost`: `purchase`, `cost {total_cost, lines, cost_complete, missing_categories}`, `profit {sale_price, cost, gross_profit, profit_pct, estimate}` |
+| PATCH | `/vehicles/{id}` | `vehicle.manage` | Master data only; price changes are recorded in the price history |
+| POST | `/vehicles/{id}/status` | `vehicle.manage` | `{status, reason?}`. Allowed directly: DRAFT→IN_PREPARATION, IN_PREPARATION→AVAILABLE, SOLD→DELIVERED, DRAFT/IN_PREPARATION/AVAILABLE→ARCHIVED (D-70). RESERVED, SOLD, back to AVAILABLE after a sale, AT_OTHER_SHOWROOM and RETURNED_TO_OWNER only through their commands |
+| POST | `/vehicles/{id}/move` | `vehicle.manage` | `{location_id, reason?}` |
+| POST 💰👁 | `/vehicles/{id}/purchase` (+ `/preview`) | `vehicle.purchase` | `{seller_customer_id, purchase_date, price, payments: [{cash_account_id, amount}], ready_for_sale}`; the unpaid part is owed to the seller → rules 6/7 |
+| POST 💰👁 | `/vehicles/{id}/seller-payments` (+ `/preview`) | `vehicle.purchase` + `cash.transact` | `{payment_date, amount, cash_account_id}` → rule 8; at most what is owed |
+| GET | `/vehicles/{id}/expenses` | `vehicle.view_cost` | Expense documents |
+| POST 💰👁 | `/vehicles/{id}/expenses` (+ `/preview`) | `vehicle.expense.record` | `{expense_date, category_id, amount, funding: CASH_ACCOUNT\|SUPPLIER_CREDIT\|PARTNER, cash_account_id\|supplier_id\|paid_by_partner_id+partner_funding_mode}` → rule 9 / 31 / 30; on a sold car P-04 (cost of sales). Consigned-in cars (rule 10) arrive in Phase 6 |
+| POST | `/vehicles/{id}/media/upload-url` | `vehicle.manage` | `{content_type, size_bytes}` → `{upload_url, storage_path}` (15 min); then `POST /vehicles/{id}/media {storage_path, content_type, size_bytes}`; `DELETE /vehicles/{id}/media/{media_id}` archives |
+| POST | `/documents/upload-url`, `/documents` | per entity (`vehicle.manage`, `customer.manage`, `sale.draft`, `supplier.manage`; cost documents also `vehicle.view_cost`) | Same two-step upload; `GET /documents?entity_type=&entity_id=`, `GET /documents/{id}/url` (5 min), `DELETE /documents/{id}` |
+| GET/POST/PATCH | `/locations` | read: `vehicle.view`; write: `tenant.settings.manage` | Yard, outdoor lot, workshop, external showroom, with customer |
+| GET | `/search?q=` | `vehicle.view` or `customer.view` | `{vehicles: [{id, stock_no, label, plate_no, vin, status}], customers: [{id, name, phone_primary}]}`; no cost data |
+| POST | `/vehicles/{id}/consign-out`, `/return-from-external` | `consignment.manage` | ⏳ Phase 6 |
 
-### 3.5 Customers, requests, follow-ups
+### 3.5 Customers, suppliers, requests, follow-ups
 
-**FACT.** Plain CRUD goes directly through Supabase (RLS). The API exposes only what needs server logic:
+**As built (D-68):** customers are written through the API (phone normalisation, duplicate check, national-ID encryption), not directly through Supabase.
 
 | Method | Path | Perm | Notes |
 |---|---|---|---|
-| PUT | `/customers/{id}/national-id` | `customer.manage` | Encrypts and stores (D-05) |
+| GET | `/customers?q=&role=` | `customer.view` | `q` matches name or phone digits ("0100 12" finds +2010012…); paginated |
+| POST / PATCH | `/customers`, `/customers/{id}` | `customer.manage` | `{name, phone, other_phones, national_id?, address, notes}`; phone stored as E.164; an existing phone → `409 CUSTOMER_PHONE_EXISTS` with the existing customer's id |
+| GET | `/customers/{id}` | `customer.view` | `{customer, balances?: {deposits_held, credit_owed} (cash.view), seller_payables?: [...] (vehicle.view_cost)}` |
 | GET | `/customers/{id}/national-id` | `customer.view_national_id` | Unmasked; audit-logged |
-| GET | `/customers/{id}/summary` | `customer.view` | Purchases, sales, installments outstanding (masked for sales), requests, follow-ups |
-| GET | `/vehicles/{id}/matches` | `request.manage` | Open requests matching this vehicle |
-| POST | `/request-matches/{id}/contacted` | `request.manage` | `{result}` |
+| POST 💰👁 | `/customers/{id}/refunds` (+ `/preview`) | `cash.transact` | Refund of customer credit (P-02 refund leg); at most what is owed |
+| GET / POST / PATCH | `/suppliers`, `/suppliers/{id}` | `supplier.manage` | With `balance` (owed to the supplier) |
+| GET | `/suppliers/{id}/statement?date_from=&date_to=` | `supplier.manage` | Opening, lines, running balance |
+| POST 💰👁 | `/suppliers/{id}/payments` (+ `/preview`) | `supplier.pay` | Rule 32; at most what is owed |
+| GET | `/customers/{id}/summary`, `/vehicles/{id}/matches`, `/request-matches/{id}/contacted` | `request.manage` | ⏳ Phase 6 |
 
 ### 3.6 Reservations and sales
 
 | Method | Path | Perm | Request → Response |
 |---|---|---|---|
-| POST 💰👁 | `/reservations` | `reservation.manage` | `{vehicle_id, customer_id, date, deposit_amount, cash_account_id, expires_on}` → rule 11; vehicle → RESERVED |
-| POST 💰👁 | `/reservations/{id}/cancel` | `reservation.manage` | `{reason, outcome: REFUND\|FORFEIT, refund_cash_account_id?}` → rule 34/35; vehicle → AVAILABLE |
-| POST | `/sales` | `sale.draft` | Draft: `{vehicle_id, buyer_customer_id, sale_date, list_price, discount, reservation_id?, payments: [{cash_account_id, payment_method_id, amount}], trade_in?: {vehicle: {...VehicleCreate}, agreed_value}, deferred: {type: NONE\|INSTALLMENTS\|OPEN_RECEIVABLE, plan?: {mode: A\|B, markup_amount?, count, frequency, first_due_date, manual_schedule?: [{due_date, amount}]}, papers?: [{paper_type, number, amount, due_date, installment_seq, drawer_bank?, ...}]}}` → draft sale |
-| PATCH/DELETE | `/sales/{id}` | `sale.draft` | Draft only |
-| POST 👁 | `/sales/{id}/preview` | `sale.draft` | Plain-language preview. Profit is included only with `vehicle.view_cost` |
-| POST 💰 | `/sales/{id}/post` | `sale.post` | `{}` → rule 12/13/14/16/26 + cost entry; vehicle → SOLD; schedule and papers created; match requests closed; invoice number assigned |
-| POST 💰👁 | `/sales/{id}/cancel` | `sale.cancel` | `{reason}` → rule 33 (see C-06/Q-12) |
-| POST 💰 | `/sales/external` | `consignment.manage` + `sale.post` | `{vehicle_id, sale_date, sale_price, buyer_name?, commission_amount}` → rule 18 |
-| POST | `/sales/{id}/deliver` | `vehicle.manage` | → DELIVERED |
-| GET | `/sales/{id}/document?format=pdf&lang=ar\|en&kind=contract\|invoice` | `sale.view` | PDF |
+| GET | `/reservations?status=&vehicle_id=` | `sale.view` or `reservation.manage` | With derived `expired` |
+| POST 💰👁 | `/reservations` (+ `/preview`) | `reservation.manage` | `{vehicle_id, customer_id, reservation_date, deposit_amount, cash_account_id, expires_on?}` → rule 11; vehicle → RESERVED |
+| POST 💰👁 | `/reservations/{id}/settle` (+ `/preview`) | `reservation.manage` | `{action: REFUND\|FORFEIT, settle_date, cash_account_id?}` → rule 34 / 35 (whole deposit, D-72); vehicle → AVAILABLE if still reserved |
+| GET | `/sales?status=&q=&date_from=&date_to=` | `sale.view` | Sales staff see posted sales and their own drafts |
+| POST / PUT / DELETE | `/sales`, `/sales/{id}` | `sale.draft` | Draft: `{vehicle_id, buyer_customer_id, sale_date, list_price, discount, reservation_id?, payments: [{cash_account_id, amount, payment_method_id?, reference?}], trade_in?: {make, model, year, vin, plate_no, …, agreed_value}, notes}`; response has `remaining`. Drafts only; sales staff edit only their own |
+| GET | `/sales/{id}` | `sale.view` | `profit` only with `vehicle.view_cost` |
+| POST 👁 | `/sales/{id}/post/preview` | `sale.post` | Plain-language preview (profit only with cost permission) |
+| POST 💰 | `/sales/{id}/post` | `sale.post` | Rule 12/26 + cost entry (D-28); vehicle → SOLD; deposit applied; trade-in car created with its own cost file; invoice number assigned (D-77). Installment and deferred sales arrive in Phase 5 |
+| POST 💰👁 | `/sales/{id}/cancel` (+ `/preview`) | `sale.cancel` | `{reason, cancel_date?}` → the tenant's method (D-41): REFUND_LIABILITY (P-03) or MIRROR (rule 33); vehicle → AVAILABLE |
+| GET | `/sales/{id}/document?kind=invoice\|contract&lang=ar\|en` | `sale.view` | PDF (D-56, D-80) |
+| POST 💰 | `/sales/external` | `consignment.manage` + `sale.post` | ⏳ Phase 6 (rule 18) |
 
 ### 3.7 Installments and deferred papers
 

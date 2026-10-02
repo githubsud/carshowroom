@@ -50,11 +50,13 @@ select is(
 );
 
 select is(
-  (select count(*) from information_schema.role_table_grants
+  (select array_agg(grantee || ':' || table_name || ':' || privilege_type order by grantee, table_name)
+     from information_schema.role_table_grants
     where grantee in ('authenticated', 'app_api') and table_schema = 'public'
       and privilege_type in ('DELETE', 'TRUNCATE')),
-  0::bigint,
-  'no client role may physically delete or truncate'
+  -- Only sale drafts (and their payment legs) are ever deleted, by the API (ERD §1).
+  array['app_api:sale_payments:DELETE', 'app_api:sales:DELETE'],
+  'no client role may physically delete or truncate, except the API deleting sale drafts'
 );
 
 select is(

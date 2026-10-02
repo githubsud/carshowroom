@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     # Used only for Auth admin calls (invites) and Storage signed URLs.
     supabase_service_role_key: SecretStr | None = None
     jwt_audience: str = "authenticated"
+    # The Supabase URL as browsers reach it (signed upload/view URLs); defaults to supabase_url.
+    supabase_public_url: str | None = None
 
     # AES-256 key (base64, 32 bytes) for national IDs (DECISIONS D-05). Without it,
     # national IDs cannot be stored or revealed; everything else works.

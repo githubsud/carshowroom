@@ -5,8 +5,10 @@ fail. The ledger is append-only, so tests assert on deltas, never on totals.
 
 import uuid
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from decimal import Decimal
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import psycopg
 import pytest
@@ -20,7 +22,8 @@ from tests.integration.conftest import DOHA, NOUR, auth
 CASH = "c0000000-0000-0000-0000-000000000001"  # seed: معرض النور main cash box
 BANK = "c0000000-0000-0000-0000-000000000002"  # seed: معرض النور CIB
 DOHA_CASH = "c0000000-0000-0000-0000-000000000003"
-TODAY = "2026-10-02"
+# Accounting dates are in the showroom's timezone (D-18); معرض النور is in Cairo.
+TODAY = datetime.now(ZoneInfo("Africa/Cairo")).date().isoformat()
 OLD_MONTH = "2025-02"  # used for lock tests, far from everyday postings
 
 

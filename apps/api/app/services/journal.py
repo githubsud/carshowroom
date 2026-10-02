@@ -146,7 +146,57 @@ _DOCUMENT_TABLES = {
     "PARTNER_LOAN_REPAYMENT": "partner_transactions",
     "PARTNER_LOAN_TO_BUSINESS": "partner_transactions",
     "PARTNER_LOAN_TO_BUSINESS_REPAYMENT": "partner_transactions",
+    "VEHICLE_PURCHASE": "vehicle_purchases",
+    "SELLER_PAYMENT": "seller_payments",
+    "VEHICLE_EXPENSE": "vehicle_expenses",
+    "SUPPLIER_PAYMENT": "supplier_payments",
+    "CUSTOMER_REFUND": "customer_refunds",
 }
+
+# Entries tied to a document's state are undone through that document (D-75):
+# a sale is cancelled, a deposit is refunded or forfeited.
+_DOCUMENT_ACTIONS = {
+    "SALE": "cancel the sale",
+    "SALE_COST": "cancel the sale",
+    "SALE_CANCELLATION": "the cancellation is final",
+    "DEPOSIT": "refund or forfeit the deposit",
+    "DEPOSIT_REFUND": "the deposit is settled",
+    "DEPOSIT_FORFEIT": "the deposit is settled",
+}
+
+
+_VEHICLE_DOCUMENTS = {
+    "VEHICLE_PURCHASE": """
+        select v.status, 'CAPITALIZE' as treatment,
+               (select count(*) from public.seller_payments s where s.purchase_id = d.id and s.status = 'POSTED')
+                 as paid_later
+          from public.vehicle_purchases d join public.vehicles v on v.id = d.vehicle_id where d.id = :id
+    """,
+    "VEHICLE_EXPENSE": """
+        select v.status, d.treatment, 0 as paid_later
+          from public.vehicle_expenses d join public.vehicles v on v.id = d.vehicle_id where d.id = :id
+    """,
+}
+
+
+def _guard_document(conn: Connection, original: JournalEntryOut) -> None:
+    if original.source_type in _DOCUMENT_ACTIONS:
+        raise AppError(
+            "USE_DOCUMENT_ACTION",
+            f"This entry cannot be reversed directly: {_DOCUMENT_ACTIONS[original.source_type]}",
+            status_code=409,
+            details={"source_type": original.source_type},
+        )
+    if original.source_type not in _VEHICLE_DOCUMENTS or original.source_id is None:
+        return
+    row = conn.execute(text(_VEHICLE_DOCUMENTS[original.source_type]), {"id": original.source_id}).first()
+    if row is None:
+        return
+    # A sold car's cost has moved to cost of sales; reversing a capitalized cost now would leave stock negative.
+    if row.status in ("SOLD", "DELIVERED") and row.treatment == "CAPITALIZE":
+        raise AppError("VEHICLE_ALREADY_SOLD", "The car is sold; cancel the sale first", status_code=409)
+    if original.source_type == "VEHICLE_PURCHASE" and row.paid_later:
+        raise AppError("PURCHASE_HAS_PAYMENTS", "Reverse the later payments to the seller first", status_code=409)
 
 
 def _reversal_plan(conn: Connection, entry_id: UUID, reversal_date: date) -> tuple[JournalEntryOut, EntryDraft]:
@@ -155,6 +205,7 @@ def _reversal_plan(conn: Connection, entry_id: UUID, reversal_date: date) -> tup
         raise AppError("ENTRY_ALREADY_REVERSED", "This entry has already been reversed", status_code=409)
     if original.reversal_of_entry_no is not None:
         raise AppError("ENTRY_IS_REVERSAL", "A reversal entry cannot be reversed", status_code=409)
+    _guard_document(conn, original)
     mirror = EntryDraft(
         entry_date=reversal_date,
         description=original.description,

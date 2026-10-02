@@ -9,12 +9,22 @@ import { AuthService } from '../auth/auth.service';
 import { PRODUCT_NAME, PRODUCT_NAME_AR } from '../config/product';
 import { LanguageService } from '../i18n/language.service';
 import { TenantContextService } from '../tenant/tenant-context.service';
+import { GlobalSearchComponent } from './global-search.component';
 import { visibleMenu } from './menu';
 
 /** App frame: top bar, side navigation (desktop), bottom bar + drawer (mobile). */
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslocoPipe, ButtonModule, DrawerModule, TagModule],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    TranslocoPipe,
+    ButtonModule,
+    DrawerModule,
+    TagModule,
+    GlobalSearchComponent,
+  ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
 })

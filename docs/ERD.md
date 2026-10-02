@@ -398,6 +398,7 @@ stateDiagram-v2
     AVAILABLE --> ARCHIVED
 ```
 
+- **As built (Phase 4):** `vehicle_status_history`, `vehicle_location_history` and `vehicle_price_history` are written by DB triggers (append-only); `vehicle_media` and `documents` hold storage paths only; `vehicle_purchases` also records trade-ins (`source = TRADE_IN`, posted inside the sale entry); `seller_payments` (rule 8) and `supplier_payments` (rule 32) are documents of their own; `vehicle_expenses.treatment` is `CAPITALIZE` or `COGS` (P-04; `RECOVERABLE` for consigned cars arrives in Phase 6); `locations` is seeded per tenant (showroom, workshop, with customer).
 - **ASSUMPTION.** `RESERVED → SOLD` and `AVAILABLE → SOLD` are both allowed (a sale without a prior reservation).
 - **OPEN QUESTION Q-30.** Whether `DELIVERED → AVAILABLE` (cancellation after delivery) is allowed. It is not allowed by default.
 - **OPEN QUESTION.** Whether a consigned-in car can go to `AT_OTHER_SHOWROOM` (re-consignment). It is not allowed by default.
@@ -531,6 +532,8 @@ erDiagram
 - **DECISION.** `OVERDUE` is derived (due date passed and remaining > 0) and **not** stored as a paper status, because a stored value would go stale. The stored statuses are the physical states. FACT: the spec lists "overdue" as a status; this is a deliberate deviation (C-10).
 
 Partial unique index: `unique (tenant_id, vehicle_id) where status = 'POSTED'` on `sales` (business rule 1).
+
+**As built (Phase 4):** `sales` also stores `sale_no`, the trade-in details as JSON until posting (`trade_in`), `cancellation_method` and both cancellation entries; `sale_payments.line_no` keeps the order of payment lines; `reservations.status` adds `RELEASED` (D-72); `customer_refunds` holds refunds of customer credit (P-02); `customers` has `national_id_last4` and E.164 `phone_primary` (D-68). `receivable_amount`, installments and deferred papers arrive in Phase 5.
 
 ---
 

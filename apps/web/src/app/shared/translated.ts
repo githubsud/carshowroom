@@ -10,3 +10,8 @@ import { Translation, TranslocoService } from '@jsverse/transloco';
 export function translationsLoaded(): Signal<Translation> {
   return toSignal(inject(TranslocoService).selectTranslation(), { initialValue: {} });
 }
+
+/** False until the first translation file has arrived (avoids "missing translation" noise). */
+export function loaded(translation: Translation): boolean {
+  return Object.keys(translation).length > 0;
+}

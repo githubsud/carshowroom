@@ -71,6 +71,46 @@ export const routes: Routes = [
         loadComponent: () => import('./features/partners/partner-statement.page').then((m) => m.PartnerStatementPage),
       },
       {
+        path: 'vehicles',
+        canActivate: [permissionGuard('vehicle.view')],
+        loadComponent: () => import('./features/vehicles/inventory.page').then((m) => m.InventoryPage),
+      },
+      {
+        path: 'vehicles/:vehicleId',
+        canActivate: [permissionGuard('vehicle.view')],
+        loadComponent: () => import('./features/vehicles/vehicle-file.page').then((m) => m.VehicleFilePage),
+      },
+      {
+        path: 'customers',
+        canActivate: [permissionGuard('customer.view')],
+        loadComponent: () => import('./features/customers/customers.page').then((m) => m.CustomersPage),
+      },
+      {
+        path: 'customers/:customerId',
+        canActivate: [permissionGuard('customer.view')],
+        loadComponent: () => import('./features/customers/customer.page').then((m) => m.CustomerPage),
+      },
+      {
+        path: 'suppliers',
+        canActivate: [permissionGuard('supplier.manage')],
+        loadComponent: () => import('./features/suppliers/suppliers.page').then((m) => m.SuppliersPage),
+      },
+      {
+        path: 'sales',
+        canActivate: [permissionGuard('sale.view')],
+        loadComponent: () => import('./features/sales/sales.page').then((m) => m.SalesPage),
+      },
+      {
+        path: 'sales/new',
+        canActivate: [permissionGuard('sale.draft')],
+        loadComponent: () => import('./features/sales/sale.page').then((m) => m.SalePage),
+      },
+      {
+        path: 'sales/:saleId',
+        canActivate: [permissionGuard('sale.view')],
+        loadComponent: () => import('./features/sales/sale.page').then((m) => m.SalePage),
+      },
+      {
         path: 'soon/:feature',
         loadComponent: () => import('./features/misc/coming-soon.page').then((m) => m.ComingSoonPage),
       },

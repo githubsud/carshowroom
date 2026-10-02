@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
@@ -10,12 +10,14 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
-import { CashAccount, ExpenseCategory } from '../../../core/api/api.models';
+import { CashAccount, ExpenseCategory, Location } from '../../../core/api/api.models';
 import { MoneyPipe } from '../../../core/format/format.service';
 import { LanguageService } from '../../../core/i18n/language.service';
 import { StateComponent } from '../../../shared/components/state.component';
 import { ErrorMessageService } from '../../../shared/error-message.service';
+import { TenantContextService } from '../../../core/tenant/tenant-context.service';
 import { FinanceService } from '../../finance/finance.service';
+import { VehiclesService } from '../../vehicles/vehicles.service';
 
 /** Settings → cash boxes, bank accounts and expense categories (SPEC §4.1). */
 @Component({
@@ -74,6 +76,32 @@ import { FinanceService } from '../../finance/finance.service';
       gap: var(--space-1);
     }
 
+    .expected {
+      display: inline-flex;
+      gap: var(--space-1);
+      align-items: center;
+      font-size: 0.875rem;
+    }
+
+    .locations {
+      padding: 0;
+      list-style: none;
+
+      li {
+        display: flex;
+        gap: var(--space-2);
+        align-items: center;
+        padding-block: var(--space-1);
+      }
+    }
+
+    .add-location {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
     .dialog-actions {
       display: flex;
       gap: var(--space-2);
@@ -83,6 +111,8 @@ import { FinanceService } from '../../finance/finance.service';
 })
 export class FinanceSettingsPage implements OnInit {
   private readonly finance = inject(FinanceService);
+  private readonly vehicles = inject(VehiclesService);
+  private readonly context = inject(TenantContextService);
   private readonly toast = inject(MessageService);
   private readonly errors = inject(ErrorMessageService);
   private readonly fb = inject(NonNullableFormBuilder);
@@ -92,6 +122,11 @@ export class FinanceSettingsPage implements OnInit {
   protected readonly loadError = signal<string | null>(null);
   protected readonly accounts = signal<CashAccount[]>([]);
   protected readonly categories = signal<ExpenseCategory[]>([]);
+  protected readonly locations = signal<Location[]>([]);
+  protected readonly expected = computed(() => this.context.tenant()?.settings.expected_cost_categories ?? []);
+  protected readonly locationTypes = ['BRANCH_YARD', 'OUTDOOR_LOT', 'WORKSHOP', 'CUSTOMER'] as const;
+  protected newLocation = '';
+  protected newLocationType: (typeof this.locationTypes)[number] = 'OUTDOOR_LOT';
 
   protected readonly accountOpen = signal(false);
   protected readonly categoryOpen = signal(false);
@@ -128,12 +163,14 @@ export class FinanceSettingsPage implements OnInit {
 
   protected async load(): Promise<void> {
     try {
-      const [accounts, categories] = await Promise.all([
+      const [accounts, categories, locations] = await Promise.all([
         this.finance.cashAccounts(true),
         this.finance.categories(undefined, true),
+        this.vehicles.locations(true),
       ]);
       this.accounts.set(accounts);
       this.categories.set(categories);
+      this.locations.set(locations);
       this.state.set('ready');
     } catch (error) {
       this.loadError.set(this.errors.message(error));
@@ -192,6 +229,23 @@ export class FinanceSettingsPage implements OnInit {
 
   protected async makeDefault(account: CashAccount): Promise<void> {
     await this.inline(() => this.finance.updateCashAccount(account.id, { is_default: true }));
+  }
+
+  /** Cost completeness checklist (SPEC §4.3): categories every car is expected to have. */
+  protected async toggleExpected(code: string): Promise<void> {
+    const current = this.expected();
+    const next = current.includes(code) ? current.filter((c) => c !== code) : [...current, code];
+    await this.inline(() => this.context.updateSettings({ expected_cost_categories: next }));
+  }
+
+  protected async toggleLocation(location: Location): Promise<void> {
+    await this.inline(() => this.vehicles.updateLocation(location.id, { archived: !location.archived }));
+  }
+
+  protected async addLocation(): Promise<void> {
+    const name = this.newLocation.trim();
+    await this.inline(() => this.vehicles.createLocation({ type: this.newLocationType, name_ar: name, is_default: false }));
+    this.newLocation = '';
   }
 
   protected async toggleCategory(category: ExpenseCategory): Promise<void> {

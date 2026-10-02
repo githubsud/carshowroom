@@ -18,3 +18,18 @@ test('owner on a phone navigates with the bottom bar and the drawer', async ({ p
   await page.getByTestId('drawer-nav').getByRole('link', { name: 'المستخدمين' }).click();
   await expect(page).toHaveURL(new RegExp(`/t/${NOUR}/settings/users$`));
 });
+
+/** BACKLOG 4.7: a vehicle expense on a phone takes under 15 seconds. */
+test('records a vehicle expense on a phone in under 15 seconds', async ({ page }) => {
+  await page.goto(`/t/${NOUR}/vehicles/e1000000-0000-0000-0000-000000000002`);
+  await expect(page.getByTestId('add-expense')).toBeVisible();
+
+  const started = Date.now();
+  await page.getByTestId('add-expense').locator('button').click();
+  await page.getByTestId('expense-chips').getByText('نقل').click();
+  await page.getByTestId('amount').locator('input').fill('750');
+  await page.getByTestId('review').locator('button').click();
+  await page.getByTestId('confirm').locator('button').click();
+  await expect(page.getByText(/تم التسجيل — قيد رقم \d+/)).toBeVisible();
+  expect(Date.now() - started).toBeLessThan(15_000);
+});

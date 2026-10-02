@@ -1,0 +1,184 @@
+<a class="back" [routerLink]="['/t', context.activeTenantId(), 'sales']">← {{ 'sales.title' | transloco }}</a>
+
+@if (loadError()) {
+  <app-state kind="error" [message]="loadError()" />
+} @else {
+  <div class="page-header">
+    <div>
+      <h1 class="page-title" data-testid="sale-title">
+        @if (sale(); as s) { {{ s.invoice_no ?? s.sale_no }} } @else { {{ 'sales.new' | transloco }} }
+      </h1>
+      @if (sale(); as s) {
+        <p-tag [severity]="severity(s.status)" [value]="'sales.status_' + s.status | transloco" data-testid="sale-status" />
+      }
+    </div>
+    @if (sale(); as s) {
+      <div class="header-actions">
+        @if (s.status === 'POSTED') {
+          <p-button icon="pi pi-print" [outlined]="true" [label]="'sales.invoice' | transloco" (onClick)="print('invoice')"
+                    data-testid="print-invoice" />
+          <p-button icon="pi pi-file" [outlined]="true" [label]="'sales.contract' | transloco" (onClick)="print('contract')" />
+          <p-button *appCan="'sale.cancel'" icon="pi pi-times" severity="danger" [outlined]="true"
+                    [label]="'sales.cancel' | transloco" (onClick)="cancelOpen.set(true)" data-testid="cancel-sale" />
+        }
+      </div>
+    }
+  </div>
+
+  @if (sale()?.status === 'CANCELLED') {
+    <p-message severity="warn">{{ 'sales.cancelledOn' | transloco: { date: sale()?.cancel_date } }} — {{ sale()?.cancel_reason }}</p-message>
+  }
+
+  <form class="sale" [formGroup]="form" data-testid="sale-form">
+    <section class="card">
+      <h2>{{ 'vehicles.vehicle' | transloco }}</h2>
+      @if (car(); as c) {
+        <p class="car">
+          <a [routerLink]="['/t', context.activeTenantId(), 'vehicles', c.id]" data-testid="sale-vehicle">{{ label() }}</a>
+          <span class="sub" dir="ltr">{{ c.stock_no }}</span>
+          @if (c.asking_price) { <span class="sub">{{ 'vehicles.askingPrice' | transloco }} {{ c.asking_price | money }}</span> }
+        </p>
+      } @else {
+        <p-select [options]="vehicleOptions()" formControlName="vehicle_id" (onChange)="chooseVehicle($event.value)"
+                  optionLabel="label" optionValue="value" [filter]="true" [fluid]="true"
+                  [placeholder]="'sales.chooseVehicle' | transloco" data-testid="sale-vehicle-select" />
+      }
+    </section>
+
+    <section class="card">
+      <h2>{{ 'sales.buyer' | transloco }}</h2>
+      <app-customer-picker inputId="buyer" formControlName="buyer_customer_id" testId="buyer-picker" />
+      @if (reservedForOther()) {
+        <p class="negative">{{ 'sales.reservedForOther' | transloco: { name: car()?.reservation?.customer_name } }}</p>
+      }
+    </section>
+
+    <section class="card">
+      <h2>{{ 'sales.price' | transloco }}</h2>
+      <div class="dialog-fields">
+        <div class="row">
+          <div class="field">
+            <label for="list-price">{{ 'sales.listPrice' | transloco }}</label>
+            <app-money-input inputId="list-price" formControlName="list_price" data-testid="list-price" />
+          </div>
+          <div class="field">
+            <label for="discount">{{ 'sales.discount' | transloco }}</label>
+            <app-money-input inputId="discount" formControlName="discount" data-testid="discount" />
+          </div>
+          <div class="field">
+            <label for="sale-date">{{ 'finance.date' | transloco }}</label>
+            <input pInputText id="sale-date" type="date" formControlName="sale_date" />
+          </div>
+        </div>
+        <p class="total">{{ 'sales.netPrice' | transloco }}: <strong data-testid="net-price">{{ salePrice() | money }}</strong></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>{{ 'sales.payment' | transloco }}</h2>
+      @if (reservation(); as r) {
+        <p data-testid="deposit-applied"><i class="pi pi-bookmark" aria-hidden="true"></i>
+          {{ 'sales.depositApplied' | transloco }}: <strong>{{ r.deposit_amount | money }}</strong></p>
+      } @else if (sale()?.deposit_applied && sale()?.deposit_applied !== '0.00') {
+        <p>{{ 'sales.depositApplied' | transloco }}: <strong>{{ sale()?.deposit_applied | money }}</strong></p>
+      }
+
+      <div class="check">
+        <p-checkbox formControlName="has_trade_in" [binary]="true" inputId="trade" data-testid="has-trade-in" />
+        <label for="trade">{{ 'sales.tradeIn' | transloco }}</label>
+      </div>
+      @if (values().has_trade_in) {
+        <div class="dialog-fields trade">
+          <div class="row">
+            <div class="field"><label for="t-make">{{ 'vehicles.make' | transloco }}</label>
+              <input pInputText id="t-make" formControlName="trade_make" data-testid="trade-make" /></div>
+            <div class="field"><label for="t-model">{{ 'vehicles.model' | transloco }}</label>
+              <input pInputText id="t-model" formControlName="trade_model" data-testid="trade-model" /></div>
+            <div class="field"><label for="t-year">{{ 'vehicles.year' | transloco }}</label>
+              <input pInputText id="t-year" formControlName="trade_year" inputmode="numeric" dir="ltr" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="t-vin">{{ 'vehicles.vin' | transloco }}</label>
+              <input pInputText id="t-vin" formControlName="trade_vin" dir="ltr" /></div>
+            <div class="field"><label for="t-plate">{{ 'vehicles.plate' | transloco }}</label>
+              <input pInputText id="t-plate" formControlName="trade_plate" /></div>
+            <div class="field"><label for="t-value">{{ 'sales.agreedValue' | transloco }}</label>
+              <app-money-input inputId="t-value" formControlName="trade_value" data-testid="trade-value" /></div>
+          </div>
+        </div>
+      }
+
+      @if (accounts().length > 0) {
+        <div class="legs" formArrayName="payments">
+          @for (leg of payments.controls; track leg; let i = $index) {
+            <div class="leg" [formGroupName]="i" [attr.data-testid]="'payment-' + i">
+              <p-select formControlName="cash_account_id" [options]="accountOptions()" optionLabel="label"
+                        optionValue="value" [attr.aria-label]="'finance.receivedIn' | transloco" />
+              <app-money-input formControlName="amount" [attr.data-testid]="'payment-amount-' + i" />
+              @if (editable()) {
+                <p-button type="button" icon="pi pi-equals" [text]="true" [ariaLabel]="'sales.fillRemaining' | transloco"
+                          (onClick)="fillRemaining(i)" [attr.data-testid]="'fill-' + i" />
+                <p-button type="button" icon="pi pi-trash" [text]="true" severity="danger"
+                          [ariaLabel]="'sales.removePayment' | transloco" (onClick)="removePayment(i)" />
+              }
+            </div>
+          }
+        </div>
+        @if (editable()) {
+          <p-button type="button" icon="pi pi-plus" [text]="true" [label]="'sales.addPayment' | transloco"
+                    (onClick)="addPayment()" data-testid="add-payment" />
+        }
+      } @else if (editable()) {
+        <p class="sub">{{ 'sales.paymentsByAccountant' | transloco }}</p>
+      }
+
+      <p class="total" [class.negative]="remaining() !== '0.00'">
+        {{ 'sales.remaining' | transloco }}: <strong data-testid="remaining">{{ remaining() | money }}</strong>
+      </p>
+    </section>
+
+    @if (sale()?.profit; as p) {
+      <section class="card" data-testid="sale-profit">
+        <h2>{{ 'vehicles.profit' | transloco }}</h2>
+        <p>{{ 'vehicles.totalCost' | transloco }} {{ p.cost | money }} — {{ 'vehicles.profit' | transloco }}
+          <strong>{{ p.gross_profit | money }}</strong> ({{ p.profit_pct | percent }})</p>
+      </section>
+    }
+
+    @if (error()) {
+      <p-message severity="error" data-testid="sale-error">{{ error() }}</p-message>
+    }
+
+    @if (editable()) {
+      <div class="footer">
+        @if (sale(); as s) {
+          <p-button type="button" severity="danger" [text]="true" icon="pi pi-trash" [label]="'sales.deleteDraft' | transloco"
+                    (onClick)="remove()" [disabled]="busy()" />
+        }
+        <span class="spacer"></span>
+        <p-button type="button" [outlined]="true" icon="pi pi-save" [label]="'sales.saveDraft' | transloco"
+                  (onClick)="save()" [loading]="busy()" data-testid="save-draft" />
+        <p-button *appCan="'sale.post'" type="button" icon="pi pi-check" [label]="'sales.post' | transloco"
+                  (onClick)="reviewPost()" [loading]="busy()" data-testid="post-sale" />
+      </div>
+    }
+  </form>
+
+  <p-dialog [(visible)]="postOpen" [modal]="true" [header]="'sales.postTitle' | transloco" [style]="{ width: 'min(560px, 96vw)' }">
+    @if (preview(); as p) {
+      <app-posting-preview [preview]="p" />
+    }
+    @if (error()) {
+      <p-message severity="error">{{ error() }}</p-message>
+    }
+    <div class="dialog-actions">
+      <p-button [text]="true" [label]="'finance.back' | transloco" (onClick)="postOpen.set(false)" />
+      <p-button icon="pi pi-check" [label]="'finance.confirm' | transloco" (onClick)="confirmPost()" [loading]="busy()"
+                data-testid="confirm" />
+    </div>
+  </p-dialog>
+
+  @if (sale(); as s) {
+    <app-cancel-sale-dialog [(visible)]="cancelOpen" [saleId]="s.id" (posted)="cancelled()" />
+  }
+}

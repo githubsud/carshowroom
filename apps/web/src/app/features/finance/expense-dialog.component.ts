@@ -12,7 +12,7 @@ import { ExpenseCategory, ExpensePosting, GeneralExpenseInput, Preview } from '.
 import { MoneyInputComponent } from '../../shared/components/money-input.component';
 import { PostingPreviewComponent } from '../../shared/components/posting-preview.component';
 import { positiveMoney } from '../../shared/money-input';
-import { translationsLoaded } from '../../shared/translated';
+import { loaded, translationsLoaded } from '../../shared/translated';
 import { FinanceService } from './finance.service';
 import { Option, PostingDialogBase, PostingKind } from './posting-dialog.base';
 
@@ -63,14 +63,18 @@ export class ExpenseDialogComponent extends PostingDialogBase<GeneralExpenseInpu
     this.categories().map((c) => ({ value: c.id, label: this.name(c) })),
   );
   protected override readonly fundingOptions = computed<Option[]>(() => {
-    this.translations();
+    if (!loaded(this.translations())) {
+      return [];
+    }
     return [
       { value: 'cash', label: this.transloco.translate('finance.fundingCash') },
       { value: 'partner', label: this.transloco.translate('finance.fundingPartner') },
     ];
   });
   protected override readonly modeOptions = computed<Option[]>(() => {
-    this.translations();
+    if (!loaded(this.translations())) {
+      return [];
+    }
     return [
       { value: 'CURRENT_ACCOUNT', label: this.transloco.translate('finance.modeCurrent') },
       { value: 'LOAN', label: this.transloco.translate('finance.modeLoan') },

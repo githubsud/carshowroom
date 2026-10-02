@@ -6,7 +6,19 @@ import { FormatService } from '../../core/format/format.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { ErrorMessageService } from '../../shared/error-message.service';
 
-export type PostingKind = 'expense' | 'transfer' | 'income' | 'partner';
+export type PostingKind =
+  | 'expense'
+  | 'transfer'
+  | 'income'
+  | 'partner'
+  | 'vehicleExpense'
+  | 'purchase'
+  | 'sellerPayment'
+  | 'reservation'
+  | 'settle'
+  | 'supplierPayment'
+  | 'refund'
+  | 'cancelSale';
 
 export interface Option {
   value: string;

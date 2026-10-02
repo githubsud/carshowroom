@@ -17,7 +17,7 @@ import { TenantContextService } from '../../core/tenant/tenant-context.service';
 import { MoneyInputComponent } from '../../shared/components/money-input.component';
 import { PostingPreviewComponent } from '../../shared/components/posting-preview.component';
 import { positiveMoney } from '../../shared/money-input';
-import { translationsLoaded } from '../../shared/translated';
+import { loaded, translationsLoaded } from '../../shared/translated';
 import { Option, PostingDialogBase, PostingKind } from '../finance/posting-dialog.base';
 import { PartnersService } from './partners.service';
 
@@ -133,7 +133,9 @@ export class PartnerTransactionDialogComponent extends PostingDialogBase<Partner
   });
 
   protected readonly typeOptions = computed<Option[]>(() => {
-    this.translations();
+    if (!loaded(this.translations())) {
+      return [];
+    }
     // Taking capital out also needs the equity permission (owner).
     const allowed = KINDS.filter((k) => k !== 'CAPITAL_WITHDRAWAL' || this.context.can('partner.equity.change'));
     return allowed.map((value) => ({ value, label: this.transloco.translate(`partners.kind_${value}`) }));

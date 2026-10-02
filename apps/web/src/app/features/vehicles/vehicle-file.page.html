@@ -1,0 +1,256 @@
+<a class="back" [routerLink]="['/t', context.activeTenantId(), 'vehicles']">← {{ 'vehicles.title' | transloco }}</a>
+
+@if (loadError()) {
+  <app-state kind="error" [message]="loadError()" (retry)="load()" />
+} @else if (vehicle(); as v) {
+  <div class="page-header">
+    <div>
+      <h1 class="page-title" data-testid="vehicle-title">{{ label() }}</h1>
+      <div class="meta">
+        <span dir="ltr" data-testid="stock-no">{{ v.stock_no }}</span>
+        <p-tag [severity]="severity(v.status)" [value]="'vehicles.status_' + v.status | transloco" data-testid="vehicle-status" />
+        @if (v.days_in_stock !== null) {
+          <span class="days" [class]="'aging-' + v.aging">{{ 'vehicles.daysInStockN' | transloco: { n: v.days_in_stock } }}</span>
+        }
+        <span><i class="pi pi-map-marker" aria-hidden="true"></i> {{ location(v) }}</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      @if (canSell()) {
+        <p-button *appCan="'sale.draft'" icon="pi pi-shopping-cart" data-testid="sell" [label]="'vehicles.sell' | transloco"
+                  (onClick)="sell()" />
+      }
+      @if (v.status !== 'ARCHIVED' && categories().length > 0) {
+        <p-button *appCan="'vehicle.expense.record'" icon="pi pi-receipt" severity="secondary" data-testid="add-expense"
+                  [label]="'vehicles.addExpense' | transloco" (onClick)="expenseOpen.set(true)"
+                  [disabled]="accounts().length === 0" />
+      }
+      @if (v.status === 'AVAILABLE') {
+        <p-button *appCan="'reservation.manage'" icon="pi pi-bookmark" severity="secondary" data-testid="reserve"
+                  [label]="'vehicles.reserve' | transloco" (onClick)="reserveOpen.set(true)" />
+      }
+      @if (v.reservation) {
+        <p-button *appCan="'reservation.manage'" icon="pi pi-undo" severity="secondary" data-testid="settle-deposit"
+                  [label]="'sales.settleTitle' | transloco" (onClick)="settleOpen.set(true)" />
+      }
+    </div>
+  </div>
+
+  <div class="toolbar" *appCan="'vehicle.manage'">
+    <p-button icon="pi pi-pencil" [text]="true" [label]="'vehicles.edit' | transloco" (onClick)="editOpen.set(true)"
+              [disabled]="v.archived" data-testid="edit-vehicle" />
+    <p-button icon="pi pi-map-marker" [text]="true" [label]="'vehicles.move' | transloco" (onClick)="moveOpen.set(true)"
+              [disabled]="v.archived" />
+    @for (next of nextStatuses(); track next) {
+      <p-button [text]="true" [severity]="next === 'ARCHIVED' ? 'danger' : 'primary'"
+                [label]="'vehicles.to_' + next | transloco" (onClick)="setStatus(next)"
+                [attr.data-testid]="'to-' + next" />
+    }
+  </div>
+
+  @if (v.reservation; as r) {
+    <div class="notice" data-testid="reservation">
+      <i class="pi pi-bookmark" aria-hidden="true"></i>
+      {{ 'vehicles.reservedFor' | transloco: { name: r.customer_name } }} — {{ r.deposit_amount | money }}
+      @if (r.expires_on) { · {{ 'sales.expiresOn' | transloco }} {{ r.expires_on | appDate }} }
+      @if (r.expired) { <p-tag severity="danger" [value]="'sales.expired' | transloco" /> }
+    </div>
+  }
+
+  <!-- Cost and profit: only users with vehicle.view_cost receive these fields at all. -->
+  @if (v.cost; as cost) {
+    <section class="card" data-testid="cost-section">
+      <h2>{{ 'vehicles.cost' | transloco }}</h2>
+      <div class="figures">
+        <div class="figure"><span>{{ 'vehicles.totalCost' | transloco }}</span>
+          <strong data-testid="total-cost">{{ cost.total_cost | money }}</strong></div>
+        @if (v.profit; as p) {
+          <div class="figure"><span>{{ 'vehicles.salePrice' | transloco }}</span><strong>{{ p.sale_price | money }}</strong></div>
+          <div class="figure" [class.negative]="p.gross_profit.startsWith('-')">
+            <span>{{ 'vehicles.profit' | transloco }}
+              @if (p.estimate) { <p-tag severity="warn" [value]="'vehicles.estimate' | transloco" /> }</span>
+            <strong data-testid="profit">{{ p.gross_profit | money }} ({{ p.profit_pct | percent }})</strong>
+          </div>
+        }
+      </div>
+      @if (!cost.cost_complete) {
+        <p class="warning" data-testid="cost-missing">
+          {{ 'vehicles.missingCosts' | transloco }}: {{ cost.missing_categories.join('، ') }}
+        </p>
+      }
+      <p-table [value]="cost.lines" styleClass="p-datatable-sm" data-testid="cost-lines">
+        <ng-template #header>
+          <tr>
+            <th>{{ 'finance.date' | transloco }}</th>
+            <th>{{ 'finance.description' | transloco }}</th>
+            <th class="num">{{ 'finance.amount' | transloco }}</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-line>
+          <tr [class.muted]="line.reversed || line.is_reversal">
+            <td>{{ line.entry_date | appDate }}<div class="sub">#{{ line.entry_no }}</div></td>
+            <td>{{ line.label }}</td>
+            <td class="num">{{ line.amount | money }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      @if (v.purchase; as purchase) {
+        <p class="sub">
+          {{ (purchase.source === 'TRADE_IN' ? 'vehicles.tradedInBy' : 'vehicles.boughtFrom') | transloco }}
+          {{ purchase.seller_name }} — {{ purchase.purchase_date | appDate }}
+          @if (purchase.outstanding !== '0.00') {
+            · <span class="negative" data-testid="seller-outstanding">{{ 'vehicles.owedToSeller' | transloco }}
+              {{ purchase.outstanding | money }}</span>
+            <p-button *appCan="'vehicle.purchase'" [text]="true" size="small" [label]="'vehicles.paySeller' | transloco"
+                      (onClick)="sellerPayOpen.set(true)" data-testid="pay-seller" />
+          }
+        </p>
+      } @else if (v.status !== 'ARCHIVED' && v.status !== 'SOLD' && v.status !== 'DELIVERED') {
+        <p-button *appCan="'vehicle.purchase'" icon="pi pi-dollar" [outlined]="true" data-testid="record-purchase"
+                  [label]="'vehicles.recordPurchase' | transloco" (onClick)="purchaseOpen.set(true)"
+                  [disabled]="accounts().length === 0" />
+      }
+    </section>
+  }
+
+  @if (v.sale; as sale) {
+    <section class="card">
+      <h2>{{ 'vehicles.sale' | transloco }}</h2>
+      <p>
+        <a [routerLink]="['/t', context.activeTenantId(), 'sales', sale.id]">{{ sale.sale_no }}</a>
+        — {{ sale.buyer_name }} — {{ sale.sale_date | appDate }} — {{ sale.sale_price | money }}
+      </p>
+    </section>
+  }
+
+  <section class="card">
+    <h2>{{ 'vehicles.photos' | transloco }}</h2>
+    <div class="photos" data-testid="photos">
+      @for (photo of v.media; track photo.id) {
+        <figure>
+          @if (photo.url) { <img [src]="photo.url" alt="" loading="lazy" /> }
+          <p-button *appCan="'vehicle.manage'" icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+                    size="small" [ariaLabel]="'vehicles.removePhoto' | transloco" (onClick)="removePhoto(photo.id)" />
+        </figure>
+      } @empty {
+        <p class="sub">{{ 'vehicles.noPhotos' | transloco }}</p>
+      }
+    </div>
+    @if (!v.archived) {
+      <label class="upload" *appCan="'vehicle.manage'">
+        <i class="pi" [class.pi-camera]="!uploading()" [class.pi-spin]="uploading()" [class.pi-spinner]="uploading()"
+           aria-hidden="true"></i>
+        {{ 'vehicles.addPhotos' | transloco }}
+        <input type="file" accept="image/*" capture="environment" multiple (change)="addPhotos($event)"
+               data-testid="photo-input" hidden />
+      </label>
+    }
+  </section>
+
+  <section class="card">
+    <h2>{{ 'vehicles.details' | transloco }}</h2>
+    <dl class="details">
+      <div><dt>{{ 'vehicles.vin' | transloco }}</dt><dd dir="ltr">{{ v.vin || '—' }}</dd></div>
+      <div><dt>{{ 'vehicles.plate' | transloco }}</dt><dd>{{ v.plate_no || '—' }}</dd></div>
+      <div><dt>{{ 'vehicles.color' | transloco }}</dt><dd>{{ v.color_ext || '—' }}</dd></div>
+      <div><dt>{{ 'vehicles.mileage' | transloco }}</dt><dd>{{ v.mileage_km ?? '—' }}</dd></div>
+      <div><dt>{{ 'vehicles.transmission' | transloco }}</dt>
+        <dd>{{ v.transmission ? ('vehicles.transmission_' + v.transmission | transloco) : '—' }}</dd></div>
+      <div><dt>{{ 'vehicles.fuel' | transloco }}</dt><dd>{{ v.fuel ? ('vehicles.fuel_' + v.fuel | transloco) : '—' }}</dd></div>
+      <div><dt>{{ 'vehicles.licenseExpiry' | transloco }}</dt><dd>{{ v.license_expiry ? (v.license_expiry | appDate) : '—' }}</dd></div>
+      <div><dt>{{ 'vehicles.askingPrice' | transloco }}</dt><dd data-testid="asking">{{ v.asking_price ? (v.asking_price | money) : '—' }}</dd></div>
+      @if (v.min_price) {
+        <div><dt>{{ 'vehicles.minPrice' | transloco }}</dt><dd>{{ v.min_price | money }}</dd></div>
+      }
+      <div><dt>{{ 'vehicles.source' | transloco }}</dt><dd>{{ 'vehicles.source_' + v.acquisition_source | transloco }}</dd></div>
+      @if (v.days_since_price_change !== null) {
+        <div><dt>{{ 'vehicles.sincePriceChange' | transloco }}</dt><dd>{{ v.days_since_price_change }}</dd></div>
+      }
+    </dl>
+    @if (v.notes) { <p>{{ v.notes }}</p> }
+  </section>
+
+  <section class="card">
+    <h2>{{ 'vehicles.documents' | transloco }}</h2>
+    <ul class="documents" data-testid="documents">
+      @for (doc of v.documents; track doc.id) {
+        <li>
+          <i class="pi pi-file" aria-hidden="true"></i>
+          <button type="button" class="link" (click)="openDocument(doc.id)">{{ doc.file_name }}</button>
+          <span class="sub">{{ 'vehicles.doc_' + doc.doc_type | transloco }}</span>
+        </li>
+      } @empty {
+        <li class="sub">{{ 'vehicles.noDocuments' | transloco }}</li>
+      }
+    </ul>
+    @if (!v.archived) {
+      <div class="doc-upload" *appCan="'vehicle.manage'">
+        <select [(ngModel)]="docType" [attr.aria-label]="'vehicles.documentType' | transloco">
+          @for (type of docTypes; track type) {
+            @if (docTypeAllowed(type)) {
+              <option [value]="type">{{ 'vehicles.doc_' + type | transloco }}</option>
+            }
+          }
+        </select>
+        <label class="upload">
+          <i class="pi pi-upload" aria-hidden="true"></i> {{ 'vehicles.addDocument' | transloco }}
+          <input type="file" accept="application/pdf,image/*" (change)="addDocument($event)" hidden />
+        </label>
+      </div>
+    }
+  </section>
+
+  <section class="card">
+    <h2>{{ 'vehicles.history' | transloco }}</h2>
+    <ul class="timeline" data-testid="status-history">
+      @for (h of v.status_history; track $index) {
+        <li>
+          <span class="when">{{ h.changed_at | appDate }}</span>
+          {{ 'vehicles.status_' + h.to_status | transloco }}
+          @if (h.reason) { <span class="sub">— {{ h.reason }}</span> }
+        </li>
+      }
+      @for (m of v.location_history; track $index) {
+        @if (m.from_name_ar) {
+          <li><span class="when">{{ m.moved_at | appDate }}</span> {{ m.from_name_ar }} ← {{ m.to_name_ar }}</li>
+        }
+      }
+      @for (p of v.price_history; track $index) {
+        <li><span class="when">{{ p.changed_at | appDate }}</span> {{ 'vehicles.askingPrice' | transloco }}:
+          {{ p.asking_price ? (p.asking_price | money) : '—' }}</li>
+      }
+    </ul>
+  </section>
+
+  <app-vehicle-form-dialog [(visible)]="editOpen" [vehicle]="v" [locations]="locations()" (saved)="vehicle.set($event)" />
+  <app-vehicle-expense-dialog [(visible)]="expenseOpen" [vehicleId]="v.id" [categories]="categories()"
+                              [accounts]="accounts()" [suppliers]="suppliers()" [partners]="partners()"
+                              (posted)="onPosted($event)" />
+  <app-purchase-dialog [(visible)]="purchaseOpen" [vehicleId]="v.id" [accounts]="accounts()" (posted)="onPosted($event)" />
+  @if (v.purchase; as purchase) {
+    <app-payment-dialog [(visible)]="sellerPayOpen" mode="sellerPayment" [targetId]="v.id" [owed]="purchase.outstanding"
+                        [accounts]="accounts()" (posted)="onPaid()" />
+  }
+  <app-reservation-dialog [(visible)]="reserveOpen" [vehicleId]="v.id" [accounts]="accounts()" (posted)="onPosted($event)" />
+  @if (v.reservation; as r) {
+    <app-settle-dialog [(visible)]="settleOpen" [reservationId]="r.id" [amount]="r.deposit_amount"
+                       [accounts]="accounts()" (posted)="onPosted($event)" />
+  }
+
+  <p-dialog [(visible)]="moveOpen" [modal]="true" [header]="'vehicles.move' | transloco" [style]="{ width: 'min(400px, 96vw)' }">
+    <div class="dialog-fields">
+      <div class="field">
+        <label for="move-to">{{ 'vehicles.location' | transloco }}</label>
+        <p-select inputId="move-to" [options]="locationOptions()" [(ngModel)]="moveTo" optionLabel="label"
+                  optionValue="value" [fluid]="true" />
+      </div>
+      <div class="field">
+        <label for="move-reason">{{ 'vehicles.reason' | transloco }}</label>
+        <input pInputText id="move-reason" [(ngModel)]="moveReason" />
+      </div>
+      <p-button [label]="'settings.save' | transloco" (onClick)="move()" [disabled]="!moveTo" />
+    </div>
+  </p-dialog>
+} @else {
+  <app-state kind="loading" />
+}

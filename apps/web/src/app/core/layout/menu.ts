@@ -15,9 +15,9 @@ export interface MenuItem {
 
 export const MENU: readonly MenuItem[] = [
   { key: 'dashboard', icon: 'pi pi-home', path: 'dashboard', anyOf: ['dashboard.view', 'partner.view_own'], primary: true },
-  { key: 'vehicles', icon: 'pi pi-car', path: 'soon/vehicles', anyOf: ['vehicle.view'], primary: true },
-  { key: 'customers', icon: 'pi pi-users', path: 'soon/customers', anyOf: ['customer.view'] },
-  { key: 'sales', icon: 'pi pi-shopping-cart', path: 'soon/sales', anyOf: ['sale.view'] },
+  { key: 'vehicles', icon: 'pi pi-car', path: 'vehicles', anyOf: ['vehicle.view'], primary: true },
+  { key: 'customers', icon: 'pi pi-users', path: 'customers', anyOf: ['customer.view'] },
+  { key: 'sales', icon: 'pi pi-shopping-cart', path: 'sales', anyOf: ['sale.view'] },
   {
     key: 'installments',
     icon: 'pi pi-calendar',
@@ -33,6 +33,7 @@ export const MENU: readonly MenuItem[] = [
     anyOf: ['consignment.manage'],
     flag: 'consignment',
   },
+  { key: 'suppliers', icon: 'pi pi-wrench', path: 'suppliers', anyOf: ['supplier.manage'] },
   { key: 'partners', icon: 'pi pi-briefcase', path: 'partners', anyOf: ['partner.view_all', 'partner.view_own'] },
   { key: 'finance', icon: 'pi pi-wallet', path: 'finance/cash', anyOf: ['cash.view'] },
   { key: 'journal', icon: 'pi pi-book', path: 'finance/journal', anyOf: ['journal.view'] },

@@ -1,0 +1,78 @@
+<div class="page-header">
+  <h1 class="page-title">{{ 'vehicles.title' | transloco }}</h1>
+  <p-button *appCan="'vehicle.manage'" icon="pi pi-plus" data-testid="add-vehicle" [label]="'vehicles.add' | transloco"
+            (onClick)="formOpen.set(true)" />
+</div>
+
+<div class="filters">
+  <p-selectbutton [options]="scopeOptions()" [(ngModel)]="scope" (ngModelChange)="filter()" optionLabel="label"
+                  optionValue="value" [allowEmpty]="false" data-testid="scope" />
+  <input pInputText type="search" [(ngModel)]="q" (keyup.enter)="filter()" (search)="filter()"
+         [placeholder]="'vehicles.searchHint' | transloco" data-testid="inventory-search" />
+  <p-select [options]="agingOptions()" [(ngModel)]="aging" (ngModelChange)="filter()" optionLabel="label"
+            optionValue="value" [showClear]="true" [placeholder]="'vehicles.aging' | transloco" />
+  <p-select [options]="sortOptions()" [(ngModel)]="sort" (ngModelChange)="filter()" optionLabel="label"
+            optionValue="value" />
+</div>
+
+@if (loadError()) {
+  <app-state kind="error" [message]="loadError()" (retry)="load()" />
+} @else {
+  <p-table [value]="page()?.items ?? []" [lazy]="true" (onLazyLoad)="lazy($event)" [paginator]="true"
+           [rows]="pageSize" [totalRecords]="page()?.total ?? 0" [loading]="loading()" styleClass="p-datatable-sm"
+           [scrollable]="true" data-testid="inventory">
+    <ng-template #header>
+      <tr>
+        <th class="photo"></th>
+        <th>{{ 'vehicles.vehicle' | transloco }}</th>
+        <th>{{ 'vehicles.status' | transloco }}</th>
+        <th class="hide-sm">{{ 'vehicles.location' | transloco }}</th>
+        <th class="num">{{ 'vehicles.askingPrice' | transloco }}</th>
+        @if (context.can('vehicle.view_cost')) {
+          <th class="num">{{ 'vehicles.totalCost' | transloco }}</th>
+        }
+        <th class="num">{{ 'vehicles.daysInStock' | transloco }}</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-row>
+      <tr class="clickable" (click)="open(row)" [attr.data-testid]="'vehicle-row-' + row.stock_no">
+        <td class="photo">
+          @if (row.photo_url) {
+            <img [src]="row.photo_url" alt="" loading="lazy" />
+          } @else {
+            <i class="pi pi-car" aria-hidden="true"></i>
+          }
+        </td>
+        <td>
+          <div class="car">{{ label(row) }}</div>
+          <div class="sub" dir="auto">{{ row.stock_no }}@if (row.plate_no) { · {{ row.plate_no }} }</div>
+        </td>
+        <td><p-tag [severity]="severity(row.status)" [value]="'vehicles.status_' + row.status | transloco" /></td>
+        <td class="hide-sm">{{ location(row) }}</td>
+        <td class="num">{{ row.asking_price ? (row.asking_price | money) : '—' }}</td>
+        @if (context.can('vehicle.view_cost')) {
+          <td class="num" data-testid="row-cost">
+            {{ row.total_cost | money }}
+            @if (row.cost_complete === false) {
+              <i class="pi pi-exclamation-circle estimate" [title]="'vehicles.costIncomplete' | transloco"></i>
+            }
+          </td>
+        }
+        <td class="num">
+          @if (row.days_in_stock !== null) {
+            <span class="days" [class]="'aging-' + row.aging">{{ row.days_in_stock }}</span>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr><td colspan="7"><app-state kind="empty" [message]="'vehicles.none' | transloco" /></td></tr>
+    </ng-template>
+  </p-table>
+}
+
+<app-vehicle-form-dialog [(visible)]="formOpen" [locations]="locations()" (saved)="onCreated($event)" />
+@if (created(); as vehicle) {
+  <app-purchase-dialog [visible]="purchaseOpen()" (visibleChange)="afterPurchase($event)" [vehicleId]="vehicle.id"
+                       [accounts]="accounts()" />
+}
