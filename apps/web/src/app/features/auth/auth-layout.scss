@@ -1,0 +1,62 @@
+:host {
+  display: grid;
+  place-items: center;
+  min-block-size: 100dvh;
+  padding: var(--space-3);
+  background: var(--color-background);
+}
+
+.card {
+  inline-size: min(420px, 100%);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: var(--space-4);
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin-block: 0 var(--space-4);
+  color: var(--color-text-muted);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.links {
+  display: flex;
+  justify-content: space-between;
+  margin-block-start: var(--space-3);
+  font-size: 0.875rem;
+}
+
+a {
+  color: var(--color-primary-link);
+}

@@ -1,0 +1,37 @@
+# pip install pre-commit && pre-commit install
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.13.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^apps/api/
+      - id: ruff-format
+        files: ^apps/api/
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy (api)
+        entry: bash -c 'cd apps/api && .venv/bin/mypy || .venv/Scripts/mypy'
+        language: system
+        files: ^apps/api/app/
+        pass_filenames: false
+      - id: eslint
+        name: eslint (web)
+        entry: bash -c 'cd apps/web && npx ng lint'
+        language: system
+        files: ^apps/web/src/
+        pass_filenames: false
+      - id: prettier
+        name: prettier (web)
+        entry: bash -c 'cd apps/web && npx prettier --check "src/**/*.{ts,html,scss,json}"'
+        language: system
+        files: ^apps/web/
+        pass_filenames: false

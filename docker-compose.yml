@@ -1,0 +1,14 @@
+# Local API container. Supabase itself runs through the Supabase CLI
+# (`npx supabase start`), which manages its own containers.
+services:
+  api:
+    build: ./apps/api
+    env_file: ./apps/api/.env
+    environment:
+      # Inside the container, reach the Supabase CLI stack on the host.
+      DATABASE_URL: postgresql://app_api:app_api_local_dev@host.docker.internal:54322/postgres
+      SUPABASE_URL: http://host.docker.internal:54321
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

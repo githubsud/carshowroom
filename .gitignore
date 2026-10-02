@@ -1,0 +1,29 @@
+# Secrets and local env — never commit (SPEC §12)
+.env
+.env.*
+!.env.example
+**/.env
+!**/.env.example
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node / Angular
+node_modules/
+
+# Supabase local state
+supabase/.temp/
+supabase/.branches/
+supabase/signing_keys.json
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/

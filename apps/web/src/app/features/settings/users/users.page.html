@@ -1,0 +1,112 @@
+<div class="page-header">
+  <h1 class="page-title">{{ 'users.title' | transloco }}</h1>
+  @if (context.active()?.subscription_status !== 'SUSPENDED') {
+    <p-button
+      type="button"
+      icon="pi pi-user-plus"
+      data-testid="invite-open"
+      [label]="'users.invite' | transloco"
+      (onClick)="openInvite()"
+     />
+  }
+</div>
+
+@switch (state()) {
+  @case ('loading') {
+    <app-state kind="loading" />
+  }
+  @case ('error') {
+    <app-state kind="error" [message]="loadError()" (retry)="load()" />
+  }
+  @default {
+    <p-table [value]="members()" dataKey="membership_id" styleClass="p-datatable-sm" data-testid="users-table">
+      <ng-template #header>
+        <tr>
+          <th>{{ 'users.name' | transloco }}</th>
+          <th>{{ 'users.role' | transloco }}</th>
+          <th>{{ 'users.status' | transloco }}</th>
+          <th>{{ 'users.lastSignIn' | transloco }}</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-member>
+        <tr>
+          <td>
+            <div class="name">{{ member.full_name || member.email }}</div>
+            <div class="email" dir="ltr">{{ member.email }}</div>
+          </td>
+          <td>
+            <p-select
+              [options]="roles()"
+              [ngModel]="member.role_code"
+              (ngModelChange)="changeRole(member, $event)"
+              optionValue="code"
+              [optionLabel]="language.language() === 'ar' ? 'name_ar' : 'name_en'"
+              [attr.aria-label]="'users.role' | transloco"
+            />
+          </td>
+          <td>
+            <p-tag
+              [value]="'users.status_' + member.status | transloco"
+              [severity]="member.status === 'ACTIVE' ? 'success' : 'secondary'"
+            />
+          </td>
+          <td>{{ member.last_sign_in_at | appDate }}</td>
+          <td class="actions">
+            <p-button
+              type="button"
+              [text]="true"
+              [severity]="member.status === 'ACTIVE' ? 'danger' : 'secondary'"
+              [label]="(member.status === 'ACTIVE' ? 'users.disable' : 'users.enable') | transloco"
+              (onClick)="toggleStatus(member)"
+             />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+}
+
+<p-dialog
+  [visible]="inviteOpen()"
+  (visibleChange)="inviteOpen.set($event)"
+  [modal]="true"
+  [header]="'users.inviteTitle' | transloco"
+  [style]="{ width: 'min(440px, 95vw)' }"
+>
+  <form class="invite-form" [formGroup]="inviteForm" (ngSubmit)="sendInvite()">
+    <div class="field">
+      <label for="invite-email">{{ 'auth.email' | transloco }}</label>
+      <input pInputText id="invite-email" type="email" formControlName="email" dir="ltr" data-testid="invite-email" />
+    </div>
+    <div class="field">
+      <label for="invite-name">{{ 'users.fullName' | transloco }}</label>
+      <input pInputText id="invite-name" formControlName="full_name" />
+    </div>
+    <div class="field">
+      <label for="invite-role">{{ 'users.role' | transloco }}</label>
+      <p-select
+        inputId="invite-role"
+        formControlName="role_code"
+        [options]="roles()"
+        optionValue="code"
+        [optionLabel]="language.language() === 'ar' ? 'name_ar' : 'name_en'"
+        [fluid]="true"
+      />
+    </div>
+    <p class="hint">{{ 'users.inviteHint' | transloco }}</p>
+    @if (inviteError()) {
+      <p-message severity="error">{{ inviteError() }}</p-message>
+    }
+    <div class="dialog-actions">
+      <p-button type="button" [text]="true" [label]="'common.cancel' | transloco" (onClick)="inviteOpen.set(false)" />
+      <p-button
+        type="submit"
+        data-testid="invite-submit"
+        [label]="'users.sendInvite' | transloco"
+        [loading]="inviting()"
+        [disabled]="inviteForm.invalid"
+       />
+    </div>
+  </form>
+</p-dialog>

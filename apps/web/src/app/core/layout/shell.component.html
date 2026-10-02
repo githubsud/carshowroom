@@ -1,0 +1,93 @@
+<header class="topbar">
+  <p-button
+    type="button"
+    class="menu-toggle"
+    icon="pi pi-bars"
+    [text]="true"
+    [ariaLabel]="'shell.openMenu' | transloco"
+    (onClick)="menuOpen.set(true)"
+   />
+
+  <span class="brand">{{ productName() }}</span>
+
+  <a class="tenant" [routerLink]="hasSeveralTenants() ? '/tenants' : null" data-testid="active-tenant">
+    <i class="pi pi-building" aria-hidden="true"></i>
+    <span>{{ tenantName() }}</span>
+    @if (hasSeveralTenants()) {
+      <i class="pi pi-angle-down" aria-hidden="true"></i>
+    }
+  </a>
+
+  <span class="spacer"></span>
+
+  <p-button
+    type="button"
+    [text]="true"
+    data-testid="language-toggle"
+    [label]="'shell.switchLanguage' | transloco"
+    (onClick)="language.toggle()"
+   />
+
+  <span class="user" data-testid="user-email">{{ email() }}</span>
+  <p-button
+    type="button"
+    icon="pi pi-sign-out"
+    [text]="true"
+    data-testid="sign-out"
+    [ariaLabel]="'shell.signOut' | transloco"
+    (onClick)="signOut()"
+   />
+</header>
+
+@if (readOnly()) {
+  <div class="read-only-banner" role="status">{{ 'shell.readOnly' | transloco }}</div>
+}
+
+<div class="frame">
+  <nav class="sidebar" [attr.aria-label]="'shell.navigation' | transloco" data-testid="sidebar">
+    @for (item of menu(); track item.key) {
+      <a
+        class="nav-item"
+        [routerLink]="link(item.path)"
+        routerLinkActive="active"
+        [attr.data-testid]="'nav-' + item.key"
+      >
+        <i [class]="item.icon" aria-hidden="true"></i>
+        <span>{{ 'menu.' + item.key | transloco }}</span>
+      </a>
+    }
+  </nav>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>
+
+<nav class="bottom-bar" [attr.aria-label]="'shell.navigation' | transloco">
+  @for (item of primaryMenu(); track item.key) {
+    <a class="bottom-item" [routerLink]="link(item.path)" routerLinkActive="active">
+      <i [class]="item.icon" aria-hidden="true"></i>
+      <span>{{ 'menu.' + item.key | transloco }}</span>
+    </a>
+  }
+  <button type="button" class="bottom-item" (click)="menuOpen.set(true)">
+    <i class="pi pi-ellipsis-h" aria-hidden="true"></i>
+    <span>{{ 'shell.more' | transloco }}</span>
+  </button>
+</nav>
+
+<p-drawer
+  [visible]="menuOpen()"
+  (visibleChange)="menuOpen.set($event)"
+  [position]="language.language() === 'ar' ? 'right' : 'left'"
+  [header]="productName()"
+>
+  <nav data-testid="drawer-nav">
+  @for (item of menu(); track item.key) {
+    <a class="nav-item" [routerLink]="link(item.path)" routerLinkActive="active" (click)="menuOpen.set(false)">
+      <i [class]="item.icon" aria-hidden="true"></i>
+      <span>{{ 'menu.' + item.key | transloco }}</span>
+    </a>
+  }
+  </nav>
+</p-drawer>

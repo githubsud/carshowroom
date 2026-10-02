@@ -1,0 +1,56 @@
+"""Permission catalogue (ARCHITECTURE §7).
+
+Mirrors public.permissions (supabase/migrations/*_reference_data.sql); an
+integration test fails if the two drift. Code checks these permissions, never
+role names (SPEC §1.2).
+"""
+
+from enum import StrEnum
+
+
+class Permission(StrEnum):
+    TENANT_SETTINGS_MANAGE = "tenant.settings.manage"
+    USERS_MANAGE = "users.manage"
+    SUPPORT_GRANT = "support.grant"
+    DASHBOARD_VIEW = "dashboard.view"
+    DASHBOARD_FINANCIAL = "dashboard.financial"
+    VEHICLE_VIEW = "vehicle.view"
+    VEHICLE_MANAGE = "vehicle.manage"
+    VEHICLE_VIEW_COST = "vehicle.view_cost"
+    VEHICLE_VIEW_MIN_PRICE = "vehicle.view_min_price"
+    VEHICLE_PURCHASE = "vehicle.purchase"
+    VEHICLE_EXPENSE_RECORD = "vehicle.expense.record"
+    CUSTOMER_VIEW = "customer.view"
+    CUSTOMER_MANAGE = "customer.manage"
+    CUSTOMER_VIEW_NATIONAL_ID = "customer.view_national_id"
+    REQUEST_MANAGE = "request.manage"
+    FOLLOWUP_MANAGE = "followup.manage"
+    SALE_VIEW = "sale.view"
+    SALE_DRAFT = "sale.draft"
+    SALE_POST = "sale.post"
+    SALE_CANCEL = "sale.cancel"
+    RESERVATION_MANAGE = "reservation.manage"
+    INSTALLMENT_VIEW = "installment.view"
+    INSTALLMENT_COLLECT = "installment.collect"
+    DEFERRED_PAPER_MANAGE = "deferred_paper.manage"
+    CONSIGNMENT_MANAGE = "consignment.manage"
+    CONSIGNMENT_SETTLE = "consignment.settle"
+    PARTNER_VIEW_ALL = "partner.view_all"
+    PARTNER_VIEW_OWN = "partner.view_own"
+    PARTNER_TRANSACT = "partner.transact"
+    PARTNER_EQUITY_CHANGE = "partner.equity.change"
+    CASH_VIEW = "cash.view"
+    CASH_TRANSACT = "cash.transact"
+    SUPPLIER_MANAGE = "supplier.manage"
+    SUPPLIER_PAY = "supplier.pay"
+    JOURNAL_VIEW = "journal.view"
+    JOURNAL_REVERSE = "journal.reverse"
+    PERIOD_LOCK = "period.lock"
+    PERIOD_UNLOCK = "period.unlock"
+    PROFIT_DISTRIBUTE = "profit.distribute"
+    REPORT_FINANCIAL = "report.financial"
+    IMPORT_RUN = "import.run"
+    AUDIT_VIEW = "audit.view"
+    PLATFORM_TENANTS_MANAGE = "platform.tenants.manage"
+    PLATFORM_BILLING_MANAGE = "platform.billing.manage"
+    PLATFORM_SUPPORT_ACCESS = "platform.support.access"

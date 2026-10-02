@@ -1,0 +1,116 @@
+{
+  "common": {
+    "loading": "Loading",
+    "empty": "Nothing here yet",
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "comingSoon": "This section is being built and will arrive in a later phase."
+  },
+  "shell": {
+    "switchLanguage": "العربية",
+    "signOut": "Sign out",
+    "openMenu": "Open menu",
+    "navigation": "Main navigation",
+    "more": "More",
+    "readOnly": "The subscription is suspended: you can view data but not record anything new."
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "vehicles": "Vehicles",
+    "customers": "Customers",
+    "sales": "Sales",
+    "installments": "Installments",
+    "consignments": "Consignments",
+    "partners": "Partners",
+    "finance": "Cash & bank",
+    "reports": "Reports",
+    "users": "Users",
+    "settings": "Settings",
+    "audit": "Audit log"
+  },
+  "auth": {
+    "loginSubtitle": "Sign in to follow your cars, money and partners.",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "forgotPassword": "Forgot password?",
+    "forgotTitle": "Reset password",
+    "forgotSubtitle": "Enter your email and we will send you a link to set a new password.",
+    "sendResetLink": "Send link",
+    "resetSent": "If this email is registered, a link will arrive within a few minutes.",
+    "backToLogin": "Back to sign in",
+    "setPasswordTitle": "Set your password",
+    "passwordRules": "At least 10 characters with an uppercase letter, a lowercase letter and a digit.",
+    "newPassword": "New password",
+    "savePassword": "Save password",
+    "linkInvalid": "This link is invalid or has expired. Request a new one."
+  },
+  "tenants": {
+    "title": "Choose a showroom",
+    "none": "Your account is not linked to any showroom yet. Ask the showroom owner for an invitation.",
+    "lastUsed": "last opened"
+  },
+  "dashboard": {
+    "welcome": "Welcome to {{name}}",
+    "yourRole": "Your role",
+    "subscription": "Subscription",
+    "currency": "Currency",
+    "comingNext": "The money and stock dashboard and the Needs Attention panel will appear here in the next phases."
+  },
+  "roles": {
+    "OWNER": "Owner / Managing partner",
+    "MANAGER": "Manager",
+    "ACCOUNTANT": "Accountant",
+    "SALES": "Sales staff",
+    "PARTNER": "Partner",
+    "VIEWER": "Viewer"
+  },
+  "subscription": {
+    "TRIAL": "Trial",
+    "ACTIVE": "Active",
+    "PAST_DUE": "Past due",
+    "SUSPENDED": "Suspended"
+  },
+  "users": {
+    "name": "Name",
+    "title": "Users",
+    "invite": "Invite user",
+    "inviteTitle": "Invite a new user",
+    "fullName": "Name",
+    "role": "Role",
+    "status": "Status",
+    "status_ACTIVE": "Active",
+    "status_DISABLED": "Disabled",
+    "lastSignIn": "Last sign-in",
+    "disable": "Disable",
+    "enable": "Enable",
+    "sendInvite": "Send invitation",
+    "inviteHint": "Someone who already has an account in another showroom is added right away. Others receive an email to set their password.",
+    "invited": "Invitation sent"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "This link is wrong or you don't have access to it.",
+    "home": "Back to showrooms"
+  },
+  "errors": {
+    "UNKNOWN_ERROR": "Something unexpected happened. Please try again.",
+    "NETWORK_ERROR": "Cannot reach the server. If you are running the system locally, make sure the API is running (scripts/dev.ps1 api) and try again.",
+    "INTERNAL_ERROR": "The server had a problem. Please try again shortly.",
+    "AUTH_INVALID_TOKEN": "Your session has ended. Please sign in again.",
+    "TENANT_HEADER_MISSING": "Choose a showroom first.",
+    "TENANT_ACCESS_DENIED": "You don't have access to this showroom.",
+    "PERMISSION_DENIED": "You don't have permission to do this.",
+    "TENANT_READ_ONLY": "The subscription is suspended; new records cannot be saved.",
+    "VALIDATION_ERROR": "Some information is missing or invalid.",
+    "NOT_FOUND": "The requested item was not found.",
+    "MEMBER_ALREADY_EXISTS": "This person is already a member of the showroom.",
+    "LAST_OWNER": "The showroom must keep at least one active owner.",
+    "INVITE_FAILED": "The invitation could not be sent. Please try again.",
+    "INVITES_DISABLED": "Invitations are not enabled on the server.",
+    "auth_invalid_credentials": "Wrong email or password.",
+    "auth_weak_password": "Password too weak. Use at least 10 characters with upper and lower case letters and a digit.",
+    "auth_over_request_rate_limit": "Too many attempts. Wait a moment and try again.",
+    "auth_same_password": "Choose a password different from the old one."
+  }
+}

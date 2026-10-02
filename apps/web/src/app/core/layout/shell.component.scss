@@ -1,0 +1,153 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100dvh;
+}
+
+.topbar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 10;
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  block-size: 56px;
+  padding-inline: var(--space-3);
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+}
+
+.brand {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.tenant {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  max-inline-size: 40vw;
+  overflow: hidden;
+  color: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.user {
+  font-size: 0.875rem;
+  opacity: 0.85;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+.read-only-banner {
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-warn-text);
+  text-align: center;
+  background: var(--color-warn-bg);
+}
+
+.frame {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  inline-size: 232px;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-surface);
+  border-inline-end: 1px solid var(--color-border);
+}
+
+.nav-item {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-block-size: 44px;
+  padding-inline: var(--space-3);
+  color: var(--color-text);
+  text-decoration: none;
+  border-radius: var(--radius);
+
+  &:hover {
+    background: var(--color-hover);
+  }
+
+  &.active {
+    font-weight: 600;
+    color: var(--color-primary);
+    background: var(--color-selected);
+  }
+}
+
+.content {
+  flex: 1;
+  min-inline-size: 0;
+  padding: var(--space-4);
+}
+
+.bottom-bar {
+  display: none;
+}
+
+@media (width <= 767px) {
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .sidebar,
+  .user {
+    display: none;
+  }
+
+  .content {
+    padding: var(--space-3);
+    padding-block-end: 80px;
+  }
+
+  .bottom-bar {
+    position: fixed;
+    inset-block-end: 0;
+    inset-inline: 0;
+    display: flex;
+    justify-content: space-around;
+    block-size: 64px;
+    background: var(--color-surface);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .bottom-item {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+    justify-content: center;
+    font: inherit;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    cursor: pointer;
+    background: none;
+    border: 0;
+
+    &.active {
+      color: var(--color-primary);
+    }
+
+    i {
+      font-size: 1.25rem;
+    }
+  }
+}

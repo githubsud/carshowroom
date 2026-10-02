@@ -1,0 +1,71 @@
+/*
+ * Global design tokens (FRONTEND.md §6, D-33). Layout uses CSS logical
+ * properties only, so Arabic (RTL) and English (LTR) share one stylesheet.
+ */
+
+:root {
+  --font-body: 'IBM Plex Sans Arabic', system-ui, 'Segoe UI', roboto, sans-serif;
+  --font-heading: 'Cairo', var(--font-body);
+
+  --color-primary: #0f172a;
+  --color-on-primary: #fff;
+  --color-primary-link: #1d4ed8;
+  --color-background: #f1f5f9;
+  --color-surface: #fff;
+  --color-border: #e2e8f0;
+  --color-hover: #f1f5f9;
+  --color-selected: #e2e8f0;
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
+  --color-danger: #b91c1c;
+  --color-warn-bg: #fef3c7;
+  --color-warn-text: #78350f;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 6%), 0 1px 3px rgb(15 23 42 / 8%);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-title {
+  margin-block: 0 var(--space-3);
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary-link);
+  outline-offset: 2px;
+}
+
+/* Text buttons on the dark top bar (PrimeNG renders them inside its own element). */
+app-shell .topbar .p-button-text {
+  color: var(--color-on-primary);
+}
+
+app-shell .topbar .p-button-text:not(:disabled):hover {
+  color: var(--color-on-primary);
+  background: rgb(255 255 255 / 12%);
+}

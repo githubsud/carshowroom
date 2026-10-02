@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss"
+  ],
+  "plugins": [
+    "stylelint-use-logical"
+  ],
+  "rules": {
+    "csstools/use-logical": [
+      "always",
+      {
+        "severity": "error"
+      }
+    ],
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "font-family-name-quotes": null,
+    "no-descending-specificity": null,
+    "custom-property-empty-line-before": null
+  }
+}
