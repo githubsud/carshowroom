@@ -75,6 +75,23 @@ export interface paths {
         patch: operations["update_customer_api_v1_customers__customer_id__patch"];
         trace?: never;
     };
+    "/api/v1/customers/{customer_id}/installment-statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Customer Statement */
+        get: operations["customer_statement_api_v1_customers__customer_id__installment_statement_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/customers/{customer_id}/national-id": {
         parameters: {
             query?: never;
@@ -120,6 +137,75 @@ export interface paths {
         put?: never;
         /** Preview Refund */
         post: operations["preview_refund_api_v1_customers__customer_id__refunds_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deferred-papers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Papers */
+        get: operations["list_papers_api_v1_deferred_papers_get"];
+        put?: never;
+        /** Create Paper */
+        post: operations["create_paper_api_v1_deferred_papers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deferred-papers/{paper_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Paper */
+        get: operations["get_paper_api_v1_deferred_papers__paper_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deferred-papers/{paper_id}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Paper Action */
+        post: operations["paper_action_api_v1_deferred_papers__paper_id__actions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deferred-papers/{paper_id}/actions/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Paper Action */
+        post: operations["preview_paper_action_api_v1_deferred_papers__paper_id__actions_preview_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -265,6 +351,125 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/installment-plans/schedule-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Schedule Preview */
+        post: operations["schedule_preview_api_v1_installment_plans_schedule_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/installment-plans/{plan_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Plan */
+        get: operations["get_plan_api_v1_installment_plans__plan_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/installment-plans/{plan_id}/receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Receipt */
+        post: operations["record_receipt_api_v1_installment_plans__plan_id__receipts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/installment-plans/{plan_id}/receipts/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Receipt */
+        post: operations["preview_receipt_api_v1_installment_plans__plan_id__receipts_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/installments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Installments */
+        get: operations["list_installments_api_v1_installments_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/installments/board": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Installment Board */
+        get: operations["installment_board_api_v1_installments_board_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/installments/kpis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Installment Kpis */
+        get: operations["installment_kpis_api_v1_installments_kpis_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/journal-entries": {
         parameters: {
             query?: never;
@@ -399,6 +604,57 @@ export interface paths {
         get: operations["me_api_v1_me_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Notifications */
+        get: operations["list_notifications_api_v1_notifications_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read All Notifications */
+        post: operations["read_all_notifications_api_v1_notifications_read_all_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{notification_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read Notification */
+        post: operations["read_notification_api_v1_notifications__notification_id__read_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1421,6 +1677,16 @@ export interface components {
              */
             reservation_date: string;
         };
+        /** AllocationOut */
+        AllocationOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /** Seq */
+            seq: number;
+        };
         /** CashAccountIn */
         CashAccountIn: {
             /** Account Number */
@@ -1666,6 +1932,47 @@ export interface components {
             /** Phone */
             phone?: string | null;
         };
+        /** CustomerInstallmentStatement */
+        CustomerInstallmentStatement: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Currency Code */
+            currency_code: string;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Customer Name */
+            customer_name: string;
+            /** Customer Phone */
+            customer_phone: string | null;
+            /** Plans */
+            plans: components["schemas"]["InstallmentPlanOut"][];
+            /**
+             * Total Financed
+             * @example 25000.00
+             */
+            total_financed: string;
+            /**
+             * Total Overdue
+             * @example 25000.00
+             */
+            total_overdue: string;
+            /**
+             * Total Paid
+             * @example 25000.00
+             */
+            total_paid: string;
+            /**
+             * Total Remaining
+             * @example 25000.00
+             */
+            total_remaining: string;
+        };
         /** CustomerOut */
         CustomerOut: {
             /** Address */
@@ -1698,6 +2005,30 @@ export interface components {
             phone_primary: string | null;
             /** Phones */
             phones: string[];
+        };
+        /** CustomerOutstanding */
+        CustomerOutstanding: {
+            /** Bounced */
+            bounced: boolean;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Customer Name */
+            customer_name: string;
+            /** Customer Phone */
+            customer_phone: string | null;
+            /**
+             * Outstanding
+             * @example 25000.00
+             */
+            outstanding: string;
+            /**
+             * Overdue
+             * @example 25000.00
+             */
+            overdue: string;
         };
         /** CustomerRefundIn */
         CustomerRefundIn: {
@@ -2022,6 +2353,214 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** InstallmentBoard */
+        InstallmentBoard: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Customers */
+            customers: components["schemas"]["CustomerOutstanding"][];
+            /**
+             * Due Soon
+             * @example 25000.00
+             */
+            due_soon: string;
+            /**
+             * Due Today
+             * @example 25000.00
+             */
+            due_today: string;
+            /**
+             * Overdue
+             * @example 25000.00
+             */
+            overdue: string;
+            /** Rows */
+            rows: components["schemas"]["InstallmentOut"][];
+        };
+        /**
+         * InstallmentKpis
+         * @description Dashboard tiles (C-09): due in 48 hours and in 7 days, overdue, bounced.
+         */
+        InstallmentKpis: {
+            /** Bounced Count */
+            bounced_count: number;
+            /**
+             * Due 48H
+             * @example 25000.00
+             */
+            due_48h: string;
+            /** Due 48H Count */
+            due_48h_count: number;
+            /**
+             * Due 7D
+             * @example 25000.00
+             */
+            due_7d: string;
+            /** Due 7D Count */
+            due_7d_count: number;
+            /**
+             * Overdue
+             * @example 25000.00
+             */
+            overdue: string;
+            /** Overdue Count */
+            overdue_count: number;
+        };
+        /** InstallmentOut */
+        InstallmentOut: {
+            /**
+             * Amount Due
+             * @example 25000.00
+             */
+            amount_due: string;
+            /** Customer Bounced */
+            customer_bounced: boolean;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Customer Name */
+            customer_name: string;
+            /** Customer Phone */
+            customer_phone: string | null;
+            /** Days Late */
+            days_late: number;
+            /**
+             * Due Date
+             * Format: date
+             */
+            due_date: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Paid
+             * @example 25000.00
+             */
+            paid: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /**
+             * Remaining
+             * @example 25000.00
+             */
+            remaining: string;
+            /**
+             * Sale Id
+             * Format: uuid
+             */
+            sale_id: string;
+            /** Sale No */
+            sale_no: string;
+            /** Seq */
+            seq: number;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "PAID" | "OVERDUE" | "DUE_TODAY" | "UPCOMING" | "CANCELLED";
+            /** Stock No */
+            stock_no: string;
+            /** Vehicle Label */
+            vehicle_label: string;
+        };
+        /**
+         * InstallmentPlanIn
+         * @description How the rest of a sale price is paid (mode a, SPEC §4.8): an equal split
+         *     by frequency, or a manual schedule that adds up exactly.
+         */
+        InstallmentPlanIn: {
+            /** Count */
+            count?: number | null;
+            /** First Due Date */
+            first_due_date?: string | null;
+            /**
+             * Frequency
+             * @default MONTHLY
+             * @enum {string}
+             */
+            frequency: "MONTHLY" | "BIWEEKLY" | "WEEKLY" | "QUARTERLY" | "MANUAL";
+            /** Schedule */
+            schedule?: components["schemas"]["ScheduleRowIn"][] | null;
+        };
+        /** InstallmentPlanOut */
+        InstallmentPlanOut: {
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Customer Name */
+            customer_name: string;
+            /**
+             * Financed Amount
+             * @example 25000.00
+             */
+            financed_amount: string;
+            /**
+             * First Due Date
+             * Format: date
+             */
+            first_due_date: string;
+            /**
+             * Frequency
+             * @enum {string}
+             */
+            frequency: "MONTHLY" | "BIWEEKLY" | "WEEKLY" | "QUARTERLY" | "MANUAL";
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Installment Count */
+            installment_count: number;
+            /** Installments */
+            installments: components["schemas"]["InstallmentOut"][];
+            /**
+             * Overdue Total
+             * @example 25000.00
+             */
+            overdue_total: string;
+            /**
+             * Paid Total
+             * @example 25000.00
+             */
+            paid_total: string;
+            /** Papers */
+            papers: components["schemas"]["PaperOut"][];
+            /** Receipts */
+            receipts: components["schemas"]["ReceiptOut"][];
+            /**
+             * Remaining Total
+             * @example 25000.00
+             */
+            remaining_total: string;
+            /**
+             * Sale Id
+             * Format: uuid
+             */
+            sale_id: string;
+            /** Sale No */
+            sale_no: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ACTIVE" | "CANCELLED";
+            /** Stock No */
+            stock_no: string;
+            /** Vehicle Label */
+            vehicle_label: string;
+        };
         /** InviteIn */
         InviteIn: {
             /**
@@ -2320,6 +2859,38 @@ export interface components {
             /** National Id */
             national_id: string;
         };
+        /** NotificationOut */
+        NotificationOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Entity Id */
+            entity_id: string | null;
+            /** Entity Type */
+            entity_type: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Params */
+            params: {
+                [key: string]: unknown;
+            };
+            /** Read */
+            read: boolean;
+        };
+        /** NotificationPage */
+        NotificationPage: {
+            /** Items */
+            items: components["schemas"]["NotificationOut"][];
+            /** Unread */
+            unread: number;
+        };
         /** OtherIncomeIn */
         OtherIncomeIn: {
             /**
@@ -2421,6 +2992,149 @@ export interface components {
             page_size: number;
             /** Total */
             total: number;
+        };
+        /** PaperActionIn */
+        PaperActionIn: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "DEPOSIT" | "COLLECT" | "BOUNCE" | "RETURN" | "DEFAULT" | "LEGAL";
+            /**
+             * Action Date
+             * Format: date
+             */
+            action_date: string;
+            /** Bank Charges */
+            bank_charges?: string | null;
+            /** Cash Account Id */
+            cash_account_id?: string | null;
+            /**
+             * Charge Customer
+             * @default false
+             */
+            charge_customer: boolean;
+            /** Note */
+            note?: string | null;
+        };
+        /** PaperEventOut */
+        PaperEventOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Entry No */
+            entry_no: number | null;
+            /**
+             * Event Date
+             * Format: date
+             */
+            event_date: string;
+            /** From Status */
+            from_status: string | null;
+            /** Note */
+            note: string | null;
+            /** To Status */
+            to_status: string;
+        };
+        /** PaperIn */
+        PaperIn: {
+            /** Account Holder */
+            account_holder?: string | null;
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Drawer Bank */
+            drawer_bank?: string | null;
+            /** Drawer Branch */
+            drawer_branch?: string | null;
+            /**
+             * Due Date
+             * Format: date
+             */
+            due_date: string;
+            /** Installment Id */
+            installment_id?: string | null;
+            /** Issue Date */
+            issue_date?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Number */
+            number: string;
+            /**
+             * Paper Type
+             * @enum {string}
+             */
+            paper_type: "PROMISSORY_NOTE" | "PDC";
+            /** Storage Location */
+            storage_location?: string | null;
+        };
+        /** PaperOut */
+        PaperOut: {
+            /** Account Holder */
+            account_holder: string | null;
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Customer Name */
+            customer_name: string;
+            /** Drawer Bank */
+            drawer_bank: string | null;
+            /** Drawer Branch */
+            drawer_branch: string | null;
+            /**
+             * Due Date
+             * Format: date
+             */
+            due_date: string;
+            /** Events */
+            events?: components["schemas"]["PaperEventOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Installment Id */
+            installment_id: string | null;
+            /** Installment Seq */
+            installment_seq: number | null;
+            /** Issue Date */
+            issue_date: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Number */
+            number: string;
+            /** Overdue */
+            overdue: boolean;
+            /**
+             * Paper Type
+             * @enum {string}
+             */
+            paper_type: "PROMISSORY_NOTE" | "PDC";
+            /** Sale No */
+            sale_no: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "HELD" | "DEPOSITED" | "COLLECTED" | "BOUNCED" | "RETURNED" | "DEFAULTED" | "LEGAL";
+            /** Storage Location */
+            storage_location: string | null;
         };
         /** PartnerIn */
         PartnerIn: {
@@ -2705,9 +3419,25 @@ export interface components {
             /** Warnings */
             warnings?: components["schemas"]["PostingWarning"][];
         };
+        /** PostingResult[InstallmentPlanOut] */
+        PostingResult_InstallmentPlanOut_: {
+            document: components["schemas"]["InstallmentPlanOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
         /** PostingResult[OtherIncomeOut] */
         PostingResult_OtherIncomeOut_: {
             document: components["schemas"]["OtherIncomeOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[PaperOut] */
+        PostingResult_PaperOut_: {
+            document: components["schemas"]["PaperOut"];
             /** Journal Entries */
             journal_entries: components["schemas"]["EntryRef"][];
             /** Warnings */
@@ -2958,6 +3688,73 @@ export interface components {
              */
             source: "PURCHASE" | "TRADE_IN";
         };
+        /** ReceiptIn */
+        ReceiptIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /** Cash Account Id */
+            cash_account_id?: string | null;
+            /**
+             * Keep Excess As Credit
+             * @default false
+             */
+            keep_excess_as_credit: boolean;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Receipt Date
+             * Format: date
+             */
+            receipt_date: string;
+            /**
+             * Source
+             * @default CASH_ACCOUNT
+             * @enum {string}
+             */
+            source: "CASH_ACCOUNT" | "CREDIT";
+        };
+        /** ReceiptOut */
+        ReceiptOut: {
+            /** Allocations */
+            allocations: components["schemas"]["AllocationOut"][];
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /** Cash Account Name Ar */
+            cash_account_name_ar: string | null;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Excess To Credit
+             * @example 25000.00
+             */
+            excess_to_credit: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Receipt Date
+             * Format: date
+             */
+            receipt_date: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "CASH_ACCOUNT" | "CREDIT" | "PAPER";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED" | "BOUNCED";
+        };
         /** ReservationIn */
         ReservationIn: {
             /**
@@ -3103,6 +3900,7 @@ export interface components {
              * @example 25000.00
              */
             discount: string;
+            installments?: components["schemas"]["InstallmentPlanIn"] | null;
             /**
              * List Price
              * @example 25000.00
@@ -3205,10 +4003,16 @@ export interface components {
             /** Entry No */
             entry_no: number | null;
             /**
+             * Financed
+             * @example 25000.00
+             */
+            financed: string;
+            /**
              * Id
              * Format: uuid
              */
             id: string;
+            installment_plan: components["schemas"]["InstallmentPlanIn"] | null;
             /** Invoice No */
             invoice_no: string | null;
             /**
@@ -3225,6 +4029,8 @@ export interface components {
             paid_total: string;
             /** Payments */
             payments: components["schemas"]["SalePaymentOut"][];
+            /** Plan Id */
+            plan_id: string | null;
             profit?: components["schemas"]["SaleProfit"] | null;
             /**
              * Remaining
@@ -3331,6 +4137,43 @@ export interface components {
             gross_profit: string;
             /** Profit Pct */
             profit_pct: string;
+        };
+        /** SchedulePreviewIn */
+        SchedulePreviewIn: {
+            /**
+             * Financed
+             * @example 25000.00
+             */
+            financed: string;
+            plan: components["schemas"]["InstallmentPlanIn"];
+        };
+        /** ScheduleRowIn */
+        ScheduleRowIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Due Date
+             * Format: date
+             */
+            due_date: string;
+        };
+        /** ScheduleRowOut */
+        ScheduleRowOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Due Date
+             * Format: date
+             */
+            due_date: string;
+            /** Seq */
+            seq: number;
         };
         /** SearchOut */
         SearchOut: {
@@ -4678,6 +5521,43 @@ export interface operations {
             };
         };
     };
+    customer_statement_api_v1_customers__customer_id__installment_statement_get: {
+        parameters: {
+            query?: {
+                format?: "json" | "pdf";
+                lang?: "ar" | "en";
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                customer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerInstallmentStatement"];
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     reveal_national_id_api_v1_customers__customer_id__national_id_get: {
         parameters: {
             query?: never;
@@ -4763,6 +5643,185 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["CustomerRefundIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_papers_api_v1_deferred_papers_get: {
+        parameters: {
+            query?: {
+                status?: ("HELD" | "DEPOSITED" | "COLLECTED" | "BOUNCED" | "RETURNED" | "DEFAULTED" | "LEGAL") | null;
+                paper_type?: ("PROMISSORY_NOTE" | "PDC") | null;
+                customer_id?: string | null;
+                overdue?: boolean;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaperOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_paper_api_v1_deferred_papers_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaperIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaperOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_paper_api_v1_deferred_papers__paper_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                paper_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaperOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    paper_action_api_v1_deferred_papers__paper_id__actions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                paper_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaperActionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_PaperOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_paper_action_api_v1_deferred_papers__paper_id__actions_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                paper_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaperActionIn"];
             };
         };
         responses: {
@@ -5168,6 +6227,252 @@ export interface operations {
             };
         };
     };
+    schedule_preview_api_v1_installment_plans_schedule_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SchedulePreviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleRowOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_plan_api_v1_installment_plans__plan_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstallmentPlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_receipt_api_v1_installment_plans__plan_id__receipts_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReceiptIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_InstallmentPlanOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_receipt_api_v1_installment_plans__plan_id__receipts_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReceiptIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_installments_api_v1_installments_get: {
+        parameters: {
+            query?: {
+                view?: "open" | "due_today" | "upcoming" | "overdue" | "calendar";
+                days?: number;
+                customer_id?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstallmentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    installment_board_api_v1_installments_board_get: {
+        parameters: {
+            query?: {
+                view?: "open" | "due_today" | "upcoming" | "overdue" | "calendar";
+                days?: number;
+                customer_id?: string | null;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstallmentBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    installment_kpis_api_v1_installments_kpis_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstallmentKpis"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_journal_entries_api_v1_journal_entries_get: {
         parameters: {
             query?: {
@@ -5468,6 +6773,100 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeOut"];
+                };
+            };
+        };
+    };
+    list_notifications_api_v1_notifications_get: {
+        parameters: {
+            query?: {
+                unread_only?: boolean;
+                limit?: number;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_all_notifications_api_v1_notifications_read_all_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_notification_api_v1_notifications__notification_id__read_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                notification_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

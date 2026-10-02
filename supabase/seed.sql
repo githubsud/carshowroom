@@ -426,3 +426,90 @@ begin
   perform set_config('app.tenant_id', '', true);
 end
 $$;
+
+-- =============================================================================
+-- Phase 5: an installment sale with papers (معرض النور).
+--   Optra 2016 (cost 150,000) sold 2026-09-29 to عمر خالد for 200,000:
+--   50,000 cash down + 6 monthly installments of 25,000 from 2026-09-30 (rule 13).
+--   Installment 1 is already overdue; a post-dated cheque covers installment 2
+--   and a promissory note installment 3. Cash 295,000 + 50,000 = 345,000.
+-- =============================================================================
+do $$
+declare
+  v_nour   constant uuid := '11111111-1111-1111-1111-111111111111';
+  v_cash   constant uuid := 'c0000000-0000-0000-0000-000000000001';
+  v_owner  constant uuid := 'a0000000-0000-0000-0000-000000000001';
+  v_omar   constant uuid := 'd0000000-0000-0000-0000-000000000004';
+  v_optra  constant uuid := 'e1000000-0000-0000-0000-000000000005';
+  v_sale   constant uuid := 'd2000000-0000-0000-0000-000000000002';
+  v_plan   constant uuid := 'd3000000-0000-0000-0000-000000000001';
+  v_entry  record;
+  v_cost   record;
+  i        integer;
+begin
+  perform set_config('app.tenant_id', v_nour::text, true);
+  insert into public.customers (id, tenant_id, name, phone_primary, is_buyer)
+  values (v_omar, v_nour, 'عمر خالد', '+201005556677', true);
+
+  update public.vehicles set status = 'AVAILABLE' where id = v_optra;
+  update public.tenant_counters set last_value = 2 where tenant_id = v_nour and counter_key in ('sale-2026', 'invoice-2026');
+
+  insert into public.sales (id, tenant_id, sale_no, vehicle_id, buyer_customer_id, sale_date, list_price, sale_price,
+                            created_by, installment_plan)
+  values (v_sale, v_nour, 'S-2026-0002', v_optra, v_omar, '2026-09-29', 200000.00, 200000.00, v_owner,
+          '{"frequency": "MONTHLY", "count": 6, "first_due_date": "2026-09-30", "schedule": null}');
+  insert into public.sale_payments (tenant_id, sale_id, cash_account_id, amount) values (v_nour, v_sale, v_cash, 50000.00);
+
+  select * into v_entry from private.post_journal_entry(jsonb_build_object(
+    'entry_date', '2026-09-29', 'description', 'بيع شيفروليه أوبترا 2016 إلى عمر خالد — S-2026-0002', 'source_type', 'SALE',
+    'source_id', v_sale,
+    'lines', jsonb_build_array(
+      jsonb_build_object('ledger_account_id', (select ledger_account_id from public.cash_accounts where id = v_cash),
+                         'debit', '50000.00', 'cash_account_id', v_cash),
+      jsonb_build_object('ledger_account_id',
+        (select id from public.ledger_accounts where tenant_id = v_nour and system_key = 'INSTALLMENT_RECEIVABLE'),
+        'debit', '150000.00', 'customer_id', v_omar),
+      jsonb_build_object('ledger_account_id',
+        (select id from public.ledger_accounts where tenant_id = v_nour and system_key = 'VEHICLE_SALES'),
+        'credit', '200000.00', 'vehicle_id', v_optra))));
+  select * into v_cost from private.post_journal_entry(jsonb_build_object(
+    'entry_date', '2026-09-29', 'description', 'تكلفة شيفروليه أوبترا 2016 — S-2026-0002', 'source_type', 'SALE_COST',
+    'source_id', v_sale,
+    'lines', jsonb_build_array(
+      jsonb_build_object('ledger_account_id',
+        (select id from public.ledger_accounts where tenant_id = v_nour and system_key = 'COST_OF_VEHICLES_SOLD'),
+        'debit', '150000.00', 'vehicle_id', v_optra),
+      jsonb_build_object('ledger_account_id',
+        (select id from public.ledger_accounts where tenant_id = v_nour and system_key = 'VEHICLE_INVENTORY'),
+        'credit', '150000.00', 'vehicle_id', v_optra))));
+  update public.sales
+     set status = 'POSTED', posted_at = now(), posted_by = v_owner, journal_entry_id = v_entry.journal_entry_id,
+         cost_journal_entry_id = v_cost.journal_entry_id, invoice_no = 'INV-2026-00002',
+         einvoice_status = 'NOT_SUBMITTED', receivable_amount = 150000.00
+   where id = v_sale;
+  update public.vehicles set status = 'SOLD' where id = v_optra;
+
+  insert into public.installment_plans (id, tenant_id, sale_id, customer_id, financed_amount, frequency,
+                                        installment_count, first_due_date)
+  values (v_plan, v_nour, v_sale, v_omar, 150000.00, 'MONTHLY', 6, '2026-09-30');
+  for i in 1..6 loop
+    insert into public.installments (id, tenant_id, plan_id, seq, due_date, amount_due)
+    values (('d4000000-0000-0000-0000-00000000000' || i)::uuid, v_nour, v_plan, i,
+            ('2026-09-30'::date + make_interval(months => i - 1))::date, 25000.00);
+  end loop;
+
+  insert into public.deferred_papers (id, tenant_id, paper_type, number, customer_id, installment_id, amount, issue_date,
+                                      due_date, storage_location, drawer_bank, drawer_branch, account_holder)
+  values
+    ('d5000000-0000-0000-0000-000000000001', v_nour, 'PDC', '004512', v_omar, 'd4000000-0000-0000-0000-000000000002',
+     25000.00, '2026-09-29', '2026-10-30', 'الخزنة — ملف الشيكات', 'بنك مصر', 'فرع المعادي', 'عمر خالد'),
+    ('d5000000-0000-0000-0000-000000000002', v_nour, 'PROMISSORY_NOTE', 'إ-0031', v_omar,
+     'd4000000-0000-0000-0000-000000000003', 25000.00, '2026-09-29', '2026-11-30', 'الخزنة — ملف الإيصالات',
+     null, null, null);
+  insert into public.deferred_paper_events (tenant_id, paper_id, from_status, to_status, event_date)
+  values (v_nour, 'd5000000-0000-0000-0000-000000000001', null, 'HELD', '2026-09-29'),
+         (v_nour, 'd5000000-0000-0000-0000-000000000002', null, 'HELD', '2026-09-29');
+
+  perform set_config('app.tenant_id', '', true);
+end
+$$;

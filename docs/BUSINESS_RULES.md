@@ -64,6 +64,18 @@
 | BR-R1 | A deposit reserves an available car only; it is applied to that buyer's sale, or refunded or forfeited in full (D-72) | `sales._plan_reservation`, `_plan_settle`, `_plan_post` | `test_deposit_refund_frees_the_car`, MIRROR test ✅ |
 | BR-M1 | Payments to sellers and suppliers and refunds of credit never exceed what is owed (D-79) | `vehicles`, `suppliers`, `customers` services | cycle test, trade-in test ✅ |
 
+## Installments (Phase 5)
+
+| ID | Rule | Enforced in | Proven by |
+|---|---|---|---|
+| BR-S3 | A payment cannot exceed the outstanding amount unless the excess is kept as customer credit (D-41, D-84) | `installments.plan_receipt` | `test_installments.py` (scenario, overpayment as credit) ✅ |
+| BR-S4 | Installment remaining = amount due − payments, always derived | `installment_status` view (no stored paid/remaining) | pgTAP 09; scenario test ✅ |
+| BR-I1 | A schedule always adds up to the financed amount; installments never change once created | `domain/schedule.py`; DB triggers | property test; pgTAP 09 ✅ |
+| BR-I2 | A cheque bounced after collection restores the receivable and the bank balance and flags the customer (rule 27) | `papers.act`; receipt status BOUNCED | `test_bounced_cheque_restores_the_receivable_and_the_bank`; pgTAP 09 ✅ |
+| BR-I3 | Papers follow their status machine; overdue is derived | DB trigger `deferred_paper_before_update` (SR021) | pgTAP 09 ✅ |
+| BR-I4 | A cancelled sale's installments take no payments; MIRROR cannot undo collections (D-88) | `installments.plan_receipt`; `sales._plan_cancel` | `test_cancelling_an_installment_sale_owes_back_what_was_collected` ✅ |
+| BR-I5 | Each reminder reaches each user once (dedupe key) and each tenant's run happens once a day | `notifications` unique key; `reminder_jobs` unique key | `test_overdue_lists_and_daily_reminders`, notification test ✅ |
+
 ## Access (Phases 1–4)
 
 | ID | Rule | Enforced in | Proven by |
@@ -79,5 +91,3 @@
 
 | ID | Rule | Phase |
 |---|---|---|
-| BR-S3 | A payment cannot exceed the outstanding amount unless the excess is recorded as customer credit (setting D-41) | ⏳ 5 |
-| BR-S4 | Installment remaining = amount due − payments, always derived | ⏳ 5 |

@@ -68,6 +68,7 @@
 | 6240 | Advertising agency | دعاية وإعلان | Expense | Dr | | ✓ |
 | 6250 | Government fees | رسوم حكومية | Expense | Dr | | ✓ |
 | 6260 | Tips (إكرامية) | إكراميات | Expense | Dr | | ✓ |
+| 6270 | Bank charges (P-07, added in Phase 5) | مصاريف بنكية | Expense | Dr | | ✓ |
 | 6290 | Other general expenses | مصروفات عامة أخرى | Expense | Dr | | ✓ |
 
 **ASSUMPTION.** Codes 6210–6290 for the seeded general categories are our numbering; the spec only says "6200..". A tenant-added category gets the next free 62xx code.
@@ -526,7 +527,7 @@ The spec has no rule for each event below. The **candidate treatment** is a prop
 | P-04 | Expense recorded on a car that is already SOLD | Dr 5000 COGS (vehicle) / Cr Cash; the car's profit is recalculated | G-03, Q-14. **Approved (Q-26); implemented in Phase 4** |
 | P-05 | Expense on a consigned-in car **borne by the showroom** (terms: showroom/shared) | Dr a showroom expense account (not specified in the COA) / Cr Cash; for the shared portion, split between 1430 and the expense | G-10, Q-15 |
 | P-06 | Consignor reimburses recoverable expenses when the car is returned unsold (§4.4 "settle any recoverable expenses") | Dr Cash / Cr 1430 (consignor) | G-10 |
-| P-07 | Bank charges on a bounced cheque, possibly recharged to the customer | Dr bank-charges expense (no account in the COA) / Cr Bank; optionally Dr 1410 (customer) | Q-20 |
+| P-07 | Bank charges on a bounced cheque, possibly recharged to the customer | Dr bank-charges expense (no account in the COA) / Cr Bank; optionally Dr 1410 (customer) | Q-20. **Approved (Q-26); implemented in Phase 5 with the new account 6270 (D-85)** |
 | P-08 | Clearing Opening Balance Equity 3900 | Allocate to partner capital or current accounts by agreement | Q-16 |
 | P-09 | Distribution of a **loss** | **Approved as tenant option (D-40)**: `ALLOCATE_TO_PARTNERS` (default) Dr 3200 per partner / Cr 3300 by %; or `CARRY_FORWARD` (stays in 3300) | G-07 |
 | P-10 | Per-car distribution (policy 2): rule 22 debits 3300 before the period is closed | **Approved as tenant option (D-40)**: on each sale, Dr 3310 Profit allocated in advance / Cr 3200 per partner; at close, 3310 is netted against 3300 | C-04, Q-10 |

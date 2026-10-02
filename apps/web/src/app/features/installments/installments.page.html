@@ -1,0 +1,119 @@
+<div class="page-header">
+  <h1 class="page-title">{{ 'installments.title' | transloco }}</h1>
+  <div class="header-actions">
+    <a *appCan="'deferred_paper.manage'" class="p-button p-button-outlined link-button" data-testid="papers-link"
+       [routerLink]="['/t', context.activeTenantId(), 'installments', 'papers']">
+      <i class="pi pi-file" aria-hidden="true"></i> {{ 'papers.title' | transloco }}
+    </a>
+  </div>
+</div>
+
+@if (board(); as b) {
+  @if (view !== 'calendar') {
+    <div class="figures card" data-testid="installment-kpis">
+      <div class="figure"><span>{{ 'installments.dueToday' | transloco }}</span><strong>{{ b.due_today | money }}</strong></div>
+      <div class="figure"><span>{{ 'installments.dueSoon' | transloco }}</span><strong>{{ b.due_soon | money }}</strong></div>
+      <div class="figure negative"><span>{{ 'installments.overdue' | transloco }}</span>
+        <strong data-testid="overdue-total">{{ b.overdue | money }}</strong></div>
+    </div>
+  }
+}
+
+<div class="filters">
+  <p-selectbutton [options]="viewOptions()" [(ngModel)]="view" (ngModelChange)="load()" optionLabel="label"
+                  optionValue="value" [allowEmpty]="false" data-testid="installment-view" />
+</div>
+
+@if (loadError()) {
+  <app-state kind="error" [message]="loadError()" (retry)="load()" />
+} @else if (view === 'calendar') {
+  <div class="calendar-head">
+    <p-button icon="pi pi-angle-right" [text]="true" [ariaLabel]="'installments.previousMonth' | transloco" (onClick)="shiftMonth(-1)" />
+    <h2>{{ monthLabel() }}</h2>
+    <p-button icon="pi pi-angle-left" [text]="true" [ariaLabel]="'installments.nextMonth' | transloco" (onClick)="shiftMonth(1)" />
+  </div>
+  <div class="calendar" data-testid="calendar">
+    @for (name of weekdays(); track $index) { <div class="weekday">{{ name }}</div> }
+    @for (day of days(); track day.iso) {
+      <div class="day" [class.outside]="!day.inMonth">
+        <span class="date">{{ day.day }}</span>
+        @for (item of day.items; track item.id) {
+          <button type="button" class="chip" [class]="'chip state-' + item.state" (click)="open(item)"
+                  [title]="item.customer_name + ' #' + item.seq">
+            {{ item.customer_name }} · {{ item.remaining === '0.00' ? (item.amount_due | money) : (item.remaining | money) }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+  <div class="legend">
+    <span class="chip state-PAID">{{ 'installments.state_PAID' | transloco }}</span>
+    <span class="chip state-UPCOMING">{{ 'installments.state_UPCOMING' | transloco }}</span>
+    <span class="chip state-DUE_TODAY">{{ 'installments.state_DUE_TODAY' | transloco }}</span>
+    <span class="chip state-OVERDUE">{{ 'installments.state_OVERDUE' | transloco }}</span>
+  </div>
+} @else if (board(); as b) {
+  <div class="layout">
+    <p-table [value]="b.rows" [loading]="loading()" styleClass="p-datatable-sm" data-testid="installments">
+      <ng-template #header>
+        <tr>
+          <th>{{ 'sales.customer' | transloco }}</th>
+          <th>{{ 'vehicles.vehicle' | transloco }}</th>
+          <th>{{ 'installments.installment' | transloco }}</th>
+          <th class="num">{{ 'installments.remaining' | transloco }}</th>
+          <th>{{ 'vehicles.status' | transloco }}</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-row>
+        <tr class="clickable" (click)="open(row)" [attr.data-testid]="'installment-' + row.sale_no + '-' + row.seq">
+          <td>
+            <div class="name">{{ row.customer_name }}
+              @if (row.customer_bounced) { <p-tag severity="danger" [value]="'installments.bounced' | transloco" /> }
+            </div>
+            <div class="sub" dir="ltr">{{ row.customer_phone }}</div>
+          </td>
+          <td>{{ row.vehicle_label }}<div class="sub">{{ row.sale_no }}</div></td>
+          <td>#{{ row.seq }} — {{ row.due_date | appDate }}<div class="sub">{{ row.amount_due | money }}</div></td>
+          <td class="num strong">{{ row.remaining | money }}</td>
+          <td>
+            <p-tag [severity]="severity(row.state)" [value]="'installments.state_' + row.state | transloco" />
+            @if (row.days_late > 0) {
+              <div class="late" data-testid="days-late">{{ 'installments.daysLate' | transloco: { n: row.days_late } }}</div>
+            }
+          </td>
+          <td>
+            <p-button *appCan="'installment.collect'" size="small" [text]="true" icon="pi pi-money-bill"
+                      [label]="'installments.collect' | transloco" (onClick)="collect(row, $event)"
+                      [attr.data-testid]="'collect-' + row.sale_no + '-' + row.seq" />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr><td colspan="6"><app-state kind="empty" [message]="'installments.none' | transloco" /></td></tr>
+      </ng-template>
+    </p-table>
+
+    <aside class="card customers" data-testid="per-customer">
+      <h2>{{ 'installments.perCustomer' | transloco }}</h2>
+      @for (c of b.customers; track c.customer_id) {
+        <div class="customer">
+          <span class="name">{{ c.customer_name }}
+            @if (c.bounced) { <i class="pi pi-exclamation-triangle negative" [title]="'installments.bounced' | transloco"></i> }
+          </span>
+          <span class="num">{{ c.outstanding | money }}</span>
+          @if (c.overdue !== '0.00') { <span class="num negative sub">{{ 'installments.overdue' | transloco }} {{ c.overdue | money }}</span> }
+        </div>
+      } @empty {
+        <p class="sub">{{ 'installments.none' | transloco }}</p>
+      }
+    </aside>
+  </div>
+} @else {
+  <app-state kind="loading" />
+}
+
+@if (collecting(); as row) {
+  <app-receipt-dialog [(visible)]="collectOpen" [planId]="row.plan_id" [owed]="row.remaining" [accounts]="accounts()"
+                      (posted)="collected()" />
+}

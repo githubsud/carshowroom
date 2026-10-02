@@ -1,0 +1,138 @@
+.link-button {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  text-decoration: none;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16rem;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.late {
+  margin-block-start: 2px;
+  font-size: 0.75rem;
+  color: var(--color-danger);
+}
+
+.customers h2 {
+  margin: 0 0 var(--space-2);
+  font-size: 1rem;
+}
+
+.customer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  justify-content: space-between;
+  padding-block: var(--space-1);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.calendar-head {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+
+  h2 {
+    min-inline-size: 10rem;
+    margin: 0;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  margin-block: var(--space-2);
+}
+
+.weekday {
+  padding: var(--space-1);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-block-size: 5.5rem;
+  padding: 4px;
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+
+  &.outside {
+    opacity: 0.45;
+  }
+
+  .date {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+}
+
+.chip {
+  display: block;
+  padding: 1px 4px;
+  overflow: hidden;
+  font: inherit;
+  font-size: 0.6875rem;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+  border-radius: 3px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+
+  .chip {
+    display: inline-block;
+    padding: 2px 8px;
+    cursor: default;
+  }
+}
+
+.state-PAID {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.state-UPCOMING {
+  color: #1e40af;
+  background: #dbeafe;
+}
+
+.state-DUE_TODAY {
+  color: #854d0e;
+  background: #fef9c3;
+}
+
+.state-OVERDUE {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+@media (width <= 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

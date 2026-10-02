@@ -533,6 +533,8 @@ erDiagram
 
 Partial unique index: `unique (tenant_id, vehicle_id) where status = 'POSTED'` on `sales` (business rule 1).
 
+**As built (Phase 5):** `installment_plans` (one per sale, status ACTIVE/CANCELLED) and `installments` are immutable once created; `customer_receipts` belong to one plan (`source` CASH_ACCOUNT / CREDIT / PAPER, `excess_to_credit`, status POSTED / REVERSED / BOUNCED); `installment_payments` are the allocations; the `installment_status` view derives paid and remaining; `deferred_papers` (status machine in the database, `receipt_id` of the collection) and `deferred_paper_events` are append-only; `sales.receivable_amount` and `sales.installment_plan` (draft JSON). `notifications` (dedupe key per user) and `reminder_jobs` (per tenant per day) are in §8.
+
 **As built (Phase 4):** `sales` also stores `sale_no`, the trade-in details as JSON until posting (`trade_in`), `cancellation_method` and both cancellation entries; `sale_payments.line_no` keeps the order of payment lines; `reservations.status` adds `RELEASED` (D-72); `customer_refunds` holds refunds of customer credit (P-02); `customers` has `national_id_last4` and E.164 `phone_primary` (D-68). `receivable_amount`, installments and deferred papers arrive in Phase 5.
 
 ---

@@ -12,3 +12,16 @@ services:
       - "8000:8000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  # Background jobs (D-03): daily installment reminders; same image, one advisory lock.
+  worker:
+    build: ./apps/api
+    command: ["python", "-m", "app.jobs"]
+    env_file: ./apps/api/.env
+    environment:
+      DATABASE_URL: postgresql://app_api:app_api_local_dev@host.docker.internal:54322/postgres
+      SUPABASE_URL: http://host.docker.internal:54321
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      disable: true

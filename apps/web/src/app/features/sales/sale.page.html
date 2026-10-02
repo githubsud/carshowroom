@@ -132,6 +132,49 @@
         <p class="sub">{{ 'sales.paymentsByAccountant' | transloco }}</p>
       }
 
+      @if (installmentsEnabled() && (editable() || sale()?.installment_plan)) {
+        <div class="installments" data-testid="installments-section">
+          <div class="check">
+            <p-checkbox formControlName="use_installments" [binary]="true" inputId="use-inst"
+                        (onChange)="refreshSchedule()" data-testid="use-installments" />
+            <label for="use-inst">{{ 'sales.restByInstallments' | transloco }}</label>
+          </div>
+          @if (values().use_installments) {
+            <div class="dialog-fields">
+              <div class="row">
+                <div class="field"><label for="inst-count">{{ 'installments.count' | transloco }}</label>
+                  <input pInputText id="inst-count" formControlName="inst_count" inputmode="numeric" dir="ltr"
+                         (change)="refreshSchedule()" data-testid="inst-count" /></div>
+                <div class="field"><label for="inst-frequency">{{ 'installments.frequency' | transloco }}</label>
+                  <p-select inputId="inst-frequency" formControlName="inst_frequency" [options]="frequencyOptions()"
+                            optionLabel="label" optionValue="value" (onChange)="refreshSchedule()" [fluid]="true" /></div>
+                <div class="field"><label for="inst-first">{{ 'installments.firstDue' | transloco }}</label>
+                  <input pInputText id="inst-first" type="date" formControlName="inst_first_due"
+                         (change)="refreshSchedule()" data-testid="inst-first" /></div>
+              </div>
+              <p>{{ 'installments.financed' | transloco }}: <strong data-testid="financed">{{ financed() | money }}</strong>
+                @if (editable()) {
+                  <p-button type="button" [text]="true" size="small" icon="pi pi-refresh"
+                            [label]="'installments.showSchedule' | transloco" (onClick)="refreshSchedule()"
+                            data-testid="show-schedule" />
+                }
+              </p>
+              @if (schedule().length) {
+                <ol class="schedule" data-testid="schedule-preview">
+                  @for (row of schedule(); track row.seq) {
+                    <li>{{ row.due_date | appDate }} — {{ row.amount | money }}</li>
+                  }
+                </ol>
+              }
+            </div>
+          }
+          @if (sale()?.plan_id; as planId) {
+            <a [routerLink]="['/t', context.activeTenantId(), 'installments', 'plans', planId]" data-testid="plan-link">
+              {{ 'installments.openPlan' | transloco }}</a>
+          }
+        </div>
+      }
+
       <p class="total" [class.negative]="remaining() !== '0.00'">
         {{ 'sales.remaining' | transloco }}: <strong data-testid="remaining">{{ remaining() | money }}</strong>
       </p>

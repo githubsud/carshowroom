@@ -3,7 +3,17 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import customers, finance, health, partners, sales, session, suppliers, vehicles
+from app.api.routers import (
+    customers,
+    finance,
+    health,
+    installments,
+    partners,
+    sales,
+    session,
+    suppliers,
+    vehicles,
+)
 from app.core.config import API_PREFIX, PRODUCT_NAME, Settings, get_settings
 from app.core.crypto import FieldCipher
 from app.core.errors import register_error_handlers
@@ -85,4 +95,5 @@ def create_app(
     app.include_router(suppliers.router, prefix=API_PREFIX)
     app.include_router(vehicles.router, prefix=API_PREFIX)
     app.include_router(sales.router, prefix=API_PREFIX)
+    app.include_router(installments.router, prefix=API_PREFIX)
     return app

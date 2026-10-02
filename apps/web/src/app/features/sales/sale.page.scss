@@ -67,3 +67,16 @@
   justify-content: flex-end;
   margin-block-start: var(--space-3);
 }
+
+.installments {
+  padding-block-start: var(--space-2);
+  margin-block-start: var(--space-2);
+  border-block-start: 1px dashed var(--color-border);
+}
+
+.schedule {
+  padding-inline-start: var(--space-4);
+  margin: 0;
+  font-size: 0.875rem;
+  columns: 2 14rem;
+}

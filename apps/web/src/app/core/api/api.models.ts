@@ -124,3 +124,23 @@ export type SalePage = Schemas['SalePage'];
 export type SalePosting = Schemas['PostingResult_SaleOut_'];
 export type SaleCancelInput = Schemas['SaleCancelIn'];
 export type TradeInInput = Schemas['TradeInIn'];
+
+// --- Installments, deferred papers, notifications (Phase 5) --------------------------
+
+export type InstallmentPlanInput = Schemas['InstallmentPlanIn'];
+export type ScheduleRow = Schemas['ScheduleRowOut'];
+export type Installment = Schemas['InstallmentOut'];
+export type InstallmentState = Installment['state'];
+export type InstallmentPlan = Schemas['InstallmentPlanOut'];
+export type InstallmentBoard = Schemas['InstallmentBoard'];
+export type InstallmentKpis = Schemas['InstallmentKpis'];
+export type ReceiptInput = Schemas['ReceiptIn'];
+export type PlanPosting = Schemas['PostingResult_InstallmentPlanOut_'];
+export type Paper = Schemas['PaperOut'];
+export type PaperInput = Schemas['PaperIn'];
+export type PaperActionInput = Schemas['PaperActionIn'];
+export type PaperAction = PaperActionInput['action'];
+export type PaperPosting = Schemas['PostingResult_PaperOut_'];
+export type NotificationItem = Schemas['NotificationOut'];
+export type NotificationPage = Schemas['NotificationPage'];
+export type InstallmentStatement = Schemas['CustomerInstallmentStatement'];

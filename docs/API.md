@@ -79,6 +79,11 @@ Endpoint status codes: `200` read, `201` created/posted, `204` no content, `400`
 | `SALE_DELIVERED` / `SALE_TRADE_IN_USED` | 409 | Cancellation refused (Q-30, D-76) |
 | `USE_DOCUMENT_ACTION` / `PURCHASE_HAS_PAYMENTS` | 409 | Journal reversal refused; use the sale or deposit screen (D-75) |
 | `UPLOAD_INVALID` / `UPLOAD_MISSING` / `STORAGE_UNAVAILABLE` | 422 / 422 / 503 | Signed-URL uploads (D-74) |
+| `PAYMENT_EXCEEDS_OUTSTANDING` | 422 | `details.outstanding`, `details.policy` (business rule 3, D-84) |
+| `CREDIT_INSUFFICIENT` / `NOTHING_TO_FINANCE` | 422 | |
+| `SALE_HAS_COLLECTIONS` | 409 | MIRROR cancellation refused while installments are collected (D-41) |
+| `PAPER_INVALID_TRANSITION` / `PAPER_NUMBER_EXISTS` | 409 | |
+| `PAPER_NOT_LINKED` / `PAPER_INSTALLMENT_MISMATCH` / `BANK_CHARGES_NOT_COLLECTED` | 422 | |
 | `ENCRYPTION_UNAVAILABLE` | 503 | `NATIONAL_ID_KEY` not configured |
 | `CONSIGNMENT_TERMS_INVALID` | 422 | |
 | `DISTRIBUTION_PERIOD_OVERLAP` | 409 | Period already distributed |
@@ -199,14 +204,19 @@ As built in Phase 4. Every vehicle response passes through cost masking (ARCHITE
 
 ### 3.7 Installments and deferred papers
 
+As built in Phase 5. Installment plans are created when an installment sale is posted (`/sales/{id}/post` with `installments` in the draft, §3.6).
+
 | Method | Path | Perm | Request → Response |
 |---|---|---|---|
-| POST | `/installment-plans/preview-schedule` | `sale.draft` | `{amount, count, frequency, first_due_date}` → `[{seq, due_date, amount}]` (remainder on the last installment) |
-| GET | `/installments?state=DUE\|OVERDUE\|PAID&from=&to=&customer_id=` | `installment.view` | `[{id, customer, vehicle, seq, due_date, amount_due, paid, remaining, days_late, state, paper}]` |
-| GET | `/installments/calendar?month=` | `installment.view` | Per-day buckets by state |
-| POST 💰👁 | `/customers/{id}/receipts` | `installment.collect` | `{date, amount, cash_account_id, deferred_paper_id?, allocations?: [{installment_id, amount}]}`. Default allocation: oldest due first → rule 15. The spec endpoint `POST /installments/{id}/payments` is kept as a shortcut for a single installment |
-| GET/POST | `/deferred-papers` | `deferred_paper.manage` | Register list/create (filters: type, status, due range) |
-| POST | `/deferred-papers/{id}/transitions` | `deferred_paper.manage` | `{to_status: DEPOSITED\|COLLECTED\|BOUNCED\|RETURNED\|DEFAULTED\|LEGAL, date, cash_account_id?, reason?}`. `COLLECTED` posts rule 15 via a receipt (💰); `BOUNCED` after `COLLECTED` posts rule 27 (💰) and flags the customer |
+| POST | `/installment-plans/schedule-preview` | `sale.draft` | `{financed, plan: {frequency, count, first_due_date} \| {frequency: MANUAL, schedule}}` → `[{seq, due_date, amount}]` (remainder on the last installment) |
+| GET | `/installments?view=open\|due_today\|upcoming\|overdue\|calendar&days=&customer_id=&date_from=&date_to=` | `installment.view` | `[{id, plan_id, sale_no, customer, vehicle, seq, due_date, amount_due, paid, remaining, days_late, state, customer_bounced}]`; paid and remaining are derived |
+| GET | `/installments/board?view=&days=` | `installment.view` | Totals (due today, due in N days, overdue), rows, and outstanding/overdue per customer |
+| GET | `/installments/kpis` | `installment.view` | Dashboard tiles: next 48 h, next 7 days, overdue, bounced cheques (C-09) |
+| GET | `/installment-plans/{id}` | `installment.view` | Schedule with states, receipts with allocations, papers (with `deferred_paper.manage`) |
+| POST 💰👁 | `/installment-plans/{id}/receipts` (+ `/preview`) | `installment.collect` | `{receipt_date, amount, source: CASH_ACCOUNT\|CREDIT, cash_account_id?, keep_excess_as_credit}` → rule 15, oldest installment first (D-83); overpayment per D-84 |
+| GET | `/customers/{id}/installment-statement?format=json\|pdf&lang=` | `installment.view` | Customer installment statement (BACKLOG 5.8) |
+| GET / POST | `/deferred-papers`, `/deferred-papers/{id}` | `deferred_paper.manage` | Register (filters: status, type, customer, overdue); create `{paper_type, number, customer_id, installment_id?, amount, issue_date?, due_date, storage_location, drawer_bank, drawer_branch, account_holder}`; detail with events |
+| POST 💰👁 | `/deferred-papers/{id}/actions` (+ `/preview`) | `deferred_paper.manage` | `{action: DEPOSIT\|COLLECT\|BOUNCE\|RETURN\|DEFAULT\|LEGAL, action_date, cash_account_id?, bank_charges?, charge_customer}`. COLLECT posts a receipt (rule 15, A-10); BOUNCE after collection posts rule 27 (+ P-07 charges) and reopens the installment (D-85) |
 
 ### 3.8 Consignment
 
@@ -264,9 +274,9 @@ As built in Phase 4. Every vehicle response passes through cost masking (ARCHITE
 
 | Method | Path | Perm | Notes |
 |---|---|---|---|
-| GET | `/notifications?unread=true` | member | Also readable through Supabase |
-| POST | `/notifications/read` | member | `{ids}` or `{all: true}` |
-| — | worker jobs | system | `installment_reminders` (daily, default 2 days ahead plus overdue), `license_expiry`, `aging_alerts`, `follow_up_due`, `tenant_nightly_export` |
+| GET | `/notifications?unread_only=&limit=` | member | `{items: [{id, kind, params, entity_type, entity_id, read, created_at}], unread}`; a user only ever sees their own (RLS) |
+| POST | `/notifications/{id}/read`, `/notifications/read-all` | member | |
+| — | worker `python -m app.jobs` | system | Hourly; advisory lock; per tenant once a day (`reminder_jobs`): installment due within N days (default 2) and overdue (D-86). `license_expiry`, `aging_alerts`, `follow_up_due`, `tenant_nightly_export` arrive with Phases 6, 7 and 9 |
 
 ### 3.13 Platform (super admin), `/api/v1/admin/*`, no `X-Tenant-Id`
 

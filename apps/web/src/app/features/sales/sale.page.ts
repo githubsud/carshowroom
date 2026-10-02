@@ -13,8 +13,8 @@ import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 
-import { CashAccount, Preview, Sale, SaleDraftInput, Vehicle } from '../../core/api/api.models';
-import { FormatService, MoneyPipe, PercentPipe } from '../../core/format/format.service';
+import { CashAccount, Preview, Sale, SaleDraftInput, ScheduleRow, Vehicle } from '../../core/api/api.models';
+import { AppDatePipe, FormatService, MoneyPipe, PercentPipe } from '../../core/format/format.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { CanDirective } from '../../core/permissions/can.directive';
 import { TenantContextService } from '../../core/tenant/tenant-context.service';
@@ -25,7 +25,9 @@ import { ErrorMessageService } from '../../shared/error-message.service';
 import { positiveMoney } from '../../shared/money-input';
 import { moneyMinus, moneySum } from '../../shared/money-math';
 import { CustomerPickerComponent } from '../customers/customer-picker.component';
+import { loaded, translationsLoaded } from '../../shared/translated';
 import { FinanceService } from '../finance/finance.service';
+import { InstallmentsService } from '../installments/installments.service';
 import { VehiclesService } from '../vehicles/vehicles.service';
 import { CancelSaleDialogComponent } from './cancel-sale-dialog.component';
 import { saleSeverity } from './sale-status';
@@ -56,6 +58,7 @@ function optionalMoney(control: { value: string }): ReturnType<typeof positiveMo
     SelectModule,
     TagModule,
     MoneyPipe,
+    AppDatePipe,
     PercentPipe,
     CanDirective,
     StateComponent,
@@ -70,6 +73,8 @@ function optionalMoney(control: { value: string }): ReturnType<typeof positiveMo
 export class SalePage implements OnInit {
   private readonly api = inject(SalesService);
   private readonly vehiclesApi = inject(VehiclesService);
+  private readonly installmentsApi = inject(InstallmentsService);
+  private readonly translations = translationsLoaded();
   private readonly finance = inject(FinanceService);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
@@ -111,6 +116,10 @@ export class SalePage implements OnInit {
     trade_vin: [''],
     trade_plate: [''],
     trade_value: ['', optionalMoney],
+    use_installments: [false],
+    inst_count: ['6', Validators.pattern(/^\d{1,3}$/)],
+    inst_frequency: ['MONTHLY' as 'MONTHLY' | 'BIWEEKLY' | 'WEEKLY' | 'QUARTERLY'],
+    inst_first_due: [''],
     notes: [''],
     payments: this.payments,
   });
@@ -140,10 +149,28 @@ export class SalePage implements OnInit {
     return !!r && !!this.values().buyer_customer_id && r.customer_id !== this.values().buyer_customer_id;
   });
   protected readonly salePrice = computed(() => moneyMinus(this.values().list_price, this.values().discount));
-  protected readonly remaining = computed(() => {
+  /** What payments, deposit and trade-in leave open. */
+  private readonly open = computed(() => {
     const v = this.values();
     const paid = moneySum(...(v.payments ?? []).map((p) => p?.amount));
-    return moneyMinus(this.salePrice(), paid, this.reservation()?.deposit_amount, v.has_trade_in ? v.trade_value : '0');
+    const deposit = this.reservation()?.deposit_amount ?? this.sale()?.deposit_applied;
+    return moneyMinus(this.salePrice(), paid, deposit, v.has_trade_in ? v.trade_value : '0');
+  });
+  /** Paid by installments (rule 13), when the plan is switched on. */
+  protected readonly financed = computed(() =>
+    this.values().use_installments && !this.open().startsWith('-') ? this.open() : '0.00',
+  );
+  protected readonly remaining = computed(() => moneyMinus(this.open(), this.financed()));
+  protected readonly schedule = signal<ScheduleRow[]>([]);
+  protected readonly installmentsEnabled = computed(() => this.context.flags()['installments'] === true);
+  protected readonly frequencyOptions = computed(() => {
+    if (!loaded(this.translations())) {
+      return [];
+    }
+    return (['MONTHLY', 'BIWEEKLY', 'WEEKLY', 'QUARTERLY'] as const).map((value) => ({
+      value,
+      label: this.transloco.translate(`installments.frequency_${value}`),
+    }));
   });
   protected readonly label = computed(() => {
     const v = this.car();
@@ -166,7 +193,7 @@ export class SalePage implements OnInit {
         this.fill(sale);
         this.car.set(await this.vehiclesApi.get(sale.vehicle_id));
       } else {
-        this.form.patchValue({ sale_date: this.format.todayIso() });
+        this.form.patchValue({ sale_date: this.format.todayIso(), inst_first_due: this.nextMonth() });
         this.payments.at(0).patchValue({ cash_account_id: this.defaultAccount() });
         if (this.vehicle()) {
           await this.chooseVehicle(this.vehicle() as string);
@@ -192,6 +219,11 @@ export class SalePage implements OnInit {
     if (car.reservation && !this.form.controls.buyer_customer_id.value) {
       this.form.patchValue({ buyer_customer_id: car.reservation.customer_id });
     }
+  }
+
+  private nextMonth(): string {
+    const [year, month, day] = this.format.todayIso().split('-').map(Number);
+    return new Date(Date.UTC(year, month, Math.min(day, 28))).toISOString().slice(0, 10);
   }
 
   private paymentRow(cashAccountId = '', amount = '') {
@@ -224,8 +256,13 @@ export class SalePage implements OnInit {
       trade_vin: sale.trade_in?.vin ?? '',
       trade_plate: sale.trade_in?.plate_no ?? '',
       trade_value: sale.trade_in?.agreed_value ?? '',
+      use_installments: !!sale.installment_plan,
+      inst_count: String(sale.installment_plan?.count ?? 6),
+      inst_frequency: (sale.installment_plan?.frequency ?? 'MONTHLY') as 'MONTHLY',
+      inst_first_due: sale.installment_plan?.first_due_date ?? '',
       notes: sale.notes ?? '',
     });
+    void this.refreshSchedule();
   }
 
   protected addPayment(): void {
@@ -265,8 +302,33 @@ export class SalePage implements OnInit {
             agreed_value: v.trade_value,
           }
         : null,
+      installments: v.use_installments
+        ? { frequency: v.inst_frequency, count: Number(v.inst_count), first_due_date: v.inst_first_due }
+        : null,
       notes: v.notes.trim() || null,
     };
+  }
+
+  /** Show the schedule the API will create (equal split, remainder on the last installment). */
+  protected async refreshSchedule(): Promise<void> {
+    const v = this.form.getRawValue();
+    if (!v.use_installments || this.financed() === '0.00' || !v.inst_first_due || !Number(v.inst_count)) {
+      this.schedule.set([]);
+      return;
+    }
+    try {
+      this.schedule.set(
+        await this.installmentsApi.schedulePreview(this.financed(), {
+          frequency: v.inst_frequency,
+          count: Number(v.inst_count),
+          first_due_date: v.inst_first_due,
+        }),
+      );
+      this.error.set(null);
+    } catch (error) {
+      this.schedule.set([]);
+      this.error.set(this.errors.message(error));
+    }
   }
 
   protected async save(): Promise<Sale | null> {

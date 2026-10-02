@@ -59,6 +59,28 @@
         "title": "ActiveReservation",
         "type": "object"
       },
+      "AllocationOut": {
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq",
+          "amount"
+        ],
+        "title": "AllocationOut",
+        "type": "object"
+      },
       "CashAccountIn": {
         "additionalProperties": false,
         "properties": {
@@ -733,6 +755,92 @@
         "title": "CustomerIn",
         "type": "object"
       },
+      "CustomerInstallmentStatement": {
+        "properties": {
+          "as_of": {
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "currency_code": {
+            "title": "Currency Code",
+            "type": "string"
+          },
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "customer_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Phone"
+          },
+          "plans": {
+            "items": {
+              "$ref": "#/components/schemas/InstallmentPlanOut"
+            },
+            "title": "Plans",
+            "type": "array"
+          },
+          "total_financed": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Total Financed",
+            "type": "string"
+          },
+          "total_overdue": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Total Overdue",
+            "type": "string"
+          },
+          "total_paid": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Total Paid",
+            "type": "string"
+          },
+          "total_remaining": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Total Remaining",
+            "type": "string"
+          }
+        },
+        "required": [
+          "customer_id",
+          "customer_name",
+          "customer_phone",
+          "as_of",
+          "currency_code",
+          "plans",
+          "total_financed",
+          "total_paid",
+          "total_remaining",
+          "total_overdue"
+        ],
+        "title": "CustomerInstallmentStatement",
+        "type": "object"
+      },
       "CustomerOut": {
         "properties": {
           "address": {
@@ -832,6 +940,60 @@
           "created_at"
         ],
         "title": "CustomerOut",
+        "type": "object"
+      },
+      "CustomerOutstanding": {
+        "properties": {
+          "bounced": {
+            "title": "Bounced",
+            "type": "boolean"
+          },
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "customer_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Phone"
+          },
+          "outstanding": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Outstanding",
+            "type": "string"
+          },
+          "overdue": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Overdue",
+            "type": "string"
+          }
+        },
+        "required": [
+          "customer_id",
+          "customer_name",
+          "customer_phone",
+          "outstanding",
+          "overdue",
+          "bounced"
+        ],
+        "title": "CustomerOutstanding",
         "type": "object"
       },
       "CustomerRefundIn": {
@@ -1713,6 +1875,441 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "InstallmentBoard": {
+        "properties": {
+          "as_of": {
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "customers": {
+            "items": {
+              "$ref": "#/components/schemas/CustomerOutstanding"
+            },
+            "title": "Customers",
+            "type": "array"
+          },
+          "due_soon": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Due Soon",
+            "type": "string"
+          },
+          "due_today": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Due Today",
+            "type": "string"
+          },
+          "overdue": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Overdue",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/InstallmentOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "as_of",
+          "due_today",
+          "due_soon",
+          "overdue",
+          "rows",
+          "customers"
+        ],
+        "title": "InstallmentBoard",
+        "type": "object"
+      },
+      "InstallmentKpis": {
+        "description": "Dashboard tiles (C-09): due in 48 hours and in 7 days, overdue, bounced.",
+        "properties": {
+          "bounced_count": {
+            "title": "Bounced Count",
+            "type": "integer"
+          },
+          "due_48h": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Due 48H",
+            "type": "string"
+          },
+          "due_48h_count": {
+            "title": "Due 48H Count",
+            "type": "integer"
+          },
+          "due_7d": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Due 7D",
+            "type": "string"
+          },
+          "due_7d_count": {
+            "title": "Due 7D Count",
+            "type": "integer"
+          },
+          "overdue": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Overdue",
+            "type": "string"
+          },
+          "overdue_count": {
+            "title": "Overdue Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "due_48h",
+          "due_48h_count",
+          "due_7d",
+          "due_7d_count",
+          "overdue",
+          "overdue_count",
+          "bounced_count"
+        ],
+        "title": "InstallmentKpis",
+        "type": "object"
+      },
+      "InstallmentOut": {
+        "properties": {
+          "amount_due": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount Due",
+            "type": "string"
+          },
+          "customer_bounced": {
+            "title": "Customer Bounced",
+            "type": "boolean"
+          },
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "customer_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Phone"
+          },
+          "days_late": {
+            "title": "Days Late",
+            "type": "integer"
+          },
+          "due_date": {
+            "format": "date",
+            "title": "Due Date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "paid": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Paid",
+            "type": "string"
+          },
+          "plan_id": {
+            "format": "uuid",
+            "title": "Plan Id",
+            "type": "string"
+          },
+          "remaining": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Remaining",
+            "type": "string"
+          },
+          "sale_id": {
+            "format": "uuid",
+            "title": "Sale Id",
+            "type": "string"
+          },
+          "sale_no": {
+            "title": "Sale No",
+            "type": "string"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          },
+          "state": {
+            "enum": [
+              "PAID",
+              "OVERDUE",
+              "DUE_TODAY",
+              "UPCOMING",
+              "CANCELLED"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "stock_no": {
+            "title": "Stock No",
+            "type": "string"
+          },
+          "vehicle_label": {
+            "title": "Vehicle Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "plan_id",
+          "sale_id",
+          "sale_no",
+          "customer_id",
+          "customer_name",
+          "customer_phone",
+          "stock_no",
+          "vehicle_label",
+          "seq",
+          "due_date",
+          "amount_due",
+          "paid",
+          "remaining",
+          "days_late",
+          "state",
+          "customer_bounced"
+        ],
+        "title": "InstallmentOut",
+        "type": "object"
+      },
+      "InstallmentPlanIn": {
+        "additionalProperties": false,
+        "description": "How the rest of a sale price is paid (mode a, SPEC §4.8): an equal split\nby frequency, or a manual schedule that adds up exactly.",
+        "properties": {
+          "count": {
+            "anyOf": [
+              {
+                "maximum": 360.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "first_due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Due Date"
+          },
+          "frequency": {
+            "default": "MONTHLY",
+            "enum": [
+              "MONTHLY",
+              "BIWEEKLY",
+              "WEEKLY",
+              "QUARTERLY",
+              "MANUAL"
+            ],
+            "title": "Frequency",
+            "type": "string"
+          },
+          "schedule": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ScheduleRowIn"
+                },
+                "maxItems": 360,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule"
+          }
+        },
+        "title": "InstallmentPlanIn",
+        "type": "object"
+      },
+      "InstallmentPlanOut": {
+        "properties": {
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "financed_amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Financed Amount",
+            "type": "string"
+          },
+          "first_due_date": {
+            "format": "date",
+            "title": "First Due Date",
+            "type": "string"
+          },
+          "frequency": {
+            "enum": [
+              "MONTHLY",
+              "BIWEEKLY",
+              "WEEKLY",
+              "QUARTERLY",
+              "MANUAL"
+            ],
+            "title": "Frequency",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "installment_count": {
+            "title": "Installment Count",
+            "type": "integer"
+          },
+          "installments": {
+            "items": {
+              "$ref": "#/components/schemas/InstallmentOut"
+            },
+            "title": "Installments",
+            "type": "array"
+          },
+          "overdue_total": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Overdue Total",
+            "type": "string"
+          },
+          "paid_total": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Paid Total",
+            "type": "string"
+          },
+          "papers": {
+            "items": {
+              "$ref": "#/components/schemas/PaperOut"
+            },
+            "title": "Papers",
+            "type": "array"
+          },
+          "receipts": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptOut"
+            },
+            "title": "Receipts",
+            "type": "array"
+          },
+          "remaining_total": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Remaining Total",
+            "type": "string"
+          },
+          "sale_id": {
+            "format": "uuid",
+            "title": "Sale Id",
+            "type": "string"
+          },
+          "sale_no": {
+            "title": "Sale No",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "CANCELLED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "stock_no": {
+            "title": "Stock No",
+            "type": "string"
+          },
+          "vehicle_label": {
+            "title": "Vehicle Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sale_id",
+          "sale_no",
+          "customer_id",
+          "customer_name",
+          "stock_no",
+          "vehicle_label",
+          "financed_amount",
+          "frequency",
+          "installment_count",
+          "first_due_date",
+          "status",
+          "paid_total",
+          "remaining_total",
+          "overdue_total",
+          "installments",
+          "receipts",
+          "papers"
+        ],
+        "title": "InstallmentPlanOut",
+        "type": "object"
+      },
       "InviteIn": {
         "additionalProperties": false,
         "properties": {
@@ -2581,6 +3178,88 @@
         "title": "NationalIdOut",
         "type": "object"
       },
+      "NotificationOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "entity_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Id"
+          },
+          "entity_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Type"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          },
+          "read": {
+            "title": "Read",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "params",
+          "entity_type",
+          "entity_id",
+          "read",
+          "created_at"
+        ],
+        "title": "NotificationOut",
+        "type": "object"
+      },
+      "NotificationPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "unread": {
+            "title": "Unread",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "unread"
+        ],
+        "title": "NotificationPage",
+        "type": "object"
+      },
       "OtherIncomeIn": {
         "additionalProperties": false,
         "properties": {
@@ -2823,6 +3502,459 @@
           "total"
         ],
         "title": "Page[TransferOut]",
+        "type": "object"
+      },
+      "PaperActionIn": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "DEPOSIT",
+              "COLLECT",
+              "BOUNCE",
+              "RETURN",
+              "DEFAULT",
+              "LEGAL"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "action_date": {
+            "format": "date",
+            "title": "Action Date",
+            "type": "string"
+          },
+          "bank_charges": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bank Charges"
+          },
+          "cash_account_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Account Id"
+          },
+          "charge_customer": {
+            "default": false,
+            "title": "Charge Customer",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "action",
+          "action_date"
+        ],
+        "title": "PaperActionIn",
+        "type": "object"
+      },
+      "PaperEventOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "entry_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entry No"
+          },
+          "event_date": {
+            "format": "date",
+            "title": "Event Date",
+            "type": "string"
+          },
+          "from_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Status"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "to_status": {
+            "title": "To Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from_status",
+          "to_status",
+          "event_date",
+          "note",
+          "entry_no",
+          "created_at"
+        ],
+        "title": "PaperEventOut",
+        "type": "object"
+      },
+      "PaperIn": {
+        "additionalProperties": false,
+        "properties": {
+          "account_holder": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Holder"
+          },
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "drawer_bank": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drawer Bank"
+          },
+          "drawer_branch": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drawer Branch"
+          },
+          "due_date": {
+            "format": "date",
+            "title": "Due Date",
+            "type": "string"
+          },
+          "installment_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Installment Id"
+          },
+          "issue_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Date"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "number": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Number",
+            "type": "string"
+          },
+          "paper_type": {
+            "enum": [
+              "PROMISSORY_NOTE",
+              "PDC"
+            ],
+            "title": "Paper Type",
+            "type": "string"
+          },
+          "storage_location": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storage Location"
+          }
+        },
+        "required": [
+          "paper_type",
+          "number",
+          "customer_id",
+          "amount",
+          "due_date"
+        ],
+        "title": "PaperIn",
+        "type": "object"
+      },
+      "PaperOut": {
+        "properties": {
+          "account_holder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Holder"
+          },
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "drawer_bank": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drawer Bank"
+          },
+          "drawer_branch": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drawer Branch"
+          },
+          "due_date": {
+            "format": "date",
+            "title": "Due Date",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/PaperEventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "installment_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Installment Id"
+          },
+          "installment_seq": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Installment Seq"
+          },
+          "issue_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Date"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "number": {
+            "title": "Number",
+            "type": "string"
+          },
+          "overdue": {
+            "title": "Overdue",
+            "type": "boolean"
+          },
+          "paper_type": {
+            "enum": [
+              "PROMISSORY_NOTE",
+              "PDC"
+            ],
+            "title": "Paper Type",
+            "type": "string"
+          },
+          "sale_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale No"
+          },
+          "status": {
+            "enum": [
+              "HELD",
+              "DEPOSITED",
+              "COLLECTED",
+              "BOUNCED",
+              "RETURNED",
+              "DEFAULTED",
+              "LEGAL"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "storage_location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storage Location"
+          }
+        },
+        "required": [
+          "id",
+          "paper_type",
+          "number",
+          "customer_id",
+          "customer_name",
+          "installment_id",
+          "installment_seq",
+          "sale_no",
+          "amount",
+          "issue_date",
+          "due_date",
+          "status",
+          "overdue",
+          "storage_location",
+          "drawer_bank",
+          "drawer_branch",
+          "account_holder",
+          "notes"
+        ],
+        "title": "PaperOut",
         "type": "object"
       },
       "PartnerIn": {
@@ -3573,6 +4705,33 @@
         "title": "PostingResult[GeneralExpenseOut]",
         "type": "object"
       },
+      "PostingResult_InstallmentPlanOut_": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/InstallmentPlanOut"
+          },
+          "journal_entries": {
+            "items": {
+              "$ref": "#/components/schemas/EntryRef"
+            },
+            "title": "Journal Entries",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "journal_entries"
+        ],
+        "title": "PostingResult[InstallmentPlanOut]",
+        "type": "object"
+      },
       "PostingResult_OtherIncomeOut_": {
         "properties": {
           "document": {
@@ -3598,6 +4757,33 @@
           "journal_entries"
         ],
         "title": "PostingResult[OtherIncomeOut]",
+        "type": "object"
+      },
+      "PostingResult_PaperOut_": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/PaperOut"
+          },
+          "journal_entries": {
+            "items": {
+              "$ref": "#/components/schemas/EntryRef"
+            },
+            "title": "Journal Entries",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "journal_entries"
+        ],
+        "title": "PostingResult[PaperOut]",
         "type": "object"
       },
       "PostingResult_PartnerTransactionOut_": {
@@ -4199,6 +5385,151 @@
         "title": "PurchaseSummary",
         "type": "object"
       },
+      "ReceiptIn": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "cash_account_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Account Id"
+          },
+          "keep_excess_as_credit": {
+            "default": false,
+            "title": "Keep Excess As Credit",
+            "type": "boolean"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "receipt_date": {
+            "format": "date",
+            "title": "Receipt Date",
+            "type": "string"
+          },
+          "source": {
+            "default": "CASH_ACCOUNT",
+            "enum": [
+              "CASH_ACCOUNT",
+              "CREDIT"
+            ],
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "receipt_date",
+          "amount"
+        ],
+        "title": "ReceiptIn",
+        "type": "object"
+      },
+      "ReceiptOut": {
+        "properties": {
+          "allocations": {
+            "items": {
+              "$ref": "#/components/schemas/AllocationOut"
+            },
+            "title": "Allocations",
+            "type": "array"
+          },
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "cash_account_name_ar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Account Name Ar"
+          },
+          "entry_no": {
+            "title": "Entry No",
+            "type": "integer"
+          },
+          "excess_to_credit": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Excess To Credit",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "receipt_date": {
+            "format": "date",
+            "title": "Receipt Date",
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "CASH_ACCOUNT",
+              "CREDIT",
+              "PAPER"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "POSTED",
+              "REVERSED",
+              "BOUNCED"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "receipt_date",
+          "amount",
+          "source",
+          "cash_account_name_ar",
+          "excess_to_credit",
+          "status",
+          "entry_no",
+          "allocations"
+        ],
+        "title": "ReceiptOut",
+        "type": "object"
+      },
       "ReservationIn": {
         "additionalProperties": false,
         "properties": {
@@ -4544,6 +5875,16 @@
             "title": "Discount",
             "type": "string"
           },
+          "installments": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InstallmentPlanIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "list_price": {
             "examples": [
               "25000.00"
@@ -4802,10 +6143,28 @@
             ],
             "title": "Entry No"
           },
+          "financed": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Financed",
+            "type": "string"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
             "type": "string"
+          },
+          "installment_plan": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InstallmentPlanIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "invoice_no": {
             "anyOf": [
@@ -4851,6 +6210,18 @@
             },
             "title": "Payments",
             "type": "array"
+          },
+          "plan_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Id"
           },
           "profit": {
             "anyOf": [
@@ -4973,6 +6344,9 @@
           "trade_in_vehicle_id",
           "payments",
           "paid_total",
+          "installment_plan",
+          "financed",
+          "plan_id",
           "remaining",
           "invoice_no",
           "einvoice_status",
@@ -5162,6 +6536,80 @@
           "profit_pct"
         ],
         "title": "SaleProfit",
+        "type": "object"
+      },
+      "SchedulePreviewIn": {
+        "additionalProperties": false,
+        "properties": {
+          "financed": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Financed",
+            "type": "string"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/InstallmentPlanIn"
+          }
+        },
+        "required": [
+          "financed",
+          "plan"
+        ],
+        "title": "SchedulePreviewIn",
+        "type": "object"
+      },
+      "ScheduleRowIn": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "due_date": {
+            "format": "date",
+            "title": "Due Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "due_date",
+          "amount"
+        ],
+        "title": "ScheduleRowIn",
+        "type": "object"
+      },
+      "ScheduleRowOut": {
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "due_date": {
+            "format": "date",
+            "title": "Due Date",
+            "type": "string"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq",
+          "due_date",
+          "amount"
+        ],
+        "title": "ScheduleRowOut",
         "type": "object"
       },
       "SearchOut": {
@@ -9306,6 +10754,99 @@
         ]
       }
     },
+    "/api/v1/customers/{customer_id}/installment-statement": {
+      "get": {
+        "operationId": "customer_statement_api_v1_customers__customer_id__installment_statement_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "customer_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Customer Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "json",
+              "enum": [
+                "json",
+                "pdf"
+              ],
+              "title": "Format",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": "ar",
+              "enum": [
+                "ar",
+                "en"
+              ],
+              "title": "Lang",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerInstallmentStatement"
+                }
+              },
+              "application/pdf": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Customer Statement",
+        "tags": [
+          "installments"
+        ]
+      }
+    },
     "/api/v1/customers/{customer_id}/national-id": {
       "get": {
         "operationId": "reveal_national_id_api_v1_customers__customer_id__national_id_get",
@@ -9531,6 +11072,431 @@
         "summary": "Preview Refund",
         "tags": [
           "customers"
+        ]
+      }
+    },
+    "/api/v1/deferred-papers": {
+      "get": {
+        "operationId": "list_papers_api_v1_deferred_papers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "HELD",
+                    "DEPOSITED",
+                    "COLLECTED",
+                    "BOUNCED",
+                    "RETURNED",
+                    "DEFAULTED",
+                    "LEGAL"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "paper_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "PROMISSORY_NOTE",
+                    "PDC"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Paper Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "customer_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Customer Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "overdue",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Overdue",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PaperOut"
+                  },
+                  "title": "Response List Papers Api V1 Deferred Papers Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Papers",
+        "tags": [
+          "installments",
+          "deferred papers"
+        ]
+      },
+      "post": {
+        "operationId": "create_paper_api_v1_deferred_papers_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaperIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaperOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Paper",
+        "tags": [
+          "installments",
+          "deferred papers"
+        ]
+      }
+    },
+    "/api/v1/deferred-papers/{paper_id}": {
+      "get": {
+        "operationId": "get_paper_api_v1_deferred_papers__paper_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paper_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Paper Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaperOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Paper",
+        "tags": [
+          "installments",
+          "deferred papers"
+        ]
+      }
+    },
+    "/api/v1/deferred-papers/{paper_id}/actions": {
+      "post": {
+        "operationId": "paper_action_api_v1_deferred_papers__paper_id__actions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paper_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Paper Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaperActionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingResult_PaperOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Paper Action",
+        "tags": [
+          "installments",
+          "deferred papers"
+        ]
+      }
+    },
+    "/api/v1/deferred-papers/{paper_id}/actions/preview": {
+      "post": {
+        "operationId": "preview_paper_action_api_v1_deferred_papers__paper_id__actions_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paper_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Paper Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaperActionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Paper Action",
+        "tags": [
+          "installments",
+          "deferred papers"
         ]
       }
     },
@@ -10363,6 +12329,594 @@
         ]
       }
     },
+    "/api/v1/installment-plans/schedule-preview": {
+      "post": {
+        "operationId": "schedule_preview_api_v1_installment_plans_schedule_preview_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchedulePreviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleRowOut"
+                  },
+                  "title": "Response Schedule Preview Api V1 Installment Plans Schedule Preview Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Schedule Preview",
+        "tags": [
+          "installments"
+        ]
+      }
+    },
+    "/api/v1/installment-plans/{plan_id}": {
+      "get": {
+        "operationId": "get_plan_api_v1_installment_plans__plan_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plan_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plan Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallmentPlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Plan",
+        "tags": [
+          "installments"
+        ]
+      }
+    },
+    "/api/v1/installment-plans/{plan_id}/receipts": {
+      "post": {
+        "operationId": "record_receipt_api_v1_installment_plans__plan_id__receipts_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plan_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plan Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReceiptIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingResult_InstallmentPlanOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Record Receipt",
+        "tags": [
+          "installments"
+        ]
+      }
+    },
+    "/api/v1/installment-plans/{plan_id}/receipts/preview": {
+      "post": {
+        "operationId": "preview_receipt_api_v1_installment_plans__plan_id__receipts_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plan_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plan Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReceiptIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Receipt",
+        "tags": [
+          "installments"
+        ]
+      }
+    },
+    "/api/v1/installments": {
+      "get": {
+        "operationId": "list_installments_api_v1_installments_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "view",
+            "required": false,
+            "schema": {
+              "default": "open",
+              "enum": [
+                "open",
+                "due_today",
+                "upcoming",
+                "overdue",
+                "calendar"
+              ],
+              "title": "View",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 7,
+              "maximum": 365,
+              "minimum": 0,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "customer_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Customer Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InstallmentOut"
+                  },
+                  "title": "Response List Installments Api V1 Installments Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Installments",
+        "tags": [
+          "installments"
+        ]
+      }
+    },
+    "/api/v1/installments/board": {
+      "get": {
+        "operationId": "installment_board_api_v1_installments_board_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "view",
+            "required": false,
+            "schema": {
+              "default": "open",
+              "enum": [
+                "open",
+                "due_today",
+                "upcoming",
+                "overdue",
+                "calendar"
+              ],
+              "title": "View",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 7,
+              "maximum": 365,
+              "minimum": 0,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "customer_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Customer Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallmentBoard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Installment Board",
+        "tags": [
+          "installments"
+        ]
+      }
+    },
+    "/api/v1/installments/kpis": {
+      "get": {
+        "operationId": "installment_kpis_api_v1_installments_kpis_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallmentKpis"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Installment Kpis",
+        "tags": [
+          "installments"
+        ]
+      }
+    },
     "/api/v1/journal-entries": {
       "get": {
         "operationId": "list_journal_entries_api_v1_journal_entries_get",
@@ -11040,6 +13594,189 @@
         "summary": "Me",
         "tags": [
           "session"
+        ]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "operationId": "list_notifications_api_v1_notifications_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "unread_only",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Unread Only",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Notifications",
+        "tags": [
+          "installments",
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/read-all": {
+      "post": {
+        "operationId": "read_all_notifications_api_v1_notifications_read_all_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read All Notifications",
+        "tags": [
+          "installments",
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{notification_id}/read": {
+      "post": {
+        "operationId": "read_notification_api_v1_notifications__notification_id__read_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notification_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Notification Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read Notification",
+        "tags": [
+          "installments",
+          "notifications"
         ]
       }
     },

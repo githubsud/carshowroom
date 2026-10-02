@@ -18,7 +18,9 @@ export type PostingKind =
   | 'settle'
   | 'supplierPayment'
   | 'refund'
-  | 'cancelSale';
+  | 'cancelSale'
+  | 'receipt'
+  | 'paperAction';
 
 export interface Option {
   value: string;

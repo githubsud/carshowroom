@@ -111,6 +111,21 @@ export const routes: Routes = [
         loadComponent: () => import('./features/sales/sale.page').then((m) => m.SalePage),
       },
       {
+        path: 'installments',
+        canActivate: [permissionGuard('installment.view')],
+        loadComponent: () => import('./features/installments/installments.page').then((m) => m.InstallmentsPage),
+      },
+      {
+        path: 'installments/plans/:planId',
+        canActivate: [permissionGuard('installment.view')],
+        loadComponent: () => import('./features/installments/plan.page').then((m) => m.PlanPage),
+      },
+      {
+        path: 'installments/papers',
+        canActivate: [permissionGuard('deferred_paper.manage')],
+        loadComponent: () => import('./features/installments/papers.page').then((m) => m.PapersPage),
+      },
+      {
         path: 'soon/:feature',
         loadComponent: () => import('./features/misc/coming-soon.page').then((m) => m.ComingSoonPage),
       },

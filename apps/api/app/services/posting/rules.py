@@ -2,11 +2,12 @@
 draft out. Unit-tested in tests/unit/test_posting_rules.py.
 
 Implemented: 1-5, 28, 29 (partners), 6-9 (purchase, seller payment, vehicle
-expense), 11, 34, 35 (deposits), 12, 26 (sale, trade-in, cost recognition),
+expense), 11, 34, 35 (deposits), 12, 13, 26 (sale, installment sale mode a,
+trade-in, cost recognition), 15 and 27 (installment collected, cheque bounced),
 20, 21 (general expense, transfer), 24 (reversal; the database performs it,
 this mirror is used for previews and cash checks), 30-32 (partner-paid and
 supplier-credit expenses, supplier payment), and the approved candidates
-P-01, P-02, P-03, P-04. Further rules arrive with their phases (BACKLOG).
+P-01, P-02, P-03, P-04, P-07. Further rules arrive with their phases (BACKLOG).
 """
 
 from collections.abc import Iterable, Sequence
@@ -498,8 +499,10 @@ def sale(
     trade_in: tuple[UUID, Decimal] | None,
     description: str,
     source_id: UUID | None,
+    financed: Decimal = ZERO,
 ) -> EntryDraft:
-    """Rule 12 (cash/bank sale, deposit applied) and rule 26 (trade-in):
+    """Rule 12 (cash/bank sale, deposit applied), rule 13 (the rest financed by
+    installments, mode a: Dr installment receivable for the buyer) and rule 26 (trade-in):
     Dr each cash/bank leg + Dr customer deposits (buyer + vehicle) + Dr vehicle
     inventory (trade-in car, at the agreed value) / Cr vehicle sales (sold car).
     The sale price is the net price after any discount (P-12)."""
@@ -518,8 +521,14 @@ def sale(
                 vehicle_id=trade_in_vehicle_id,
             )
         )
+    if financed > 0:
+        lines.append(
+            Line(
+                account=Account.system("INSTALLMENT_RECEIVABLE"), debit=_positive_amount(financed), customer_id=buyer_id
+            )
+        )
     if sum((line.debit for line in lines), ZERO) != sale_price:
-        raise LedgerRuleError("payments, deposit and trade-in must add up to the sale price")
+        raise LedgerRuleError("payments, deposit, trade-in and financed amount must add up to the sale price")
     lines.append(Line(account=Account.system("VEHICLE_SALES"), credit=sale_price, vehicle_id=vehicle_id))
     draft = EntryDraft(
         entry_date=entry_date, description=description, source_type="SALE", source_id=source_id, lines=tuple(lines)
@@ -558,11 +567,13 @@ def sale_cancellation_to_credit(
     trade_in: tuple[UUID, Decimal] | None,
     description: str,
     source_id: UUID | None,
+    receivable_outstanding: Decimal = ZERO,
 ) -> EntryDraft:
     """P-03 (approved as the default cancellation method, D-41): reverse the revenue
     and owe the customer what they paid: Dr vehicle sales / Cr customer credits
     (customer) for money paid and deposit applied, Cr vehicle inventory for a
-    trade-in car handed back. The refund itself is posted separately (P-02)."""
+    trade-in car handed back, and Cr installment receivable for what was still
+    to be collected. The refund itself is posted separately (P-02)."""
     sale_price = _positive_amount(sale_price)
     lines = [Line(account=Account.system("VEHICLE_SALES"), debit=sale_price, vehicle_id=vehicle_id)]
     if amount_paid > 0:
@@ -576,6 +587,14 @@ def sale_cancellation_to_credit(
                 account=Account.system("VEHICLE_INVENTORY"),
                 credit=_positive_amount(value),
                 vehicle_id=trade_in_vehicle_id,
+            )
+        )
+    if receivable_outstanding > 0:
+        lines.append(
+            Line(
+                account=Account.system("INSTALLMENT_RECEIVABLE"),
+                credit=_positive_amount(receivable_outstanding),
+                customer_id=buyer_id,
             )
         )
     draft = EntryDraft(
@@ -609,6 +628,105 @@ def customer_credit_refund(
             Line(account=Account.system("CUSTOMER_CREDITS"), debit=amount, customer_id=customer_id),
             Line(account=paid_from.account, credit=amount, cash_account_id=paid_from.cash_account_id),
         ),
+    )
+    draft.validate()
+    return draft
+
+
+# --- Installments (rules 15, 27; P-02 credit legs; P-07) ------------------------------------------
+
+
+def installment_receipt(
+    *,
+    entry_date: date,
+    customer_id: UUID,
+    allocated: Decimal,
+    received_in: CashAccountRef | None,
+    excess_to_credit: Decimal,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """Rule 15 (mode a) — installment collected: Dr cash or bank / Cr installment
+    receivable (customer). P-02 (approved, D-41): an overpayment kept as credit is
+    Cr customer credits; paying from existing credit is Dr customer credits instead of cash."""
+    allocated = _positive_amount(allocated)
+    if received_in is None:
+        if excess_to_credit > 0:
+            raise LedgerRuleError("credit cannot be turned into more credit")
+        first = Line(account=Account.system("CUSTOMER_CREDITS"), debit=allocated, customer_id=customer_id)
+    else:
+        total = allocated + (excess_to_credit if excess_to_credit > 0 else ZERO)
+        first = Line(account=received_in.account, debit=total, cash_account_id=received_in.cash_account_id)
+    lines = [first, Line(account=Account.system("INSTALLMENT_RECEIVABLE"), credit=allocated, customer_id=customer_id)]
+    if excess_to_credit > 0:
+        lines.append(
+            Line(
+                account=Account.system("CUSTOMER_CREDITS"),
+                credit=_positive_amount(excess_to_credit),
+                customer_id=customer_id,
+            )
+        )
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="INSTALLMENT_RECEIPT",
+        source_id=source_id,
+        lines=tuple(lines),
+    )
+    draft.validate()
+    return draft
+
+
+def cheque_bounced(
+    *,
+    entry_date: date,
+    customer_id: UUID,
+    amount: Decimal,
+    bank: CashAccountRef,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """Rule 27 — a cheque already recorded as collected bounces: Dr installment
+    receivable (customer) / Cr bank. The installment balance reopens."""
+    amount = _positive_amount(amount)
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="CHEQUE_BOUNCE",
+        source_id=source_id,
+        lines=(
+            Line(account=Account.system("INSTALLMENT_RECEIVABLE"), debit=amount, customer_id=customer_id),
+            Line(account=bank.account, credit=amount, cash_account_id=bank.cash_account_id),
+        ),
+    )
+    draft.validate()
+    return draft
+
+
+def bounce_charges(
+    *,
+    entry_date: date,
+    amount: Decimal,
+    bank: CashAccountRef,
+    charge_customer_id: UUID | None,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """P-07 (approved 2026-10-02) — bank charges on a bounced cheque: Dr bank
+    charges (6270) / Cr bank, or, when recharged to the customer, Dr other
+    receivables (customer) / Cr bank."""
+    amount = _positive_amount(amount)
+    debit = (
+        Line(account=Account.system("OTHER_RECEIVABLE"), debit=amount, customer_id=charge_customer_id)
+        if charge_customer_id is not None
+        else Line(account=Account.system("EXP_BANK_CHARGES"), debit=amount)
+    )
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="BANK_CHARGES",
+        source_id=source_id,
+        lines=(debit, Line(account=bank.account, credit=amount, cash_account_id=bank.cash_account_id)),
     )
     draft.validate()
     return draft

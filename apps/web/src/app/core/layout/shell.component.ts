@@ -10,6 +10,7 @@ import { PRODUCT_NAME, PRODUCT_NAME_AR } from '../config/product';
 import { LanguageService } from '../i18n/language.service';
 import { TenantContextService } from '../tenant/tenant-context.service';
 import { GlobalSearchComponent } from './global-search.component';
+import { NotificationBellComponent } from './notification-bell.component';
 import { visibleMenu } from './menu';
 
 /** App frame: top bar, side navigation (desktop), bottom bar + drawer (mobile). */
@@ -24,6 +25,7 @@ import { visibleMenu } from './menu';
     DrawerModule,
     TagModule,
     GlobalSearchComponent,
+    NotificationBellComponent,
   ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',

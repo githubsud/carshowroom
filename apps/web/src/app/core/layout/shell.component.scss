@@ -107,8 +107,20 @@
   }
 
   .sidebar,
-  .user {
+  .user,
+  .brand {
     display: none;
+  }
+
+  // Phones: room for the tenant, search, notifications and language without sideways scroll.
+  .topbar {
+    gap: var(--space-1);
+    padding-inline: var(--space-2);
+  }
+
+  .tenant {
+    flex-shrink: 1;
+    min-inline-size: 0;
   }
 
   .content {

@@ -41,6 +41,18 @@ Demo users (local seed only; password `Demo-Pass-2026`):
 
 Invitation emails sent locally can be read in Mailpit at http://127.0.0.1:54324.
 
+## Background worker
+
+Daily installment reminders run in a worker that uses the API image (D-86):
+
+```bash
+cd apps/api && .venv/bin/python -m app.jobs --once   # one run (cron style)
+docker compose up worker                              # hourly loop, one advisory lock across copies
+```
+
+Each showroom is processed once a day; reminders appear in the notification bell. SMS and WhatsApp
+providers only log until real providers are configured.
+
 ## PrimeUI licence
 
 PrimeNG needs a PrimeUI licence key (DECISIONS Q-38). Set it as an environment variable before starting or building the web app; it is never committed:

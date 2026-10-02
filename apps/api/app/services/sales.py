@@ -19,6 +19,7 @@ from sqlalchemy import Connection, text
 
 from app.core.errors import AppError, not_found
 from app.domain.finance import EntryRef, PostingResult, PostingWarning, Preview, PreviewEffect
+from app.domain.installments import InstallmentPlanIn
 from app.domain.ledger import ZERO, EntryDraft
 from app.domain.money import format_money, ltr, quantize
 from app.domain.sales import (
@@ -34,9 +35,10 @@ from app.domain.sales import (
     SaleProfit,
     TradeInIn,
 )
+from app.domain.schedule import ScheduleRow
 from app.domain.vehicles import VehicleIn
 from app.integrations.einvoice import adapter_for
-from app.services import customers, finance, vehicles
+from app.services import customers, finance, installments, papers, vehicles
 from app.services.posting import engine, rules
 
 _COUNTER = text(
@@ -365,6 +367,11 @@ def get_sale(conn: Connection, sale_id: UUID, *, viewer_id: UUID, see_all_drafts
     paid = sum((p.amount for p in payments), ZERO)
     deposit = Decimal(row["deposit_applied"]) if row["status"] != "DRAFT" else _deposit_of(conn, row["reservation_id"])
     trade_in_value = Decimal(row["trade_in_value"])
+    plan = InstallmentPlanIn.model_validate(row["installment_plan"]) if row["installment_plan"] else None
+    open_amount = Decimal(row["sale_price"]) - paid - deposit - trade_in_value
+    financed = (
+        (Decimal(row["receivable_amount"]) if row["status"] != "DRAFT" else max(open_amount, ZERO)) if plan else ZERO
+    )
     sale = SaleOut(
         id=row["id"],
         sale_no=row["sale_no"],
@@ -386,7 +393,10 @@ def get_sale(conn: Connection, sale_id: UUID, *, viewer_id: UUID, see_all_drafts
         trade_in_vehicle_id=row["trade_in_vehicle_id"],
         payments=payments,
         paid_total=paid,
-        remaining=Decimal(row["sale_price"]) - paid - deposit - trade_in_value,
+        installment_plan=plan,
+        financed=financed,
+        plan_id=installments.plan_id_for_sale(conn, row["id"]) if row["status"] != "DRAFT" else None,
+        remaining=open_amount - financed,
         invoice_no=row["invoice_no"],
         einvoice_status=row["einvoice_status"],
         entry_no=row["entry_no"],
@@ -510,6 +520,7 @@ def _draft_values(conn: Connection, payload: SaleDraftIn) -> dict[str, Any]:
         "deposit_applied": _deposit_of(conn, payload.reservation_id),
         "trade_in_value": trade_in.agreed_value if trade_in else ZERO,
         "trade_in": trade_in.model_dump_json() if trade_in else None,
+        "installment_plan": payload.installments.model_dump_json() if payload.installments else None,
         "notes": payload.notes,
     }
 
@@ -524,10 +535,10 @@ def create_draft(
             """
             insert into public.sales
               (tenant_id, sale_no, vehicle_id, buyer_customer_id, sale_date, list_price, discount, sale_price,
-               reservation_id, deposit_applied, trade_in_value, trade_in, notes)
+               reservation_id, deposit_applied, trade_in_value, trade_in, installment_plan, notes)
             values (private.current_tenant_id(), :sale_no, :vehicle_id, :buyer_customer_id, :sale_date, :list_price,
                     :discount, :sale_price, :reservation_id, :deposit_applied, :trade_in_value,
-                    cast(:trade_in as jsonb), :notes)
+                    cast(:trade_in as jsonb), cast(:installment_plan as jsonb), :notes)
             returning id
             """
         ),
@@ -553,9 +564,14 @@ def update_draft(
     _editable_draft(conn, sale_id, viewer_id=viewer_id, can_edit_others=can_edit_others)
     _validate_draft(conn, payload)
     values = _draft_values(conn, payload)
-    assignments = ", ".join(f"{column} = :{column}" for column in values if column != "trade_in")
+    assignments = ", ".join(
+        f"{column} = :{column}" for column in values if column not in ("trade_in", "installment_plan")
+    )
     conn.execute(
-        text(f"update public.sales set {assignments}, trade_in = cast(:trade_in as jsonb) where id = :id"),  # noqa: S608 - fixed keys
+        text(
+            f"update public.sales set {assignments}, trade_in = cast(:trade_in as jsonb), "  # noqa: S608 - fixed keys
+            "installment_plan = cast(:installment_plan as jsonb) where id = :id"
+        ),
         {**values, "id": sale_id},
     )
     _write_payments(conn, sale_id, payload)
@@ -581,6 +597,9 @@ class _SalePlan:
     cost: Decimal
     sale_draft: EntryDraft
     cost_draft: EntryDraft
+    financed: Decimal
+    plan: InstallmentPlanIn | None
+    schedule: list[ScheduleRow]
 
 
 def _plan_post(
@@ -639,7 +658,19 @@ def _plan_post(
     sale_price = Decimal(sale["sale_price"])
     paid = sum((amount for _, amount in legs), ZERO)
     trade_value = trade_in.agreed_value if trade_in else ZERO
-    if paid + deposit + trade_value != sale_price:
+    plan = InstallmentPlanIn.model_validate(sale["installment_plan"]) if sale["installment_plan"] else None
+    financed = sale_price - paid - deposit - trade_value if plan else ZERO
+    schedule: list[ScheduleRow] = []
+    if plan is not None:
+        enabled = conn.execute(
+            text("select private.feature_enabled(private.current_tenant_id(), 'installments')")
+        ).scalar_one()
+        if not enabled:
+            raise AppError("FEATURE_DISABLED", "Installments are not enabled for this showroom", status_code=403)
+        if financed <= 0:
+            raise AppError("NOTHING_TO_FINANCE", "Nothing is left to pay by installments", status_code=422)
+        schedule = installments.build_schedule(financed, plan)
+    if paid + deposit + trade_value + financed != sale_price:
         raise AppError(
             "SALE_AMOUNTS_MISMATCH",
             "Payments, deposit and trade-in must add up to the sale price",
@@ -663,6 +694,7 @@ def _plan_post(
         trade_in=(trade_in_vehicle_id, trade_value) if trade_in else None,
         description=description,
         source_id=sale_id,
+        financed=financed,
     )
     cost_draft = rules.cost_of_sale(
         entry_date=sale["sale_date"],
@@ -681,6 +713,9 @@ def _plan_post(
         cost=cost,
         sale_draft=sale_draft,
         cost_draft=cost_draft,
+        financed=financed,
+        plan=plan,
+        schedule=schedule,
     )
 
 
@@ -699,6 +734,17 @@ def preview_post(conn: Connection, sale_id: UUID, *, with_lines: bool, with_prof
         parts_ar.append(f"سيارة العميل {label} بقيمة {_money(plan.trade_in.agreed_value, info, 'ar')} تدخل المخزون")
         parts_en.append(
             f"the customer's {label} at {_money(plan.trade_in.agreed_value, info, 'en')}, which enters stock"
+        )
+    if plan.financed > 0:
+        frequency_ar = {"MONTHLY": "شهرية", "BIWEEKLY": "كل أسبوعين", "WEEKLY": "أسبوعية", "QUARTERLY": "ربع سنوية"}
+        first = plan.schedule[0]
+        parts_ar.append(
+            f"والباقي {_money(plan.financed, info, 'ar')} على {len(plan.schedule)} قسط "
+            f"{frequency_ar.get(plan.plan.frequency if plan.plan else '', '')} أولها {ltr(first.due_date.isoformat())}"
+        )
+        parts_en.append(
+            f"the remaining {_money(plan.financed, info, 'en')} in {len(plan.schedule)} installments from "
+            f"{first.due_date.isoformat()}"
         )
     discount = Decimal(plan.sale["discount"])
     discount_ar = f" بعد خصم {_money(discount, info, 'ar')}" if discount > 0 else ""
@@ -801,7 +847,7 @@ def post_sale(conn: Connection, sale_id: UUID, *, user_id: UUID, with_profit: bo
                    set status = 'POSTED', posted_at = now(), posted_by = :user, journal_entry_id = :entry,
                        cost_journal_entry_id = :cost_entry, invoice_no = :invoice_no, deposit_applied = :deposit,
                        trade_in_vehicle_id = :trade_in_vehicle, einvoice_status = :einvoice_status,
-                       einvoice_uuid = :einvoice_uuid
+                       einvoice_uuid = :einvoice_uuid, receivable_amount = :financed
                  where id = :id
                 """
             ),
@@ -814,8 +860,18 @@ def post_sale(conn: Connection, sale_id: UUID, *, user_id: UUID, with_profit: bo
                 "trade_in_vehicle": created_trade_in,
                 "einvoice_status": einvoice.status,
                 "einvoice_uuid": einvoice.document_uuid,
+                "financed": plan.financed,
                 "id": sale_id,
             },
+        )
+    if plan.plan is not None and plan.financed > 0:
+        installments.create_plan(
+            conn,
+            sale_id=sale_id,
+            customer_id=plan.sale["buyer_customer_id"],
+            financed=plan.financed,
+            plan=plan.plan,
+            schedule=plan.schedule,
         )
     vehicles.set_status(conn, plan.vehicle.id, "SOLD", f"بيع {plan.sale['sale_no']}")
     if plan.reservation_id is not None:
@@ -886,7 +942,17 @@ def _plan_cancel(
 
     method = conn.execute(text("select sale_cancellation_method from public.tenant_settings")).scalar_one()
     payments = list(conn.execute(_PAYMENTS, {"id": sale_id}).mappings())
-    paid = sum((Decimal(p["amount"]) for p in payments), ZERO) + Decimal(sale["deposit_applied"])
+    plan_id = installments.plan_id_for_sale(conn, sale_id)
+    collected = installments.collected(conn, plan_id) if plan_id else ZERO
+    if method == "MIRROR" and collected > 0:
+        # D-41: the literal mirror cannot undo installments already collected.
+        raise AppError(
+            "SALE_HAS_COLLECTIONS",
+            "Installments have been collected; refund or credit them first",
+            status_code=409,
+            details={"collected": f"{collected:.2f}"},
+        )
+    paid = sum((Decimal(p["amount"]) for p in payments), ZERO) + Decimal(sale["deposit_applied"]) + collected
     legs = [
         (p["cash_account_name_ar"], p["cash_account_name_en"] or p["cash_account_name_ar"], Decimal(p["amount"]))
         for p in payments
@@ -902,6 +968,7 @@ def _plan_cancel(
             sale_price=Decimal(sale["sale_price"]),
             amount_paid=paid,
             trade_in=(sale["trade_in_vehicle_id"], trade_value) if trade_value > 0 else None,
+            receivable_outstanding=Decimal(sale["receivable_amount"]) - collected,
             description=f"إلغاء بيع {vehicle.label} ({vehicle.stock_no}) — {sale['sale_no']}: {payload.reason}",
             source_id=sale_id,
         )
@@ -1035,6 +1102,10 @@ def cancel_sale(
         },
     )
     vehicles.set_status(conn, sale["vehicle_id"], "AVAILABLE", f"إلغاء البيع {sale['sale_no']}: {reason}")
+    plan_id = installments.plan_id_for_sale(conn, sale_id)
+    if plan_id is not None:
+        installments.cancel_plan(conn, plan_id)
+        papers.return_held_papers(conn, plan_id, plan.cancel_date, f"إلغاء البيع {sale['sale_no']}")
     if sale["trade_in_vehicle_id"] is not None:
         conn.execute(
             text(

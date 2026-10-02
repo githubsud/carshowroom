@@ -4,9 +4,10 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 
-import { PartnerStatement } from '../../core/api/api.models';
+import { InstallmentKpis, PartnerStatement } from '../../core/api/api.models';
 import { FormatService, MoneyPipe } from '../../core/format/format.service';
 import { LanguageService } from '../../core/i18n/language.service';
+import { InstallmentsService } from '../installments/installments.service';
 import { PartnersService } from '../partners/partners.service';
 import { TenantContextService } from '../../core/tenant/tenant-context.service';
 
@@ -46,6 +47,20 @@ import { TenantContextService } from '../../core/tenant/tenant-context.service';
         </p-card>
       }
 
+      @if (installments(); as k) {
+        <p-card data-testid="installment-tiles">
+          <div class="kv"><strong>{{ 'installments.title' | transloco }}</strong>
+            <a [routerLink]="['/t', context.activeTenantId(), 'installments']">{{ 'dashboard.open' | transloco }}</a></div>
+          <div class="kv"><span>{{ 'installments.due48h' | transloco: { n: k.due_48h_count } }}</span><span>{{ k.due_48h | money }}</span></div>
+          <div class="kv"><span>{{ 'installments.due7d' | transloco: { n: k.due_7d_count } }}</span><span>{{ k.due_7d | money }}</span></div>
+          <div class="kv"><span>{{ 'installments.overdueN' | transloco: { n: k.overdue_count } }}</span>
+            <strong [class.negative]="k.overdue_count > 0" data-testid="dashboard-overdue">{{ k.overdue | money }}</strong></div>
+          @if (k.bounced_count > 0) {
+            <div class="kv negative"><span>{{ 'installments.bouncedCheques' | transloco }}</span><strong>{{ k.bounced_count }}</strong></div>
+          }
+        </p-card>
+      }
+
       <p-card>
         <p class="muted">{{ 'dashboard.comingNext' | transloco }}</p>
       </p-card>
@@ -65,6 +80,10 @@ import { TenantContextService } from '../../core/tenant/tenant-context.service';
       min-block-size: 40px;
     }
 
+    .negative {
+      color: var(--color-danger);
+    }
+
     .muted {
       margin: 0;
       color: var(--color-text-muted);
@@ -76,11 +95,19 @@ export class DashboardPage implements OnInit {
   private readonly language = inject(LanguageService);
   private readonly partners = inject(PartnersService);
   private readonly format = inject(FormatService);
+  private readonly installmentsApi = inject(InstallmentsService);
 
   /** A partner sees their own position at a glance (SPEC §1.2). */
   protected readonly myPosition = signal<PartnerStatement | null>(null);
+  protected readonly installments = signal<InstallmentKpis | null>(null);
 
   ngOnInit(): void {
+    if (this.context.can('installment.view') && this.context.flags()['installments'] === true) {
+      void this.installmentsApi
+        .kpis()
+        .then((k) => this.installments.set(k))
+        .catch(() => this.installments.set(null));
+    }
     const partnerId = this.context.active()?.partner_id;
     if (partnerId && (this.context.can('partner.view_own') || this.context.can('partner.view_all'))) {
       const today = this.format.todayIso();

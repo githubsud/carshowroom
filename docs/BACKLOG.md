@@ -168,6 +168,22 @@
 
 **Phase 5 accepted when (FACT):** the scenario test with installments passes and the overdue lists are correct.
 
+### Phase 5 status: delivered (2026-10-03); continuing per the standing instruction
+
+| ID | Status | Notes |
+|---|---|---|
+| 5.1 | ✅ | Equal split (half-up, remainder on the last) or manual schedule; weekly/biweekly/monthly/quarterly with month-end clamping (D-90); property test over 2,000 random splits |
+| 5.2 | ✅ | Rule 13 (mode a); plan and installments created when the sale posts; schedule preview in the sale screen (D-82, D-89) |
+| 5.3 | 🔒 | Mode (b) markup waits for Q-03 (D-82) |
+| 5.4 | ✅ | Rule 15; partial payments; oldest-first allocation; remaining derived (`installment_status`); overpayment per D-84; customer credit can pay installments |
+| 5.5 | ✅ | Deferred papers register with status machine (DB-enforced), events, scans (documents), collect → receipt (A-10), bounce → rule 27 reopens the balance and flags the customer, P-07 bank charges, papers returned on cancellation (D-85) |
+| 5.6 | ✅ | Board: overdue with days late, due today, next 7 days, all open, totals per customer; calendar "radar" coloured by state; dashboard tiles (D-87) |
+| 5.7 | ✅ | Worker (`python -m app.jobs`, docker-compose `worker`), advisory lock, `reminder_jobs`, deduplicated in-app notifications, log-only SMS/WhatsApp providers (D-86); notification bell |
+| 5.8 | ✅ | Customer installment statement (JSON and PDF) on the customer page |
+| Cancel | ✅ | Installment sales cancel per D-88 (collected installments owed back; MIRROR refused with collections) |
+| Seed | ✅ | Optra sold on 6 monthly installments (first overdue) with a post-dated cheque and a promissory note |
+| Tests | ✅ | pgTAP 145 · API 205 (+1 PDF test in Docker/CI) · web unit 44 · E2E 36 |
+
 ---
 
 ## Phase 6: Consignment and customer requests

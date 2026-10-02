@@ -7,6 +7,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
+from app.domain.installments import InstallmentPlanIn
 from app.domain.money import Money, PositiveMoney
 from app.domain.vehicles import Fuel, NoteText, ReasonText, ShortText, Transmission, VinText
 
@@ -91,6 +92,8 @@ class SaleDraftIn(StrictModel):
     reservation_id: UUID | None = None
     payments: list[SalePaymentIn] = Field(default_factory=list, max_length=6)
     trade_in: TradeInIn | None = None
+    # Whatever payments, deposit and trade-in leave open, paid by installments (rule 13, mode a).
+    installments: InstallmentPlanIn | None = None
     notes: NoteText | None = None
 
 
@@ -135,7 +138,11 @@ class SaleOut(BaseModel):
     trade_in_vehicle_id: UUID | None
     payments: list[SalePaymentOut]
     paid_total: Money
-    # Still to be covered before the sale can be posted (sale price - paid - deposit - trade-in).
+    installment_plan: InstallmentPlanIn | None
+    # Financed by installments: what payments, deposit and trade-in leave open, when a plan is set.
+    financed: Money
+    plan_id: UUID | None
+    # Still to be covered before the sale can be posted (sale price - paid - deposit - trade-in - financed).
     remaining: Money
     invoice_no: str | None
     einvoice_status: str

@@ -21,7 +21,7 @@ export const MENU: readonly MenuItem[] = [
   {
     key: 'installments',
     icon: 'pi pi-calendar',
-    path: 'soon/installments',
+    path: 'installments',
     anyOf: ['installment.view'],
     flag: 'installments',
     primary: true,
