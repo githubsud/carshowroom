@@ -18,7 +18,10 @@ import { ErrorMessageService } from '../../shared/error-message.service';
     <div class="card">
       <h1>{{ 'signup.title' | transloco }}</h1>
       <p class="subtitle">{{ 'signup.subtitle' | transloco }}</p>
-      <form [formGroup]="form" (ngSubmit)="submit()" data-testid="signup-form">
+      @if (checkEmail()) {
+        <p-message severity="success" data-testid="signup-check-email">{{ 'signup.checkEmail' | transloco }}</p-message>
+      }
+      <form [formGroup]="form" (ngSubmit)="submit()" data-testid="signup-form" [hidden]="checkEmail()">
         <div class="field">
           <label for="su-name">{{ 'signup.name' | transloco }}</label>
           <input pInputText id="su-name" formControlName="name" autocomplete="name" data-testid="su-name" />
@@ -49,6 +52,8 @@ export class SignupPage {
   private readonly errors = inject(ErrorMessageService);
 
   protected readonly busy = signal(false);
+  /** Hosted projects confirm the email first: the user follows the link, then signs in. */
+  protected readonly checkEmail = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly form = inject(NonNullableFormBuilder).group({
     name: ['', Validators.required],
@@ -64,8 +69,11 @@ export class SignupPage {
     this.error.set(null);
     try {
       const v = this.form.getRawValue();
-      await this.auth.signUp(v.email.trim(), v.password, v.name.trim());
-      await this.router.navigate(['/create-showroom']);
+      if (await this.auth.signUp(v.email.trim(), v.password, v.name.trim())) {
+        await this.router.navigate(['/create-showroom']);
+      } else {
+        this.checkEmail.set(true);
+      }
     } catch (error) {
       this.error.set(this.errors.message(error));
     } finally {

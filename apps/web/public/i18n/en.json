@@ -1110,7 +1110,8 @@
     "country": "Country",
     "country_EG": "Egypt (EGP)",
     "country_QA": "Qatar (QAR)",
-    "createShowroom": "Create a showroom"
+    "createShowroom": "Create a showroom",
+    "checkEmail": "We sent a confirmation email. Open its link, then sign in to create your showroom."
   },
   "admin": {
     "title": "Platform console",

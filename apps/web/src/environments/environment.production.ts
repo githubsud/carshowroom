@@ -1,10 +1,11 @@
 /**
- * Production build values. Replace the placeholders in the deployment pipeline;
- * only public values belong here (Supabase URL, publishable key, API URL).
+ * Production build values: public only (Supabase URL, publishable key, API URL).
+ * The free test deployment (docs/RUNBOOK.md §6): Supabase Frankfurt + Render.
  */
 export const environment = {
   production: true,
-  supabaseUrl: 'https://YOUR-PROJECT.supabase.co',
+  supabaseUrl: 'https://dzwfmotqnwyeuddwrkwf.supabase.co',
+  // Project Settings → API Keys → "Publishable key" (sb_publishable_...). Public by design.
   supabasePublishableKey: 'YOUR-PUBLISHABLE-KEY',
-  apiBaseUrl: 'https://api.example.com/api/v1',
+  apiBaseUrl: 'https://sayyara-api.onrender.com/api/v1',
 };

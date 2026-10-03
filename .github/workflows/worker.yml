@@ -1,0 +1,43 @@
+name: Daily jobs (test deployment)
+
+# The free test deployment has no always-on worker: GitHub runs the same jobs
+# once a day (installment reminders, needs-attention notifications). The daily
+# database activity also keeps the free Supabase project from pausing.
+# docs/RUNBOOK.md §6. Needs the repository secret WORKER_DATABASE_URL.
+on:
+  schedule:
+    - cron: "0 4 * * *" # 06:00-07:00 in Cairo
+  workflow_dispatch:
+
+concurrency:
+  group: daily-jobs
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: apps/api/pyproject.toml
+      - run: pip install .
+      - name: Run the jobs once
+        env:
+          ENVIRONMENT: production
+          DATABASE_URL: ${{ secrets.WORKER_DATABASE_URL }}
+          SUPABASE_URL: https://dzwfmotqnwyeuddwrkwf.supabase.co
+          # No lasting disk here: owners download their data on demand instead.
+          NIGHTLY_EXPORT_ENABLED: "false"
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "WORKER_DATABASE_URL is not set; nothing to do."
+            exit 0
+          fi
+          python -m app.jobs --once

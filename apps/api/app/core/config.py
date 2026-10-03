@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     # Nightly per-tenant exports (BACKLOG 9.9).
     export_dir: str = "exports"
     export_keep_days: int = 14
+    # Off where the worker has no lasting disk (the free test deployment runs it in GitHub Actions).
+    nightly_export_enabled: bool = True
 
     @property
     def jwks_url(self) -> str:

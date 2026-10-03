@@ -14,6 +14,7 @@ import json
 import zipfile
 from datetime import date, datetime, timedelta
 from decimal import Decimal
+from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -406,8 +407,10 @@ def _jsonable(value: Any) -> Any:
         return f"{value}"
     if isinstance(value, datetime | date):
         return value.isoformat()
-    if isinstance(value, UUID):
+    if isinstance(value, UUID | IPv4Address | IPv6Address | IPv4Network | IPv6Network | timedelta):
         return str(value)
+    if isinstance(value, bytes | memoryview):
+        return bytes(value).hex()
     return value
 
 

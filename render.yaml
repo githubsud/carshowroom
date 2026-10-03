@@ -1,0 +1,87 @@
+# Free test deployment on Render (docs/RUNBOOK.md §6). Testing only: no real
+# personal data (DECISIONS Q-21). Secrets are entered in the Render dashboard
+# (sync: false) and never committed.
+services:
+  # FastAPI, from the same image as local Docker. Free plan: sleeps after 15
+  # minutes without requests; the next request wakes it in 30-60 seconds.
+  - type: web
+    name: sayyara-api
+    runtime: docker
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: ./apps/api
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: PORT
+        value: "8000"
+      # Render's proxy is the only way in: trust its X-Forwarded-For, so rate
+      # limits count each visitor, not the proxy (SECURITY.md).
+      - key: FORWARDED_ALLOW_IPS
+        value: "*"
+      - key: SUPABASE_URL
+        value: https://dzwfmotqnwyeuddwrkwf.supabase.co
+      - key: CORS_ORIGINS
+        value: '["https://sayyara-web.onrender.com"]'
+      - key: INVITE_REDIRECT_URL
+        value: https://sayyara-web.onrender.com/reset-password
+      # postgresql://app_api.<project-ref>:<password>@<pooler-host>:5432/postgres (session pooler, IPv4)
+      - key: DATABASE_URL
+        sync: false
+      # Supabase secret key (sb_secret_...): invites and signed file URLs. Never in the web app.
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      # AES-256 key for national IDs (base64, 32 bytes). Copy it somewhere safe:
+      # losing it makes stored national IDs unreadable.
+      - key: NATIONAL_ID_KEY
+        generateValue: true
+
+  # The Angular app as static files. Free, HTTPS, no sleeping.
+  - type: web
+    name: sayyara-web
+    runtime: static
+    rootDir: apps/web
+    buildCommand: npm ci && npx ng build --define "PRIMEUI_LICENSE='${PRIMEUI_LICENSE}'"
+    staticPublishPath: dist/web/browser
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Optional: the PrimeUI licence key (D-61). Empty shows the licence notice.
+      - key: PRIMEUI_LICENSE
+        sync: false
+    routes:
+      # Angular routes are client-side.
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: Strict-Transport-Security
+        value: max-age=31536000; includeSubDomains
+      # SECURITY.md S-01: report-only first; enforce once the browser console shows no violations.
+      - path: /*
+        name: Content-Security-Policy-Report-Only
+        value: >-
+          default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+          font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://dzwfmotqnwyeuddwrkwf.supabase.co;
+          connect-src 'self' https://sayyara-api.onrender.com https://dzwfmotqnwyeuddwrkwf.supabase.co
+          wss://dzwfmotqnwyeuddwrkwf.supabase.co; worker-src 'self'; manifest-src 'self'; frame-ancestors 'none'
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache

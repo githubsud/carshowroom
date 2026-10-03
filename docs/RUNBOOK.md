@@ -111,3 +111,55 @@ Only a platform operator can remove a factor: Supabase Dashboard → Authenticat
 | `MFA_REQUIRED` after sign-in | The user enabled two-step sign-in; they must enter the code (login page second step) |
 | Balance check fails in CI | `supabase/tests/database` balance tests and `tests/integration/test_full_scenario.py`; never "fix" by editing posted entries |
 | Slow pages | `scripts/perf_check.py` against a copy; see PERFORMANCE.md |
+
+---
+
+## 6. Free test deployment (Supabase Frankfurt + Render + GitHub Actions)
+
+**For testing only, with no real personal data (DECISIONS Q-21, D-133).** Cost: $0.
+
+| Piece | Where | Notes |
+|---|---|---|
+| Database, Auth, Storage | Supabase Free, project `dzwfmotqnwyeuddwrkwf` (Frankfurt) | Pauses after 7 days without database activity; the daily job keeps it awake |
+| API | Render free web service `sayyara-api` (Docker, Frankfurt) | Sleeps after 15 minutes idle; the next request takes 30–60 s |
+| Web app | Render static site `sayyara-web` | `https://sayyara-web.onrender.com` |
+| Daily jobs | GitHub Actions `.github/workflows/worker.yml` at 04:00 UTC | No nightly export file (no lasting disk); owners download their data on demand |
+
+### 6.1 Database (once)
+
+```bash
+npx supabase login                                   # opens the browser
+npx supabase link --project-ref dzwfmotqnwyeuddwrkwf # asks for the database password
+npx supabase db push                                 # applies supabase/migrations (never seed.sql)
+```
+
+Then, in the Supabase SQL editor, give the API's role a password (a long random one, kept in a password manager):
+
+```sql
+alter role app_api with login password '<a long random password>';
+```
+
+`DATABASE_URL` for the API and the worker uses the **session pooler** (IPv4) with that role:
+`postgresql://app_api.dzwfmotqnwyeuddwrkwf:<password>@<pooler-host>:5432/postgres` where `<pooler-host>` is shown under **Connect → Session pooler** (e.g. `aws-0-eu-central-1.pooler.supabase.com`).
+
+### 6.2 Supabase Auth settings (dashboard)
+
+- **URL configuration:** Site URL `https://sayyara-web.onrender.com`; redirect URLs `https://sayyara-web.onrender.com/**`.
+- **Email:** keep "Confirm email" on (sign-up then shows "check your email", D-118).
+- **Passwords:** minimum length 10, lower and upper case letters and digits (SECURITY.md).
+- **MFA:** TOTP enabled (default).
+
+### 6.3 Render
+
+New → **Blueprint** → this repository (branch `main`) → it reads `render.yaml`. Fill in the secrets it asks for:
+`DATABASE_URL` (6.1), `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Project Settings → API Keys → secret key, `sb_secret_…`), `PRIMEUI_LICENSE` (optional). Copy the generated `NATIONAL_ID_KEY` to the password manager.
+
+If Render gives a service another address than `sayyara-api.onrender.com` / `sayyara-web.onrender.com`, update `render.yaml` (CORS, CSP), `environment.production.ts` and the Supabase URLs to match.
+
+### 6.4 GitHub
+
+Repository → Settings → Secrets and variables → Actions → **New repository secret** `WORKER_DATABASE_URL` = the same `DATABASE_URL`. Run "Daily jobs (test deployment)" once by hand to check it.
+
+### 6.5 First use
+
+Open the web app, **Create an account**, confirm the email, sign in, create the showroom. Demo users are never loaded in the cloud (their password is public).

@@ -173,3 +173,14 @@ def test_rate_limits_and_security_headers() -> None:
         assert statuses[5] == 429
         big = guarded.post("/api/v1/imports", content=b"x", headers={"Content-Length": str(20 * 1024 * 1024)})
         assert big.status_code == 413
+
+
+def test_the_export_handles_every_column_type() -> None:
+    # The audit log keeps the visitor's IP (inet): the export once failed on it.
+    from ipaddress import IPv4Address
+    from uuid import UUID
+
+    from app.services.platform import _jsonable
+
+    assert _jsonable(IPv4Address("41.33.10.5")) == "41.33.10.5"
+    assert _jsonable(UUID("11111111-1111-1111-1111-111111111111")) == "11111111-1111-1111-1111-111111111111"

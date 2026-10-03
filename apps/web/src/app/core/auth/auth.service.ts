@@ -34,13 +34,22 @@ export class AuthService {
     this._session.set(data.session);
   }
 
-  /** Self-serve signup (SPEC §4.16): the account first, then the showroom. */
-  async signUp(email: string, password: string, fullName: string): Promise<void> {
-    const { data, error } = await this.supabase.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
+  /**
+   * Self-serve signup (SPEC §4.16): the account first, then the showroom.
+   * Returns false when the project asks to confirm the email first (hosted
+   * Supabase, D-118): the user follows the link, then signs in.
+   */
+  async signUp(email: string, password: string, fullName: string): Promise<boolean> {
+    const { data, error } = await this.supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName }, emailRedirectTo: `${window.location.origin}/login` },
+    });
     if (error) {
       throw error;
     }
     this._session.set(data.session);
+    return data.session !== null;
   }
 
   // --- Two-step sign-in (TOTP, D-119) ---------------------------------------------------

@@ -42,9 +42,12 @@ def run_once(db: Database, sms: MessageProvider) -> dict[str, dict[str, int] | N
                         ).scalar_one()
                         today = datetime.now(ZoneInfo(timezone)).date()
                         results[str(tenant_id)] = notifications.run_reminders(conn, today, sms)
-                    with db.transaction(user_id=None, tenant_id=tenant_id) as conn:
-                        settings = get_settings()
-                        platform.nightly_export(conn, tenant_id, today, settings.export_dir, settings.export_keep_days)
+                    settings = get_settings()
+                    if settings.nightly_export_enabled:
+                        with db.transaction(user_id=None, tenant_id=tenant_id) as conn:
+                            platform.nightly_export(
+                                conn, tenant_id, today, settings.export_dir, settings.export_keep_days
+                            )
                 except Exception:
                     # One tenant's failure must not stop the others.
                     logger.exception("reminders failed", extra={"tenant_id": str(tenant_id)})
