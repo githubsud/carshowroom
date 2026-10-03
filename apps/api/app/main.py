@@ -10,6 +10,7 @@ from app.api.routers import (
     distribution,
     finance,
     health,
+    imports,
     installments,
     partners,
     reports,
@@ -104,4 +105,5 @@ def create_app(
     app.include_router(crm.router, prefix=API_PREFIX)
     app.include_router(distribution.router, prefix=API_PREFIX)
     app.include_router(reports.router, prefix=API_PREFIX)
+    app.include_router(imports.router, prefix=API_PREFIX)
     return app

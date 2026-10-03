@@ -287,6 +287,8 @@ A consigned car's sale goes through `/sales` (rule 16, D-94); `SaleOut` carries 
 
 ### 3.11 Imports
 
+**As built (Phase 8):** `GET /imports/template?lang=` (xlsx); `GET /imports`; `POST /imports` `{go_live_date, file_name?, content_base64?, sheets?: [{name, kind, headers, rows}]}` → job with each sheet's detected kind, header row, sample rows and suggested `column_map`; `PUT /imports/{id}/mapping` `{sheets: [{index, kind?, column_map, skip, remember}]}`; `POST /imports/{id}/validate` → per sheet `ok_rows` and `error_rows: [{row_no, errors: [{field, code}]}]` plus `opening_total`; `GET /imports/{id}/errors?lang=` (xlsx); `POST 💰 /imports/{id}/commit` (Idempotency-Key; `IMPORT_HAS_ERRORS`, `IMPORT_NOT_VALIDATED`, `IMPORT_COMMITTED`). `GET /opening-equity` and `POST 💰 /opening-equity/clear` `{clearing_date, lines: [{partner_id, account: CAPITAL|CURRENT, amount}]}` (`partner.equity.change`, P-08). All import endpoints need `import.run`.
+
 | Method | Path | Perm | Request → Response |
 |---|---|---|---|
 | GET | `/imports/templates/{kind}` | `import.run` | xlsx template |

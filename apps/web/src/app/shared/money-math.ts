@@ -27,3 +27,27 @@ export function moneyMinus(total: string | null | undefined, ...parts: (string |
 export function moneySum(...parts: (string | null | undefined)[]): string {
   return fromCents(parts.reduce((sum, part) => sum + toCents(part), 0n));
 }
+
+/**
+ * Split an amount by percentage weights ("60.0000"), in cents, adding up exactly:
+ * the leftover cents go to the largest remainders (a suggestion the user can edit).
+ */
+export function splitByWeights(total: string, weights: readonly string[]): string[] {
+  const cents = toCents(total);
+  const scaled = weights.map((w) => BigInt(Math.round(Number(w) * 10_000)));
+  const sum = scaled.reduce((a, b) => a + b, 0n);
+  if (sum === 0n) {
+    return weights.map(() => '0.00');
+  }
+  const shares = scaled.map((w) => (cents * w) / sum);
+  const remainders = scaled.map((w, i) => ({ i, r: cents * w - shares[i] * sum }));
+  let left = cents - shares.reduce((a, b) => a + b, 0n);
+  for (const { i } of remainders.sort((a, b) => (b.r > a.r ? 1 : b.r < a.r ? -1 : a.i - b.i))) {
+    if (left <= 0n) {
+      break;
+    }
+    shares[i] += 1n;
+    left -= 1n;
+  }
+  return shares.map(fromCents);
+}

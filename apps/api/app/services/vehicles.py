@@ -856,7 +856,7 @@ def purchase_summary(conn: Connection, vehicle_id: UUID) -> PurchaseSummary | No
                               where a.system_key = 'SELLER_PAYABLE' and l.vehicle_id = p.vehicle_id
                                 and l.customer_id = p.seller_customer_id), 0) as outstanding
               from public.vehicle_purchases p
-              join public.customers c on c.id = p.seller_customer_id
+              left join public.customers c on c.id = p.seller_customer_id
               join public.journal_entries je on je.id = p.journal_entry_id
              where p.vehicle_id = :id and p.status = 'POSTED'
             """
@@ -1038,6 +1038,8 @@ def _plan_seller_payment(
             status_code=422,
             details={"outstanding": f"{purchase.outstanding:.2f}"},
         )
+    if purchase.seller_customer_id is None:
+        raise AppError("NOTHING_OWED", "Nothing is owed to a seller for this car", status_code=409)
     cash = finance.active_cash_account(conn, payload.cash_account_id)
     draft = rules.seller_payment(
         entry_date=payload.payment_date,

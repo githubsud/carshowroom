@@ -98,6 +98,14 @@
 | BR-D4 | The full scenario of SPEC §7 matches the hand-calculated values exactly | the posting rules | `test_full_scenario_matches_the_hand_calculation` ✅ |
 | BR-D5 | Reports and alerts follow permissions: sales staff never receive profit, cost, cash or partner data | `REPORT_PERMISSIONS`; `attention.alerts(can)`; `dashboard.build(can)` | `test_reports.py` ✅ |
 
+## Import and opening balances (Phase 8)
+
+| ID | Rule | Enforced in | Proven by |
+|---|---|---|---|
+| BR-O1 | Nothing is saved while any row has an error; an import commits all or nothing, once | `imports.commit`; trigger on `import_jobs` | `test_a_messy_sheet_*`, `test_a_clean_sheet_*`; pgTAP 12 ✅ |
+| BR-O2 | Opening balances are one entry at go-live, balanced by 3900 | `rules.opening_balances` | unit `test_rule_25_*`; `test_a_clean_sheet_*` ✅ |
+| BR-O3 | Opening equity is cleared only by agreement and never beyond its balance (P-08) | `imports.clear_opening_equity` | `test_a_clean_sheet_*` ✅ |
+
 ## Access (Phases 1–4)
 
 | ID | Rule | Enforced in | Proven by |

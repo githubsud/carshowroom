@@ -41,6 +41,8 @@ export const MENU: readonly MenuItem[] = [
   { key: 'periods', icon: 'pi pi-calendar-times', path: 'finance/periods', anyOf: ['period.lock', 'journal.view'] },
   { key: 'distribution', icon: 'pi pi-percentage', path: 'distribution', anyOf: ['profit.distribute'] },
   { key: 'reports', icon: 'pi pi-chart-bar', path: 'reports', anyOf: ['report.financial', 'journal.view'] },
+  { key: 'import', icon: 'pi pi-upload', path: 'import', anyOf: ['import.run'] },
+  { key: 'onboarding', icon: 'pi pi-flag', path: 'onboarding', anyOf: ['import.run'] },
   { key: 'users', icon: 'pi pi-user-plus', path: 'settings/users', anyOf: ['users.manage'] },
   { key: 'settings', icon: 'pi pi-cog', path: 'settings/finance', anyOf: ['tenant.settings.manage'] },
   { key: 'policies', icon: 'pi pi-sliders-h', path: 'settings/policies', anyOf: ['tenant.settings.manage'] },

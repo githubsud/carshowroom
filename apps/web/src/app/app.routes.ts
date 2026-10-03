@@ -161,6 +161,16 @@ export const routes: Routes = [
         loadComponent: () => import('./features/settings/policies.page').then((m) => m.PoliciesPage),
       },
       {
+        path: 'import',
+        canActivate: [permissionGuard('import.run')],
+        loadComponent: () => import('./features/imports/import.page').then((m) => m.ImportPage),
+      },
+      {
+        path: 'onboarding',
+        canActivate: [permissionGuard('import.run')],
+        loadComponent: () => import('./features/imports/onboarding.page').then((m) => m.OnboardingPage),
+      },
+      {
         path: 'notifications',
         loadComponent: () => import('./features/misc/notifications.page').then((m) => m.NotificationsPage),
       },

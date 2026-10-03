@@ -87,9 +87,11 @@ def mark_read(conn: Connection, user_id: UUID, notification_id: UUID | None) -> 
 
 _DUE = text(
     """
-    select s.id, s.plan_id, s.seq, s.due_date, s.remaining, sa.sale_no, c.name as customer_name, c.phone_primary
+    select s.id, s.plan_id, s.seq, s.due_date, s.remaining, coalesce(sa.sale_no, p.opening_reference) as sale_no,
+           c.name as customer_name, c.phone_primary
       from public.installment_status s
-      join public.sales sa on sa.id = s.sale_id
+      join public.installment_plans p on p.id = s.plan_id
+      left join public.sales sa on sa.id = s.sale_id
       join public.customers c on c.id = s.customer_id
      where s.plan_status = 'ACTIVE' and s.remaining > 0 and s.due_date <= :until
      order by s.due_date

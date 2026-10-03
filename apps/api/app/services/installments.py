@@ -103,14 +103,16 @@ def create_plan(
 # --- Reading installments ------------------------------------------------------------------------
 
 _INSTALLMENTS = """
-    select s.id, s.plan_id, s.sale_id, sa.sale_no, s.customer_id, c.name as customer_name,
-           c.phone_primary as customer_phone, v.stock_no, concat_ws(' ', v.make, v.model, v.year) as vehicle_label,
+    select s.id, s.plan_id, s.sale_id, coalesce(sa.sale_no, p.opening_reference) as sale_no, s.customer_id,
+           c.name as customer_name, c.phone_primary as customer_phone, coalesce(v.stock_no, '') as stock_no,
+           coalesce(concat_ws(' ', v.make, v.model, v.year), p.opening_vehicle, '') as vehicle_label,
            s.seq, s.due_date, s.amount_due, s.paid, s.remaining, s.plan_status,
            exists (select 1 from public.deferred_papers d
                     where d.customer_id = s.customer_id and d.status = 'BOUNCED') as customer_bounced
       from public.installment_status s
-      join public.sales sa on sa.id = s.sale_id
-      join public.vehicles v on v.id = sa.vehicle_id
+      join public.installment_plans p on p.id = s.plan_id
+      left join public.sales sa on sa.id = s.sale_id
+      left join public.vehicles v on v.id = sa.vehicle_id
       join public.customers c on c.id = s.customer_id
 """
 
@@ -238,12 +240,13 @@ def kpis(conn: Connection) -> InstallmentKpis:
 # --- Plans ---------------------------------------------------------------------------------------------
 
 _PLANS = """
-    select p.id, p.sale_id, sa.sale_no, p.customer_id, c.name as customer_name, v.stock_no,
-           concat_ws(' ', v.make, v.model, v.year) as vehicle_label, p.financed_amount, p.frequency,
-           p.installment_count, p.first_due_date, p.status
+    select p.id, p.sale_id, coalesce(sa.sale_no, p.opening_reference) as sale_no, p.customer_id,
+           c.name as customer_name, coalesce(v.stock_no, '') as stock_no,
+           coalesce(concat_ws(' ', v.make, v.model, v.year), p.opening_vehicle, '') as vehicle_label,
+           p.financed_amount, p.frequency, p.installment_count, p.first_due_date, p.status
       from public.installment_plans p
-      join public.sales sa on sa.id = p.sale_id
-      join public.vehicles v on v.id = sa.vehicle_id
+      left join public.sales sa on sa.id = p.sale_id
+      left join public.vehicles v on v.id = sa.vehicle_id
       join public.customers c on c.id = p.customer_id
 """
 
@@ -548,8 +551,8 @@ def customer_statement(conn: Connection, customer_id: UUID) -> CustomerInstallme
     info = finance.tenant_info(conn)
     plan_ids = conn.execute(
         text(
-            "select p.id from public.installment_plans p join public.sales s on s.id = p.sale_id "
-            "where p.customer_id = :id order by s.sale_date, s.sale_no"
+            "select p.id from public.installment_plans p left join public.sales s on s.id = p.sale_id "
+            "where p.customer_id = :id order by coalesce(s.sale_date, p.first_due_date), s.sale_no"
         ),
         {"id": customer_id},
     ).scalars()

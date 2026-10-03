@@ -262,6 +262,18 @@
 | 8.4 | Commit and opening entry | Vehicles (with cost breakdown memo), customers, partners with opening balances, open installments; a single labelled opening entry (rule 25) at the go-live date; all or nothing; 🔒 OBE clearing (Q-16) |
 | 8.5 | Onboarding wizard | Profile → partners/capital → cash/bank openings → import → done |
 
+### Phase 8 status: delivered (2026-10-03); continuing per the standing instruction
+
+| ID | Status | Notes |
+|---|---|---|
+| 8.1 | ✅ | Template workbook (a sheet per kind, Arabic or English headers); upload of their own .xlsx/.csv; header row found below titles; kind detected from headers and sheet name (D-109) |
+| 8.2 | ✅ | Suggested mapping from Arabic/English synonyms, editable per column, remembered per tenant and header layout |
+| 8.3 | ✅ | Row-by-row errors (missing fields, bad numbers incl. Arabic-Indic digits and currency, bad dates, duplicate VINs/phones in the file or in stock, shares ≠ 100%); downloadable error sheet; nothing saved (D-111) |
+| 8.4 | ✅ | Vehicles with cost breakdown, customers, partners with capital/current/loans and shares, open installments (D-107), cash/bank; one opening entry at go-live, all or nothing (D-110); 🔓 P-08 opening-equity clearing by agreement (D-112) |
+| 8.5 | ✅ | Onboarding wizard: profile → partners & capital → cash & banks → stock file → review → one opening entry → opening equity to partners |
+| Fixture | ⚠️ | Synthetic messy workbook (`test_imports.py`); a real anonymised sheet is still wanted (Q-35) |
+| Tests | ✅ | pgTAP 169 · API 313 (+1 PDF test in Docker/CI) · web unit 47 · E2E 44 |
+
 **Phase 8 accepted when (FACT):** a realistic messy Excel sheet imports with clear error reporting and correct opening balances. **DECISION:** we need a real anonymised sheet from the pilot showroom as a fixture (Q-35).
 
 ---

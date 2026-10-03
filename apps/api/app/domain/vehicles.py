@@ -409,9 +409,10 @@ class CostLine(BaseModel):
 
 class PurchaseSummary(BaseModel):
     id: UUID
-    source: Literal["PURCHASE", "TRADE_IN"]
-    seller_customer_id: UUID
-    seller_name: str
+    # OPENING: brought in by the Excel import at go-live (D-108).
+    source: Literal["PURCHASE", "TRADE_IN", "OPENING"]
+    seller_customer_id: UUID | None
+    seller_name: str | None
     purchase_date: date
     price: Money
     deferred_amount: Money

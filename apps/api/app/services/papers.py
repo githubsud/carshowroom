@@ -33,7 +33,8 @@ _NEXT = {
 
 _PAPERS = """
     select d.id, d.paper_type, d.number, d.customer_id, c.name as customer_name, d.installment_id,
-           i.seq as installment_seq, s.sale_no, d.amount, d.issue_date, d.due_date, d.status, d.storage_location,
+           i.seq as installment_seq, coalesce(s.sale_no, p.opening_reference) as sale_no,
+           d.amount, d.issue_date, d.due_date, d.status, d.storage_location,
            d.drawer_bank, d.drawer_branch, d.account_holder, d.notes, d.receipt_id, i.plan_id
       from public.deferred_papers d
       join public.customers c on c.id = d.customer_id

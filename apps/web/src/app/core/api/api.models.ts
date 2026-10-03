@@ -186,3 +186,16 @@ export type ReportRow = Schemas['ReportRow'];
 export type Dashboard = Schemas['DashboardOut'];
 export type AttentionItem = Schemas['AttentionItem'];
 export type EquityRow = Schemas['EquityRow'];
+
+// --- Excel import and onboarding (Phase 8) ----------------------------------------------
+
+export type ImportJob = Schemas['ImportJobOut'];
+export type ImportSheet = Schemas['SheetOut'];
+export type ImportKind = ImportSheet['kind'];
+export type ImportField = Schemas['FieldSpec'];
+export type ImportCreateInput = Schemas['ImportCreateIn'];
+export type ImportMappingInput = Schemas['ImportMappingIn'];
+export type ImportPosting = Schemas['PostingResult_ImportJobOut_'];
+export type OpeningEquity = Schemas['OpeningEquityOut'];
+export type EquityClearingInput = Schemas['EquityClearingIn'];
+export type TenantProfileUpdate = Schemas['TenantProfileUpdate'];

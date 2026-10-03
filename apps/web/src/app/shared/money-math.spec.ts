@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { fromCents, moneyMinus, moneySum, toCents } from './money-math';
+import { fromCents, moneyMinus, moneySum, splitByWeights, toCents } from './money-math';
 
 describe('money maths on cents', () => {
   it('parses and prints exactly', () => {
@@ -22,5 +22,14 @@ describe('money maths on cents', () => {
 
   it('can go negative when more is paid than owed', () => {
     expect(moneyMinus('100', '150')).toBe('-50.00');
+  });
+});
+
+describe('splitByWeights', () => {
+  it('splits by percentages and adds up exactly', () => {
+    expect(splitByWeights('787500.00', ['60.0000', '40.0000'])).toEqual(['472500.00', '315000.00']);
+    const thirds = splitByWeights('100.00', ['33.3334', '33.3333', '33.3333']);
+    expect(thirds).toEqual(['33.34', '33.33', '33.33']);
+    expect(splitByWeights('0.00', ['50', '50'])).toEqual(['0.00', '0.00']);
   });
 });

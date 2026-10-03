@@ -167,6 +167,7 @@ _DOCUMENT_ACTIONS = {
     "PROFIT_NETTING": "reverse the profit distribution",
     "PROFIT_DISTRIBUTION": "reverse the profit distribution",
     "PROFIT_ALLOCATION": "cancel the sale",
+    "OPENING_BALANCE": "correct opening balances with a new entry",
     "SALE_CANCELLATION": "the cancellation is final",
     "DEPOSIT": "refund or forfeit the deposit",
     "DEPOSIT_REFUND": "the deposit is settled",

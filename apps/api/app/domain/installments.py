@@ -63,7 +63,8 @@ class SchedulePreviewIn(StrictModel):
 class InstallmentOut(BaseModel):
     id: UUID
     plan_id: UUID
-    sale_id: UUID
+    # None for a plan imported as an opening balance (D-107).
+    sale_id: UUID | None
     sale_no: str
     customer_id: UUID
     customer_name: str
@@ -130,7 +131,7 @@ class PaperOut(BaseModel):
 
 class InstallmentPlanOut(BaseModel):
     id: UUID
-    sale_id: UUID
+    sale_id: UUID | None
     sale_no: str
     customer_id: UUID
     customer_name: str

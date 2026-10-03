@@ -817,6 +817,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Imports */
+        get: operations["list_imports_api_v1_imports_get"];
+        put?: never;
+        /** Create Import */
+        post: operations["create_import_api_v1_imports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Template */
+        get: operations["template_api_v1_imports_template_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Import */
+        get: operations["get_import_api_v1_imports__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports/{job_id}/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Commit Import */
+        post: operations["commit_import_api_v1_imports__job_id__commit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports/{job_id}/errors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Error File */
+        get: operations["error_file_api_v1_imports__job_id__errors_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports/{job_id}/mapping": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Mapping */
+        put: operations["set_mapping_api_v1_imports__job_id__mapping_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports/{job_id}/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate Import */
+        post: operations["validate_import_api_v1_imports__job_id__validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/installment-plans/schedule-preview": {
         parameters: {
             query?: never;
@@ -1121,6 +1241,40 @@ export interface paths {
         put?: never;
         /** Read Notification */
         post: operations["read_notification_api_v1_notifications__notification_id__read_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/opening-equity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Opening Equity */
+        get: operations["opening_equity_api_v1_opening_equity_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/opening-equity/clear": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clear Opening Equity */
+        post: operations["clear_opening_equity_api_v1_opening_equity_clear_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3484,6 +3638,34 @@ export interface components {
              */
             id: string;
         };
+        /** EquityClearingIn */
+        EquityClearingIn: {
+            /**
+             * Clearing Date
+             * Format: date
+             */
+            clearing_date: string;
+            /** Lines */
+            lines: components["schemas"]["EquityClearingLine"][];
+        };
+        /** EquityClearingLine */
+        EquityClearingLine: {
+            /**
+             * Account
+             * @enum {string}
+             */
+            account: "CAPITAL" | "CURRENT";
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Partner Id
+             * Format: uuid
+             */
+            partner_id: string;
+        };
         /** EquityRow */
         EquityRow: {
             /**
@@ -3712,6 +3894,32 @@ export interface components {
             /** Phone */
             phone?: string | null;
         };
+        /** FieldSpec */
+        FieldSpec: {
+            /** Key */
+            key: string;
+            /** Label Ar */
+            label_ar: string;
+            /** Label En */
+            label_en: string;
+            /**
+             * Multiple
+             * @default false
+             */
+            multiple: boolean;
+            /**
+             * Required
+             * @default false
+             */
+            required: boolean;
+            /** Synonyms */
+            synonyms: string[];
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "text" | "money" | "date" | "year" | "int" | "percent" | "phone";
+        };
         /**
          * FollowUpDue
          * @description A customer whose latest follow-up asks to be called back by today.
@@ -3897,6 +4105,64 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** ImportCreateIn */
+        ImportCreateIn: {
+            /** Content Base64 */
+            content_base64?: string | null;
+            /** File Name */
+            file_name?: string | null;
+            /**
+             * Go Live Date
+             * Format: date
+             */
+            go_live_date: string;
+            /** Sheets */
+            sheets?: components["schemas"]["SheetIn"][];
+        };
+        /** ImportJobOut */
+        ImportJobOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Entry No */
+            entry_no?: number | null;
+            /** Fields */
+            fields: {
+                [key: string]: components["schemas"]["FieldSpec"][];
+            };
+            /** File Name */
+            file_name: string | null;
+            /**
+             * Go Live Date
+             * Format: date
+             */
+            go_live_date: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Opening Total */
+            opening_total?: string | null;
+            /** Result */
+            result?: {
+                [key: string]: unknown;
+            } | null;
+            /** Sheets */
+            sheets: components["schemas"]["SheetOut"][];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "UPLOADED" | "VALIDATED" | "COMMITTED";
+        };
+        /** ImportMappingIn */
+        ImportMappingIn: {
+            /** Sheets */
+            sheets: components["schemas"]["SheetMappingIn"][];
+        };
         /** InstallmentBoard */
         InstallmentBoard: {
             /**
@@ -3998,11 +4264,8 @@ export interface components {
              * @example 25000.00
              */
             remaining: string;
-            /**
-             * Sale Id
-             * Format: uuid
-             */
-            sale_id: string;
+            /** Sale Id */
+            sale_id: string | null;
             /** Sale No */
             sale_no: string;
             /** Seq */
@@ -4088,11 +4351,8 @@ export interface components {
              * @example 25000.00
              */
             remaining_total: string;
-            /**
-             * Sale Id
-             * Format: uuid
-             */
-            sale_id: string;
+            /** Sale Id */
+            sale_id: string | null;
             /** Sale No */
             sale_no: string;
             /**
@@ -4455,6 +4715,21 @@ export interface components {
             items: components["schemas"]["NotificationOut"][];
             /** Unread */
             unread: number;
+        };
+        /**
+         * OpeningEquityOut
+         * @description What is left on 3900 Opening balance equity (Q-16) and who can take it.
+         */
+        OpeningEquityOut: {
+            /**
+             * Balance
+             * @example 25000.00
+             */
+            balance: string;
+            /** Partners */
+            partners: {
+                [key: string]: unknown;
+            }[];
         };
         /** OtherIncomeIn */
         OtherIncomeIn: {
@@ -5016,9 +5291,25 @@ export interface components {
             /** Warnings */
             warnings?: components["schemas"]["PostingWarning"][];
         };
+        /** PostingResult[ImportJobOut] */
+        PostingResult_ImportJobOut_: {
+            document: components["schemas"]["ImportJobOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
         /** PostingResult[InstallmentPlanOut] */
         PostingResult_InstallmentPlanOut_: {
             document: components["schemas"]["InstallmentPlanOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[OpeningEquityOut] */
+        PostingResult_OpeningEquityOut_: {
+            document: components["schemas"]["OpeningEquityOut"];
             /** Journal Entries */
             journal_entries: components["schemas"]["EntryRef"][];
             /** Warnings */
@@ -5272,18 +5563,15 @@ export interface components {
              * Format: date
              */
             purchase_date: string;
-            /**
-             * Seller Customer Id
-             * Format: uuid
-             */
-            seller_customer_id: string;
+            /** Seller Customer Id */
+            seller_customer_id: string | null;
             /** Seller Name */
-            seller_name: string;
+            seller_name: string | null;
             /**
              * Source
              * @enum {string}
              */
-            source: "PURCHASE" | "TRADE_IN";
+            source: "PURCHASE" | "TRADE_IN" | "OPENING";
         };
         /** ReceiptIn */
         ReceiptIn: {
@@ -5577,6 +5865,20 @@ export interface components {
             name_ar: string;
             /** Name En */
             name_en: string;
+        };
+        /** RowError */
+        RowError: {
+            /** Code */
+            code: string;
+            /** Field */
+            field: string | null;
+        };
+        /** RowResult */
+        RowResult: {
+            /** Errors */
+            errors: components["schemas"]["RowError"][];
+            /** Row No */
+            row_no: number;
         };
         /** SaleCancelIn */
         SaleCancelIn: {
@@ -6028,6 +6330,72 @@ export interface components {
             partner_name_en: string | null;
             /** Percentage */
             percentage: string;
+        };
+        /**
+         * SheetIn
+         * @description A sheet given as data (the onboarding wizard), headers = field keys.
+         */
+        SheetIn: {
+            /** Headers */
+            headers: string[];
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "VEHICLES" | "CUSTOMERS" | "PARTNERS" | "INSTALLMENTS" | "CASH";
+            /** Name */
+            name: string;
+            /** Rows */
+            rows: (string | null)[][];
+        };
+        /** SheetMappingIn */
+        SheetMappingIn: {
+            /** Column Map */
+            column_map: (string | null)[];
+            /** Index */
+            index: number;
+            /** Kind */
+            kind?: ("VEHICLES" | "CUSTOMERS" | "PARTNERS" | "INSTALLMENTS" | "CASH") | null;
+            /**
+             * Remember
+             * @default true
+             */
+            remember: boolean;
+            /**
+             * Skip
+             * @default false
+             */
+            skip: boolean;
+        };
+        /** SheetOut */
+        SheetOut: {
+            /** Column Map */
+            column_map: (string | null)[];
+            /** Error Rows */
+            error_rows?: components["schemas"]["RowResult"][] | null;
+            /** Header Row */
+            header_row: number;
+            /** Headers */
+            headers: string[];
+            /** Index */
+            index: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "VEHICLES" | "CUSTOMERS" | "PARTNERS" | "INSTALLMENTS" | "CASH";
+            /** Mapping Remembered */
+            mapping_remembered: boolean;
+            /** Name */
+            name: string;
+            /** Ok Rows */
+            ok_rows?: number | null;
+            /** Row Count */
+            row_count: number;
+            /** Sample Rows */
+            sample_rows: (string | null)[][];
+            /** Skip */
+            skip: boolean;
         };
         /** SignedUrlOut */
         SignedUrlOut: {
@@ -9263,6 +9631,277 @@ export interface operations {
             };
         };
     };
+    list_imports_api_v1_imports_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_import_api_v1_imports_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportCreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    template_api_v1_imports_template_get: {
+        parameters: {
+            query?: {
+                lang?: "ar" | "en";
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_import_api_v1_imports__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    commit_import_api_v1_imports__job_id__commit_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_ImportJobOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    error_file_api_v1_imports__job_id__errors_get: {
+        parameters: {
+            query?: {
+                lang?: "ar" | "en";
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_mapping_api_v1_imports__job_id__mapping_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportMappingIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_import_api_v1_imports__job_id__validate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     schedule_preview_api_v1_installment_plans_schedule_preview_post: {
         parameters: {
             query?: never;
@@ -9895,6 +10534,73 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    opening_equity_api_v1_opening_equity_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningEquityOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clear_opening_equity_api_v1_opening_equity_clear_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EquityClearingIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_OpeningEquityOut_"];
+                };
             };
             /** @description Validation Error */
             422: {

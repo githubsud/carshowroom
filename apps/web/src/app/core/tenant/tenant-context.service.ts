@@ -3,7 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { Me, Membership, Tenant, TenantSettingsUpdate } from '../api/api.models';
+import { Me, Membership, Tenant, TenantProfileUpdate, TenantSettingsUpdate } from '../api/api.models';
 import { ActiveTenantStore } from './active-tenant.store';
 
 /**
@@ -67,6 +67,13 @@ export class TenantContextService {
       this._tenant.set(await firstValueFrom(this.http.get<Tenant>(`${environment.apiBaseUrl}/tenant`)));
     }
     return true;
+  }
+
+  /** Change the showroom profile (onboarding, Settings); the API checks tenant.settings.manage. */
+  async updateProfile(changes: TenantProfileUpdate): Promise<Tenant> {
+    const tenant = await firstValueFrom(this.http.patch<Tenant>(`${environment.apiBaseUrl}/tenant/profile`, changes));
+    this._tenant.set(tenant);
+    return tenant;
   }
 
   /** Change behavioural settings (Settings pages); the API checks tenant.settings.manage. */

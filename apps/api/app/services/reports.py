@@ -623,12 +623,13 @@ def installment_collections_table(conn: Connection, f: ReportFilters) -> ReportT
     rows_db = conn.execute(
         text(
             """
-            select r.receipt_date, c.name as customer, s.sale_no, r.amount, r.status,
+            select r.receipt_date, c.name as customer, coalesce(s.sale_no, p.opening_reference) as sale_no,
+                   r.amount, r.status,
                    coalesce(ca.name_ar, 'رصيد العميل') as account, je.entry_no, p.id as plan_id
               from public.customer_receipts r
               join public.customers c on c.id = r.customer_id
               join public.installment_plans p on p.id = r.plan_id
-              join public.sales s on s.id = p.sale_id
+              left join public.sales s on s.id = p.sale_id
               left join public.cash_accounts ca on ca.id = r.cash_account_id
               join public.journal_entries je on je.id = r.journal_entry_id
              where r.receipt_date between :f and :t

@@ -1123,3 +1123,58 @@ def advance_netting(*, entry_date: date, amount: Decimal, description: str, sour
     )
     draft.validate()
     return draft
+
+
+# --- Opening balances (rule 25; P-08) ---------------------------------------------------------------
+
+
+def opening_balances(
+    *, entry_date: date, lines: Sequence[Line], description: str, source_id: UUID | None
+) -> EntryDraft:
+    """Rule 25 — the single opening entry at go-live: every imported balance, and
+    opening balance equity (3900) for the difference (Q-16 decides where it goes)."""
+    balances = [line for line in lines if line.debit != line.credit]
+    if not balances:
+        raise LedgerRuleError("no opening balances")
+    net = sum((line.debit - line.credit for line in balances), ZERO)
+    if net != 0:
+        balances.append(_signed(Account.system("OPENING_BALANCE_EQUITY"), net))
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="OPENING_BALANCE",
+        source_id=source_id,
+        lines=tuple(balances),
+        is_opening=True,
+    )
+    draft.validate()
+    return draft
+
+
+def opening_equity_clearing(
+    *,
+    entry_date: date,
+    allocations: Sequence[tuple[UUID, Literal["CAPITAL", "CURRENT"], Decimal]],
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """P-08 (approved 2026-10-02: by agreement) — clear opening balance equity into
+    partner capital or current accounts: Dr 3900 / Cr 3100 or 3200 per partner."""
+    partner_lines = [
+        Line(
+            account=Account.system("PARTNER_CAPITAL" if account == "CAPITAL" else "PARTNER_CURRENT"),
+            credit=_positive_amount(amount),
+            partner_id=partner_id,
+        )
+        for partner_id, account, amount in allocations
+    ]
+    total = sum((line.credit for line in partner_lines), ZERO)
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="OPENING_EQUITY_CLEARING",
+        source_id=source_id,
+        lines=(Line(account=Account.system("OPENING_BALANCE_EQUITY"), debit=total), *partner_lines),
+    )
+    draft.validate()
+    return draft
