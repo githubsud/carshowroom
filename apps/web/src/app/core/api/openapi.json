@@ -4156,6 +4156,30 @@
         "title": "ExpenseCategoryUpdate",
         "type": "object"
       },
+      "ExpenseShare": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "vehicle_id": {
+            "format": "uuid",
+            "title": "Vehicle Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "vehicle_id",
+          "amount"
+        ],
+        "title": "ExpenseShare",
+        "type": "object"
+      },
       "ExternalCollectionIn": {
         "additionalProperties": false,
         "properties": {
@@ -9142,6 +9166,33 @@
         "title": "PostingResult[SellerPaymentOut]",
         "type": "object"
       },
+      "PostingResult_SplitVehicleExpenseOut_": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/SplitVehicleExpenseOut"
+          },
+          "journal_entries": {
+            "items": {
+              "$ref": "#/components/schemas/EntryRef"
+            },
+            "title": "Journal Entries",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "journal_entries"
+        ],
+        "title": "PostingResult[SplitVehicleExpenseOut]",
+        "type": "object"
+      },
       "PostingResult_SupplierPaymentOut_": {
         "properties": {
           "document": {
@@ -11907,6 +11958,142 @@
         "title": "SignupOut",
         "type": "object"
       },
+      "SplitVehicleExpenseIn": {
+        "additionalProperties": false,
+        "description": "One direct expense shared by several cars (pilot review, D-71): each car gets\nits part as an ordinary vehicle expense, treated by that car's own rules.",
+        "properties": {
+          "cash_account_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Account Id"
+          },
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "expense_date": {
+            "format": "date",
+            "title": "Expense Date",
+            "type": "string"
+          },
+          "funding": {
+            "default": "CASH_ACCOUNT",
+            "enum": [
+              "CASH_ACCOUNT",
+              "SUPPLIER_CREDIT",
+              "PARTNER"
+            ],
+            "title": "Funding",
+            "type": "string"
+          },
+          "paid_by_partner_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid By Partner Id"
+          },
+          "partner_funding_mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "CURRENT_ACCOUNT",
+                  "LOAN"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partner Funding Mode"
+          },
+          "shares": {
+            "items": {
+              "$ref": "#/components/schemas/ExpenseShare"
+            },
+            "maxItems": 50,
+            "minItems": 2,
+            "title": "Shares",
+            "type": "array"
+          },
+          "supplier_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplier Id"
+          }
+        },
+        "required": [
+          "expense_date",
+          "category_id",
+          "shares"
+        ],
+        "title": "SplitVehicleExpenseIn",
+        "type": "object"
+      },
+      "SplitVehicleExpenseOut": {
+        "properties": {
+          "expenses": {
+            "items": {
+              "$ref": "#/components/schemas/VehicleExpenseOut"
+            },
+            "title": "Expenses",
+            "type": "array"
+          },
+          "split_group_id": {
+            "format": "uuid",
+            "title": "Split Group Id",
+            "type": "string"
+          },
+          "total": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Total",
+            "type": "string"
+          }
+        },
+        "required": [
+          "split_group_id",
+          "total",
+          "expenses"
+        ],
+        "title": "SplitVehicleExpenseOut",
+        "type": "object"
+      },
       "StatementRow": {
         "properties": {
           "amount_owed": {
@@ -14393,6 +14580,18 @@
               }
             ],
             "title": "Paid By Partner Name Ar"
+          },
+          "split_group_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Split Group Id"
           },
           "status": {
             "enum": [
@@ -27669,6 +27868,151 @@
         "summary": "Update User",
         "tags": [
           "users"
+        ]
+      }
+    },
+    "/api/v1/vehicle-expenses/split": {
+      "post": {
+        "description": "One direct expense shared by several cars (pilot review, D-71).",
+        "operationId": "record_split_expense_api_v1_vehicle_expenses_split_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SplitVehicleExpenseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingResult_SplitVehicleExpenseOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Record Split Expense",
+        "tags": [
+          "vehicles"
+        ]
+      }
+    },
+    "/api/v1/vehicle-expenses/split/preview": {
+      "post": {
+        "operationId": "preview_split_expense_api_v1_vehicle_expenses_split_preview_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SplitVehicleExpenseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Split Expense",
+        "tags": [
+          "vehicles"
         ]
       }
     },

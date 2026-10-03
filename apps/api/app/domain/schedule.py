@@ -29,10 +29,14 @@ class ScheduleRow:
 
 
 def _add_months(start: date, months: int) -> date:
-    """Same day of the month, clamped to the month's last day (31 Jan -> 28 Feb)."""
+    """Same day of the month on a 30-day month, as for payroll (pilot review,
+    D-90): a schedule starting on the 31st falls on the 30th after, and on
+    February's last day (31 Jan -> 28 Feb -> 30 Mar -> 30 Apr)."""
+    if months == 0:
+        return start
     month_index = start.month - 1 + months
     year, month = start.year + month_index // 12, month_index % 12 + 1
-    return date(year, month, min(start.day, calendar.monthrange(year, month)[1]))
+    return date(year, month, min(start.day, 30, calendar.monthrange(year, month)[1]))
 
 
 def due_dates(first: date, count: int, frequency: Frequency) -> list[date]:

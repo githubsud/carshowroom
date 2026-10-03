@@ -29,6 +29,7 @@ class Permission(StrEnum):
     SALE_DRAFT = "sale.draft"
     SALE_POST = "sale.post"
     SALE_CANCEL = "sale.cancel"
+    SALE_CANCEL_CONSIGNED = "sale.cancel_consigned"
     RESERVATION_MANAGE = "reservation.manage"
     INSTALLMENT_VIEW = "installment.view"
     INSTALLMENT_COLLECT = "installment.collect"

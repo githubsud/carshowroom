@@ -12,6 +12,7 @@ from sqlalchemy import Connection, text
 
 from app.api.deps import TenantContext, get_database, get_storage, require, require_any, require_writable
 from app.api.masking import masked
+from app.core.errors import permission_denied
 from app.db.session import Database
 from app.domain.finance import PostingResult, Preview
 from app.domain.permissions import Permission
@@ -243,14 +244,22 @@ def post_sale(
     )
 
 
+def _check_cancel_permission(conn: Connection, ctx: TenantContext, sale_id: UUID) -> None:
+    """A consigned car's sale is cancelled by the owner or a manager only (pilot review, Q-41)."""
+    needed = Permission.SALE_CANCEL_CONSIGNED if sales.is_consigned_sale(conn, sale_id) else Permission.SALE_CANCEL
+    if not ctx.can(needed):
+        raise permission_denied(str(needed))
+
+
 @router.post("/sales/{sale_id}/cancel/preview", response_model=Preview)
 def preview_cancel(
     sale_id: UUID,
     payload: SaleCancelIn,
-    ctx: TenantContext = Depends(require(Permission.SALE_CANCEL)),
+    ctx: TenantContext = Depends(require_any(Permission.SALE_CANCEL, Permission.SALE_CANCEL_CONSIGNED)),
     db: Database = Depends(get_database),
 ) -> Preview:
     with _tx(db, ctx) as conn:
+        _check_cancel_permission(conn, ctx, sale_id)
         return sales.preview_cancel(conn, sale_id, payload, with_lines=ctx.can(Permission.JOURNAL_VIEW))
 
 
@@ -259,10 +268,15 @@ def cancel_sale(
     sale_id: UUID,
     payload: SaleCancelIn,
     idempotency_key: IdempotencyKey = None,
-    ctx: TenantContext = Depends(require(Permission.SALE_CANCEL)),
+    ctx: TenantContext = Depends(require_any(Permission.SALE_CANCEL, Permission.SALE_CANCEL_CONSIGNED)),
     db: Database = Depends(get_database),
 ) -> JSONResponse:
     require_writable(ctx)
+
+    def operation(conn: Connection) -> PostingResult[SaleOut]:
+        _check_cancel_permission(conn, ctx, sale_id)
+        return sales.cancel_sale(conn, sale_id, payload, user_id=ctx.user.id, with_profit=_with_profit(ctx))
+
     return idempotency.run(
         db,
         user_id=ctx.user.id,
@@ -270,9 +284,7 @@ def cancel_sale(
         key=idempotency_key,
         endpoint=f"POST /sales/{sale_id}/cancel",
         payload=payload,
-        operation=lambda conn: sales.cancel_sale(
-            conn, sale_id, payload, user_id=ctx.user.id, with_profit=_with_profit(ctx)
-        ),
+        operation=operation,
     )
 
 

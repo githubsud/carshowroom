@@ -36,6 +36,8 @@ from app.domain.vehicles import (
     SellerPaymentIn,
     SellerPaymentOut,
     SignedUrlOut,
+    SplitVehicleExpenseIn,
+    SplitVehicleExpenseOut,
     UploadTicket,
     VehicleDetail,
     VehicleExpenseIn,
@@ -336,6 +338,36 @@ def record_expense(
         endpoint=f"POST /vehicles/{vehicle_id}/expenses",
         payload=payload,
         operation=lambda conn: vehicles.record_expense(conn, vehicle_id, payload),
+    )
+
+
+@router.post("/vehicle-expenses/split/preview", response_model=Preview)
+def preview_split_expense(
+    payload: SplitVehicleExpenseIn,
+    ctx: TenantContext = Depends(require(Permission.VEHICLE_EXPENSE_RECORD)),
+    db: Database = Depends(get_database),
+) -> Preview:
+    with _tx(db, ctx) as conn:
+        return vehicles.preview_split_expense(conn, payload, with_lines=ctx.can(Permission.JOURNAL_VIEW))
+
+
+@router.post("/vehicle-expenses/split", response_model=PostingResult[SplitVehicleExpenseOut], status_code=201)
+def record_split_expense(
+    payload: SplitVehicleExpenseIn,
+    idempotency_key: IdempotencyKey = None,
+    ctx: TenantContext = Depends(require(Permission.VEHICLE_EXPENSE_RECORD)),
+    db: Database = Depends(get_database),
+) -> JSONResponse:
+    """One direct expense shared by several cars (pilot review, D-71)."""
+    require_writable(ctx)
+    return idempotency.run(
+        db,
+        user_id=ctx.user.id,
+        tenant_id=ctx.tenant_id,
+        key=idempotency_key,
+        endpoint="POST /vehicle-expenses/split",
+        payload=payload,
+        operation=lambda conn: vehicles.record_split_expense(conn, payload),
     )
 
 

@@ -16,6 +16,8 @@ import {
   UploadTicket,
   Vehicle,
   VehicleDocument,
+  SplitVehicleExpenseInput,
+  SplitVehicleExpensePosting,
   VehicleExpenseInput,
   VehicleExpensePosting,
   VehicleInput,
@@ -116,6 +118,17 @@ export class VehiclesService {
   recordExpense(id: string, body: VehicleExpenseInput, key: string): Promise<VehicleExpensePosting> {
     return firstValueFrom(
       this.http.post<VehicleExpensePosting>(`${this.base}/vehicles/${id}/expenses`, body, idempotent(key)),
+    );
+  }
+
+  /** One direct expense shared by several cars (pilot review, D-71). */
+  previewSplitExpense(body: SplitVehicleExpenseInput): Promise<Preview> {
+    return firstValueFrom(this.http.post<Preview>(`${this.base}/vehicle-expenses/split/preview`, body));
+  }
+
+  recordSplitExpense(body: SplitVehicleExpenseInput, key: string): Promise<SplitVehicleExpensePosting> {
+    return firstValueFrom(
+      this.http.post<SplitVehicleExpensePosting>(`${this.base}/vehicle-expenses/split`, body, idempotent(key)),
     );
   }
 

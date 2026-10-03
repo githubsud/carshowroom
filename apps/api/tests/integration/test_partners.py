@@ -285,6 +285,18 @@ def test_repayment_cannot_exceed_what_is_owed(client: TestClient) -> None:
     assert response.json()["error"]["code"] == "REPAYMENT_EXCEEDS_LOAN"
 
 
+@pytest.mark.parametrize("kind", ["DRAWING", "CAPITAL_WITHDRAWAL"])
+def test_nobody_withdraws_more_than_their_net_balance(client: TestClient, kind: str) -> None:
+    # Pilot review (D-63): refused, not just flagged. منى holds 300,000 in the business.
+    body = {"type": kind, "txn_date": TODAY, "amount": "300000.01", "cash_account_id": NOUR_BANK}
+    for path in ("transactions/preview", "transactions"):
+        response = client.post(f"/api/v1/partners/{MONA}/{path}", headers=owner(), json=body)
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["code"] == "WITHDRAWAL_EXCEEDS_BALANCE"
+        assert Decimal(error["details"]["available"]) <= Decimal("300000.00")
+
+
 def test_expense_paid_personally_does_not_touch_cash(client: TestClient) -> None:
     accounts = client.get("/api/v1/cash-accounts", headers=auth("owner@nour.example", NOUR)).json()
     before = {a["id"]: a["balance"] for a in accounts}

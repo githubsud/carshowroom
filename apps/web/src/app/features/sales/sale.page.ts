@@ -139,6 +139,10 @@ export class SalePage implements OnInit {
     }
     return sale.status === 'DRAFT' && (sale.created_by_me || this.context.can('sale.post'));
   });
+  /** A consigned car's sale is cancelled by the owner or a manager only (pilot review, Q-41). */
+  protected readonly canCancel = computed(() =>
+    this.context.can(this.sale()?.ownership_type === 'CONSIGNED_IN' ? 'sale.cancel_consigned' : 'sale.cancel'),
+  );
   /** The deposit applies when the car is reserved for this buyer. */
   protected readonly reservation = computed(() => {
     const r = this.car()?.reservation;

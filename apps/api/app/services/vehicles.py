@@ -34,6 +34,7 @@ from app.domain.vehicles import (
     DocumentOut,
     DocumentRegisterIn,
     DocumentUploadIn,
+    ExpenseShare,
     LocationChange,
     LocationIn,
     LocationOut,
@@ -47,6 +48,8 @@ from app.domain.vehicles import (
     PurchaseSummary,
     SellerPaymentIn,
     SellerPaymentOut,
+    SplitVehicleExpenseIn,
+    SplitVehicleExpenseOut,
     StatusChange,
     UploadTicket,
     VehicleConsignedOut,
@@ -370,7 +373,8 @@ _COST_TOTALS = text(
     select l.vehicle_id,
            coalesce(sum(l.debit - l.credit) filter (where a.system_key = 'VEHICLE_INVENTORY'), 0) as inventory,
            coalesce(sum(l.debit - l.credit) filter (where a.system_key = 'COST_OF_VEHICLES_SOLD'), 0) as cogs,
-           coalesce(sum(l.credit - l.debit) filter (where a.system_key = 'VEHICLE_SALES'), 0) as sales,
+           coalesce(sum(l.credit - l.debit) filter (where a.system_key in ('VEHICLE_SALES', 'SALES_DISCOUNTS')), 0)
+             as sales,
            coalesce(sum(l.debit - l.credit) filter (where a.system_key = 'EXTERNAL_COMMISSION_EXPENSE'), 0)
              as external_commission,
            coalesce(sum(l.credit - l.debit) filter (where a.system_key = 'CONSIGNMENT_COMMISSION'), 0) as commission,
@@ -378,7 +382,7 @@ _COST_TOTALS = text(
       from public.journal_lines l
       join public.ledger_accounts a on a.id = l.ledger_account_id
      where l.vehicle_id = any(:ids)
-       and a.system_key in ('VEHICLE_INVENTORY', 'COST_OF_VEHICLES_SOLD', 'VEHICLE_SALES',
+       and a.system_key in ('VEHICLE_INVENTORY', 'COST_OF_VEHICLES_SOLD', 'VEHICLE_SALES', 'SALES_DISCOUNTS',
                             'EXTERNAL_COMMISSION_EXPENSE', 'CONSIGNMENT_COMMISSION', 'EXP_CONSIGNMENT')
      group by l.vehicle_id
     """
@@ -1307,6 +1311,17 @@ def record_expense(conn: Connection, vehicle_id: UUID, payload: VehicleExpenseIn
     info = finance.tenant_info(conn)
     plan = _plan_expense(conn, info, vehicle_ref(conn, vehicle_id, lock=True), payload)
     warnings = finance.check_cash(conn, info, plan.draft.cash_effects(), lock=True)
+    document_id, posted = _post_expense(conn, vehicle_id, payload, plan, split_group_id=None)
+    return PostingResult[VehicleExpenseOut](
+        document=get_expense(conn, document_id),
+        journal_entries=[EntryRef(id=posted.id, entry_no=posted.entry_no)],
+        warnings=warnings,
+    )
+
+
+def _post_expense(
+    conn: Connection, vehicle_id: UUID, payload: VehicleExpenseIn, plan: _ExpensePlan, *, split_group_id: UUID | None
+) -> tuple[UUID, Any]:
     document_id = uuid4()
     posted = engine.post(conn, replace(plan.draft, source_id=document_id))
     conn.execute(
@@ -1314,10 +1329,10 @@ def record_expense(conn: Connection, vehicle_id: UUID, payload: VehicleExpenseIn
             """
             insert into public.vehicle_expenses
               (id, tenant_id, vehicle_id, category_id, expense_date, amount, description, funding, cash_account_id,
-               supplier_id, paid_by_partner_id, partner_funding_mode, treatment, journal_entry_id)
+               supplier_id, paid_by_partner_id, partner_funding_mode, treatment, journal_entry_id, split_group_id)
             values (:id, private.current_tenant_id(), :vehicle_id, :category_id, :expense_date, :amount, :description,
                     :funding, :cash_account_id, :supplier_id, :paid_by_partner_id, :partner_funding_mode, :treatment,
-                    :entry)
+                    :entry, :split_group_id)
             """
         ),
         {
@@ -1326,11 +1341,94 @@ def record_expense(conn: Connection, vehicle_id: UUID, payload: VehicleExpenseIn
             "vehicle_id": vehicle_id,
             "treatment": plan.treatment,
             "entry": posted.id,
+            "split_group_id": split_group_id,
         },
     )
-    return PostingResult[VehicleExpenseOut](
-        document=get_expense(conn, document_id),
-        journal_entries=[EntryRef(id=posted.id, entry_no=posted.entry_no)],
+    return document_id, posted
+
+
+# --- One expense split over several cars (pilot review, D-71) ------------------------------------------------
+
+
+def _plan_split(
+    conn: Connection, info: finance.TenantInfo, payload: SplitVehicleExpenseIn, *, lock: bool
+) -> list[tuple[ExpenseShare, VehicleExpenseIn, _ExpensePlan]]:
+    plans = []
+    for share in payload.shares:
+        part = payload.part(share)
+        plans.append((share, part, _plan_expense(conn, info, vehicle_ref(conn, share.vehicle_id, lock=lock), part)))
+    return plans
+
+
+def _split_cash_effects(plans: list[tuple[ExpenseShare, VehicleExpenseIn, _ExpensePlan]]) -> dict[UUID, Decimal]:
+    effects: dict[UUID, Decimal] = {}
+    for _, _, plan in plans:
+        for account, amount in plan.draft.cash_effects().items():
+            effects[account] = effects.get(account, ZERO) + amount
+    return effects
+
+
+def preview_split_expense(conn: Connection, payload: SplitVehicleExpenseIn, *, with_lines: bool) -> Preview:
+    info = finance.tenant_info(conn)
+    plans = _plan_split(conn, info, payload, lock=False)
+    finance.ensure_period_open(conn, payload.expense_date)
+    warnings = finance.check_cash(conn, info, _split_cash_effects(plans), lock=False)
+    first = plans[0][2]
+    total_ar = format_money(payload.total, info.currency, "ar")
+    total_en = format_money(payload.total, info.currency, "en")
+    parts_ar = "، ".join(
+        f"{plan.vehicle.label} ({plan.vehicle.stock_no}) {format_money(share.amount, info.currency, 'ar')}"
+        for share, _, plan in plans
+    )
+    parts_en = "; ".join(
+        f"{plan.vehicle.label} ({plan.vehicle.stock_no}) {format_money(share.amount, info.currency, 'en')}"
+        for share, _, plan in plans
+    )
+    if first.cash is not None:
+        how_ar, how_en = f"تُدفع من «{first.cash.name_ar}»", f"paid from “{first.cash.name_en}”"
+    elif payload.funding == "SUPPLIER_CREDIT":
+        how_ar, how_en = f"على الحساب للمورد {first.payer_ar}", f"on credit from {first.payer_en}"
+    else:
+        how_ar, how_en = f"دفعها الشريك {first.payer_ar} من ماله الخاص", f"paid personally by partner {first.payer_en}"
+    lines = None
+    if with_lines:
+        lines = [line for _, _, plan in plans for line in finance.preview_lines(conn, plan.draft)]
+    return Preview(
+        summary_ar=(
+            f"مصروف «{first.category_ar}» بقيمة {total_ar} موزع على {len(plans)} سيارات: {parts_ar}؛ {how_ar}، "
+            f"بتاريخ {ltr(payload.expense_date.isoformat())}. كل جزء يُعامل حسب حالة سيارته."
+        ),
+        summary_en=(
+            f"A “{first.category_en}” expense of {total_en} split over {len(plans)} cars: {parts_en}; {how_en}, "
+            f"on {payload.expense_date.isoformat()}. Each part follows its own car's rules."
+        ),
+        effects=(
+            [
+                PreviewEffect(
+                    direction="OUT", label_ar=first.cash.name_ar, label_en=first.cash.name_en, amount=payload.total
+                )
+            ]
+            if first.cash
+            else []
+        ),
+        warnings=warnings,
+        lines=lines,
+    )
+
+
+def record_split_expense(conn: Connection, payload: SplitVehicleExpenseIn) -> PostingResult[SplitVehicleExpenseOut]:
+    info = finance.tenant_info(conn)
+    plans = _plan_split(conn, info, payload, lock=True)
+    warnings = finance.check_cash(conn, info, _split_cash_effects(plans), lock=True)
+    group_id = uuid4()
+    documents, entries = [], []
+    for share, part, plan in plans:
+        document_id, posted = _post_expense(conn, share.vehicle_id, part, plan, split_group_id=group_id)
+        documents.append(get_expense(conn, document_id))
+        entries.append(EntryRef(id=posted.id, entry_no=posted.entry_no))
+    return PostingResult[SplitVehicleExpenseOut](
+        document=SplitVehicleExpenseOut(split_group_id=group_id, total=payload.total, expenses=documents),
+        journal_entries=entries,
         warnings=warnings,
     )
 
@@ -1339,7 +1437,7 @@ _EXPENSES = """
     select x.id, x.vehicle_id, x.expense_date, x.category_id, ec.code as category_code,
            ec.name_ar as category_name_ar, ec.name_en as category_name_en, x.amount, x.description, x.funding,
            ca.name_ar as cash_account_name_ar, su.name as supplier_name, pa.name_ar as paid_by_partner_name_ar,
-           x.treatment, x.status, je.entry_no
+           x.treatment, x.status, je.entry_no, x.split_group_id
       from public.vehicle_expenses x
       join public.expense_categories ec on ec.id = x.category_id
       left join public.cash_accounts ca on ca.id = x.cash_account_id

@@ -63,6 +63,7 @@ Endpoint status codes: `200` read, `201` created/posted, `204` no content, `400`
 | `PARTNER_INVALID` | 422 | Unknown, archived or another showroom's partner |
 | `SHARE_DATE_INVALID` | 422 | New batch not after the latest change (D-64) |
 | `REPAYMENT_EXCEEDS_LOAN` | 422 | More than is owed (D-63) |
+| `WITHDRAWAL_EXCEEDS_BALANCE` | 422 | A drawing or capital withdrawal above the partner's net balance; `details.available` (D-123) |
 | `PARTNER_NOT_SETTLED` | 409 | Archive refused: open share or balance (D-62) |
 | `PARTNER_ALREADY_LINKED` | 409 | Partner already linked to another user (D-66) |
 | `VEHICLE_INVALID_TRANSITION` | 409 | `details.from`, `details.to`; also raised by the database (SR020) |
@@ -177,6 +178,8 @@ As built in Phase 4. Every vehicle response passes through cost masking (ARCHITE
 | GET/POST/PATCH | `/locations` | read: `vehicle.view`; write: `tenant.settings.manage` | Yard, outdoor lot, workshop, external showroom, with customer |
 | GET | `/search?q=` | `vehicle.view` or `customer.view` | `{vehicles: [{id, stock_no, label, plate_no, vin, status}], customers: [{id, name, phone_primary}]}`; no cost data |
 | POST | `/vehicles/{id}/consign-out`, `/return-from-external` | `consignment.manage` | ⏳ Phase 6 |
+
+**Pilot review (D-127):** `POST /vehicle-expenses/split/preview` and `POST 💰 /vehicle-expenses/split` (`vehicle.expense.record`, Idempotency-Key) take one expense (`expense_date, category_id`, funding as for a single expense, `description?`) with `shares: [{vehicle_id, amount}]` (2–50 distinct cars) and return `{split_group_id, total, expenses: [VehicleExpenseOut]}`; each expense carries `split_group_id`.
 
 ### 3.5 Customers, suppliers, requests, follow-ups
 

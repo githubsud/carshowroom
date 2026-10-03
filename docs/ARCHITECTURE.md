@@ -269,6 +269,7 @@ This serializes postings per tenant on the counter, which is acceptable for show
 | `sale.draft` | ✓ | ✓ | ✓ | ✓ | | |
 | `sale.post` (configurable, FACT §4.7) | ✓ | setting | ✓ | | | |
 | `sale.cancel` | ✓ | | ✓ | | | |
+| `sale.cancel_consigned` (consigned car's sale, D-125) | ✓ | ✓ | | | | |
 | `reservation.manage` (take deposit) | ✓ | ✓ | ✓ | Q-05 | | |
 | `installment.view`, `installment.collect`, `deferred_paper.manage` | ✓ | ✓ | ✓ | view due list only (Q-05) | | |
 | `consignment.manage`, `consignment.settle` | ✓ | ✓ | ✓ | manage only | | |

@@ -322,7 +322,16 @@ def _plan_transaction(
             status_code=422,
             details={"outstanding": f"{position.loans_from_partner:.2f}"},
         )
-    # Drawings beyond the current account are allowed but flagged (SPEC §4.17, Q-17).
+    # Nobody takes out more than they have in the business: a drawing or capital
+    # withdrawal above the partner's net balance is refused (pilot review, D-63).
+    if payload.type in ("DRAWING", "CAPITAL_WITHDRAWAL") and amount > position.net:
+        raise AppError(
+            "WITHDRAWAL_EXCEEDS_BALANCE",
+            "The amount is more than the partner's net balance",
+            status_code=422,
+            details={"available": f"{max(position.net, Decimal(0)):.2f}"},
+        )
+    # Within the net balance, drawing ahead of profits is allowed but flagged (SPEC §4.17, Q-17).
     if payload.type == "DRAWING" and position.current - amount < 0:
         warnings.append(
             PostingWarning(

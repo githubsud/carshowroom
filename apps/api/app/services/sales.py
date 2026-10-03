@@ -785,6 +785,8 @@ def _plan_post(
         source_id=sale_id,
         financed=financed,
         consignor_id=consignment_sale.consignor_id if consignment_sale else None,
+        # A consigned car's price is owed to its owner in full (rule 16): no discount line of ours.
+        discount=ZERO if consignment_sale else Decimal(sale["discount"]),
     )
     if consignment_sale is not None:
         cost_draft = rules.consignment_commission(
@@ -1056,6 +1058,8 @@ class _CancelPlan:
     legs: list[tuple[str, str, Decimal]]
     credit_draft: EntryDraft | None
     mirror_cash: dict[UUID, Decimal]
+    trade_in_expenses: Decimal = ZERO
+    trade_in_charge: EntryDraft | None = None
 
 
 def _plan_cancel(
@@ -1075,8 +1079,9 @@ def _plan_cancel(
     if vehicle.status != "SOLD":
         # Q-30 default: a delivered car's sale is not cancelled.
         raise AppError("SALE_DELIVERED", "The car has been delivered; the sale cannot be cancelled", status_code=409)
+    trade_in_expenses = ZERO
     if sale["trade_in_vehicle_id"] is not None:
-        _check_trade_in_returnable(conn, sale["trade_in_vehicle_id"])
+        trade_in_expenses = _trade_in_expenses(conn, sale["trade_in_vehicle_id"], Decimal(sale["trade_in_value"]))
 
     method = conn.execute(text("select sale_cancellation_method from public.tenant_settings")).scalar_one()
     if vehicle.ownership_type == "CONSIGNED_IN":
@@ -1117,6 +1122,7 @@ def _plan_cancel(
             amount_paid=paid,
             trade_in=(sale["trade_in_vehicle_id"], trade_value) if trade_value > 0 else None,
             receivable_outstanding=Decimal(sale["receivable_amount"]) - collected,
+            discount=_posted_discount(conn, sale["journal_entry_id"]),
             description=f"إلغاء بيع {vehicle.label} ({vehicle.stock_no}) — {sale['sale_no']}: {payload.reason}",
             source_id=sale_id,
         )
@@ -1127,6 +1133,20 @@ def _plan_cancel(
                 mirror_cash[line.cash_account_id] = (
                     mirror_cash.get(line.cash_account_id, ZERO) + line.debit - line.credit
                 )
+    trade_in_charge = None
+    if trade_in_expenses > 0:
+        # With REFUND_LIABILITY the expenses come off what the customer is owed;
+        # the mirror refunds the money as it came, so they are owed to us instead.
+        owed_to_customer = paid if method == "REFUND_LIABILITY" else ZERO
+        trade_in_charge = rules.trade_in_expenses_to_customer(
+            entry_date=cancel_date,
+            trade_in_vehicle_id=sale["trade_in_vehicle_id"],
+            customer_id=sale["buyer_customer_id"],
+            amount=trade_in_expenses,
+            from_credit=min(trade_in_expenses, owed_to_customer),
+            description=f"مصاريف سيارة الاستبدال على العميل — إلغاء {sale['sale_no']}",
+            source_id=sale_id,
+        )
     return _CancelPlan(
         sale=sale,
         method=method,
@@ -1135,28 +1155,51 @@ def _plan_cancel(
         legs=legs,
         credit_draft=credit_draft,
         mirror_cash=mirror_cash,
+        trade_in_expenses=trade_in_expenses,
+        trade_in_charge=trade_in_charge,
     )
 
 
-def _check_trade_in_returnable(conn: Connection, trade_in_vehicle_id: UUID) -> None:
-    """The customer's car goes back to them only if nothing has happened to it yet (G-23, Q-30)."""
-    row = conn.execute(
-        text(
-            """
-            select v.status,
-                   (select count(*) from public.vehicle_expenses x where x.vehicle_id = v.id and x.status = 'POSTED')
-                     as expenses
-              from public.vehicles v where v.id = :id
-            """
-        ),
-        {"id": trade_in_vehicle_id},
-    ).one()
-    if row.status not in ("DRAFT", "IN_PREPARATION", "AVAILABLE") or row.expenses:
+def _trade_in_expenses(conn: Connection, trade_in_vehicle_id: UUID, agreed_value: Decimal) -> Decimal:
+    """The customer's car goes back to them unless it has been sold or reserved (G-23, Q-30).
+    Returns what we spent on it beyond the agreed value, charged to the customer (D-76 revised)."""
+    status = conn.execute(
+        text("select status from public.vehicles where id = :id"), {"id": trade_in_vehicle_id}
+    ).scalar_one()
+    if status not in ("DRAFT", "IN_PREPARATION", "AVAILABLE"):
         raise AppError(
             "SALE_TRADE_IN_USED",
-            "The trade-in car has been sold, reserved or had expenses; the sale cannot be cancelled",
+            "The trade-in car has been sold or reserved; the sale cannot be cancelled",
             status_code=409,
         )
+    return max(vehicles.inventory_cost(conn, trade_in_vehicle_id) - agreed_value, ZERO)
+
+
+def _posted_discount(conn: Connection, entry_id: UUID) -> Decimal:
+    """The sales-discount line of a sale's entry, so a cancellation mirrors what was posted."""
+    return Decimal(
+        conn.execute(
+            text(
+                "select coalesce(sum(l.debit - l.credit), 0) from public.journal_lines l "
+                "join public.ledger_accounts a on a.id = l.ledger_account_id "
+                "where l.journal_entry_id = :id and a.system_key = 'SALES_DISCOUNTS'"
+            ),
+            {"id": entry_id},
+        ).scalar_one()
+    )
+
+
+def is_consigned_sale(conn: Connection, sale_id: UUID) -> bool:
+    """True when the sold car belongs to a consignor (its cancellation needs its own permission)."""
+    return bool(
+        conn.execute(
+            text(
+                "select v.ownership_type = 'CONSIGNED_IN' from public.sales s "
+                "join public.vehicles v on v.id = s.vehicle_id where s.id = :id"
+            ),
+            {"id": sale_id},
+        ).scalar_one_or_none()
+    )
 
 
 def preview_cancel(conn: Connection, sale_id: UUID, payload: SaleCancelIn, *, with_lines: bool) -> Preview:
@@ -1174,6 +1217,14 @@ def preview_cancel(conn: Connection, sale_id: UUID, payload: SaleCancelIn, *, wi
     )
     trade_ar = " سيارة الاستبدال تُعاد للعميل." if sale["trade_in_vehicle_id"] else ""
     trade_en = " The trade-in car goes back to the customer." if sale["trade_in_vehicle_id"] else ""
+    if plan.trade_in_expenses > 0:
+        spent_ar, spent_en = _money(plan.trade_in_expenses, info, "ar"), _money(plan.trade_in_expenses, info, "en")
+        if plan.method == "REFUND_LIABILITY":
+            trade_ar += f" ما صُرف عليها ({spent_ar}) يُخصم مما يُرد للعميل."
+            trade_en += f" What was spent on it ({spent_en}) comes off the customer's refund."
+        else:
+            trade_ar += f" ما صُرف عليها ({spent_ar}) يُسجل مستحقاً على العميل."
+            trade_en += f" What was spent on it ({spent_en}) is recorded as owed by the customer."
     effects: list[PreviewEffect] = []
     warnings: list[PostingWarning] = []
     if plan.method == "REFUND_LIABILITY":
@@ -1187,6 +1238,8 @@ def preview_cancel(conn: Connection, sale_id: UUID, payload: SaleCancelIn, *, wi
             "the customer page; no money leaves the cash box now."
         )
         lines = finance.preview_lines(conn, plan.credit_draft) if with_lines and plan.credit_draft else None
+        if lines is not None and plan.trade_in_charge is not None:
+            lines = [*lines, *finance.preview_lines(conn, plan.trade_in_charge)]
     else:
         body_ar = " يُعكس قيد البيع كما هو: " + "، ".join(
             f"خصم {_money(amount, info, 'ar')} من «{name_ar}»" for name_ar, _, amount in plan.legs
@@ -1228,6 +1281,7 @@ def cancel_sale(
         warnings = finance.check_cash(conn, info, plan.mirror_cash, lock=True)
         cancel_entry = engine.reverse(conn, sale["journal_entry_id"], reason, plan.cancel_date)
     cost_entry = engine.reverse(conn, sale["cost_journal_entry_id"], reason, plan.cancel_date)
+    charge_entry = engine.post(conn, plan.trade_in_charge) if plan.trade_in_charge is not None else None
     distribution.reverse_sale_allocation(conn, sale_id, reason, plan.cancel_date)
     conn.execute(
         text(
@@ -1278,6 +1332,7 @@ def cancel_sale(
         journal_entries=[
             EntryRef(id=cancel_entry.id, entry_no=cancel_entry.entry_no),
             EntryRef(id=cost_entry.id, entry_no=cost_entry.entry_no),
+            *([EntryRef(id=charge_entry.id, entry_no=charge_entry.entry_no)] if charge_entry else []),
         ],
         warnings=warnings,
     )

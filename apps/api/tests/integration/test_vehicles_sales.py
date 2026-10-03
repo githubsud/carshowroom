@@ -21,6 +21,7 @@ from app.domain.vehicles import (
     CustomerRefundIn,
     PurchaseIn,
     SellerPaymentIn,
+    SplitVehicleExpenseIn,
     SupplierIn,
     SupplierPaymentIn,
     VehicleExpenseIn,
@@ -190,6 +191,11 @@ def test_purchase_expenses_sale_cycle_matches_hand_calculation(client: TestClien
             )
             assert vehicles.vehicle_ref(conn, car).status == "SOLD"
             assert sales.get_reservation(conn, reservation.id).status == "APPLIED"
+            # The discount is its own line (pilot review): 4100 at list price, 4150 the discount.
+            assert (_car_ledger(conn, car, "VEHICLE_SALES"), _car_ledger(conn, car, "SALES_DISCOUNTS")) == (
+                Decimal("-500000.00"),
+                Decimal("10000.00"),
+            )
 
             # P-04: a late invoice on a sold car goes to cost of sales.
             late = _expense(conn, car, "transport", "1200")
@@ -248,6 +254,147 @@ def test_purchase_expenses_sale_cycle_matches_hand_calculation(client: TestClien
             with pytest.raises(AppError) as sold_twice:
                 sales.post_sale(conn, second.id, user_id=OWNER_ID, with_profit=True)
             assert sold_twice.value.code == "VEHICLE_ALREADY_SOLD"
+            raise _Rollback
+
+    with pytest.raises(_Rollback):
+        scenario()
+
+
+def _car_ledger(conn: Connection, car: uuid.UUID, system_key: str) -> Decimal:
+    """Debit minus credit on one account for one car."""
+    return Decimal(
+        conn.execute(
+            text(
+                "select coalesce(sum(l.debit - l.credit), 0) from public.journal_lines l "
+                "join public.ledger_accounts a on a.id = l.ledger_account_id "
+                "where l.vehicle_id = :car and a.system_key = :key"
+            ),
+            {"car": car, "key": system_key},
+        ).scalar_one()
+    )
+
+
+@pytest.mark.parametrize("method", ["REFUND_LIABILITY", "MIRROR"])
+def test_a_discount_is_its_own_line_and_a_cancellation_clears_it(client: TestClient, method: str) -> None:
+    """Pilot review (P-12 revised): sold at 300,000 less 20,000; profit is on the net
+    280,000, the discount stays visible on 4150, and either cancellation method
+    brings 4100 and 4150 back to zero for the car."""
+
+    def scenario() -> None:
+        with _owner_tx(client) as conn:
+            conn.execute(text("update public.tenant_settings set sale_cancellation_method = :m"), {"m": method})
+            seller, buyer = _customer(conn, "بائع"), _customer(conn, "مشتري")
+            car = _vehicle(conn, "Kia", "Cerato", 2020)
+            vehicles.record_purchase(
+                conn,
+                car,
+                PurchaseIn.model_validate(
+                    {
+                        "seller_customer_id": seller,
+                        "purchase_date": DAY,
+                        "price": "250000",
+                        "payments": [{"cash_account_id": NOUR_BANK, "amount": "250000"}],
+                        "ready_for_sale": True,
+                    }
+                ),
+            )
+            draft = sales.create_draft(
+                conn,
+                SaleDraftIn.model_validate(
+                    {
+                        "vehicle_id": car,
+                        "buyer_customer_id": buyer,
+                        "sale_date": DAY,
+                        "list_price": "300000",
+                        "discount": "20000",
+                        "payments": [{"cash_account_id": NOUR_BANK, "amount": "280000"}],
+                    }
+                ),
+                viewer_id=OWNER_ID,
+                see_all_drafts=True,
+                with_profit=True,
+            )
+            sale = sales.post_sale(conn, draft.id, user_id=OWNER_ID, with_profit=True).document
+            assert sale.profit is not None
+            assert sale.profit.gross_profit == Decimal("30000.00")
+            assert _car_ledger(conn, car, "VEHICLE_SALES") == Decimal("-300000.00")
+            assert _car_ledger(conn, car, "SALES_DISCOUNTS") == Decimal("20000.00")
+
+            sales.cancel_sale(conn, sale.id, SaleCancelIn(reason="العميل تراجع"), user_id=OWNER_ID, with_profit=True)
+            assert _car_ledger(conn, car, "VEHICLE_SALES") == Decimal("0.00")
+            assert _car_ledger(conn, car, "SALES_DISCOUNTS") == Decimal("0.00")
+            raise _Rollback
+
+    with pytest.raises(_Rollback):
+        scenario()
+
+
+@pytest.mark.parametrize("method", ["REFUND_LIABILITY", "MIRROR"])
+def test_a_worked_on_trade_in_goes_back_with_its_expenses_charged(client: TestClient, method: str) -> None:
+    """Pilot review (D-76 revised): Omar's own car was taken at 200,000 and we spent
+    5,000 painting it. Cancelling the sale hands it back and charges him the 5,000:
+    off the 350,000 he is owed (REFUND_LIABILITY), or as owed by him (MIRROR)."""
+
+    def scenario() -> None:
+        with _owner_tx(client) as conn:
+            conn.execute(text("update public.tenant_settings set sale_cancellation_method = :m"), {"m": method})
+            seller, omar = _customer(conn, "بائع"), _customer(conn, "عمر")
+            car = _vehicle(conn, "Kia", "Sportage", 2021)
+            vehicles.record_purchase(
+                conn,
+                car,
+                PurchaseIn.model_validate(
+                    {
+                        "seller_customer_id": seller,
+                        "purchase_date": DAY,
+                        "price": "450000",
+                        "payments": [{"cash_account_id": NOUR_BANK, "amount": "450000"}],
+                        "ready_for_sale": True,
+                    }
+                ),
+            )
+            draft = sales.create_draft(
+                conn,
+                SaleDraftIn.model_validate(
+                    {
+                        "vehicle_id": car,
+                        "buyer_customer_id": omar,
+                        "sale_date": DAY,
+                        "list_price": "550000",
+                        "payments": [{"cash_account_id": NOUR_BANK, "amount": "350000"}],
+                        "trade_in": {"make": "Toyota", "model": "Corolla", "year": 2015, "agreed_value": "200000"},
+                    }
+                ),
+                viewer_id=OWNER_ID,
+                see_all_drafts=True,
+                with_profit=True,
+            )
+            sale = sales.post_sale(conn, draft.id, user_id=OWNER_ID, with_profit=True).document
+            trade_in = sale.trade_in_vehicle_id
+            assert trade_in is not None
+            _expense(conn, trade_in, "paint", "5000", cash_account_id=NOUR_CASH)
+            assert vehicles.inventory_cost(conn, trade_in) == Decimal("205000.00")
+
+            preview = sales.preview_cancel(conn, sale.id, SaleCancelIn(reason="العميل تراجع"), with_lines=True)
+            assert "5,000.00" in preview.summary_ar
+            result = sales.cancel_sale(
+                conn, sale.id, SaleCancelIn(reason="العميل تراجع"), user_id=OWNER_ID, with_profit=True
+            )
+            assert len(result.journal_entries) == 3  # cancellation, cost reversal, the trade-in charge
+            assert vehicles.vehicle_ref(conn, trade_in).status == "ARCHIVED"
+            assert vehicles.inventory_cost(conn, trade_in) == Decimal("0.00")
+            if method == "REFUND_LIABILITY":
+                assert customers.credit_owed(conn, omar) == Decimal("345000.00")
+            else:
+                owed_by_omar = conn.execute(
+                    text(
+                        "select coalesce(sum(l.debit - l.credit), 0) from public.journal_lines l "
+                        "join public.ledger_accounts a on a.id = l.ledger_account_id "
+                        "where l.customer_id = :c and a.system_key = 'OTHER_RECEIVABLE'"
+                    ),
+                    {"c": omar},
+                ).scalar_one()
+                assert owed_by_omar == Decimal("5000.00")
             raise _Rollback
 
     with pytest.raises(_Rollback):
@@ -747,3 +894,53 @@ def test_photo_upload_through_signed_urls(client: TestClient) -> None:
         json={"storage_path": f"{NOUR}/{uuid.uuid4()}/x.png", "content_type": "image/png", "size_bytes": 10},
     )
     assert other.status_code == 422
+
+
+def test_one_expense_split_over_several_cars(client: TestClient) -> None:
+    """Pilot review (D-71): a 3,000 transport bill for two cars, 2,000 + 1,000, paid
+    once from the cash box. The car in stock adds its part to its cost; the sold
+    car's part goes to cost of sales (P-04)."""
+    in_stock = uuid.UUID("e1000000-0000-0000-0000-000000000001")
+    sold = uuid.UUID("e1000000-0000-0000-0000-000000000004")
+
+    def scenario() -> None:
+        with _owner_tx(client) as conn:
+            cash_before, _ = _balances(conn)
+            stock_cost = vehicles.inventory_cost(conn, in_stock)
+            payload = SplitVehicleExpenseIn.model_validate(
+                {
+                    "expense_date": DAY,
+                    "category_id": _category(conn, "transport"),
+                    "cash_account_id": NOUR_CASH,
+                    "shares": [{"vehicle_id": in_stock, "amount": "2000"}, {"vehicle_id": sold, "amount": "1000"}],
+                }
+            )
+            preview = vehicles.preview_split_expense(conn, payload, with_lines=True)
+            assert "3,000.00" in preview.summary_ar
+            assert [e.amount for e in preview.effects] == [Decimal("3000.00")]
+
+            result = vehicles.record_split_expense(conn, payload).document
+            assert result.total == Decimal("3000.00")
+            assert [(e.vehicle_id, e.treatment) for e in result.expenses] == [(in_stock, "CAPITALIZE"), (sold, "COGS")]
+            assert {e.split_group_id for e in result.expenses} == {result.split_group_id}
+            assert vehicles.inventory_cost(conn, in_stock) == stock_cost + Decimal("2000.00")
+            assert _balances(conn)[0] == cash_before - Decimal("3000.00")
+            raise _Rollback
+
+    with pytest.raises(_Rollback):
+        scenario()
+
+
+def test_a_split_names_each_car_once(client: TestClient) -> None:
+    car = "e1000000-0000-0000-0000-000000000001"
+    response = client.post(
+        "/api/v1/vehicle-expenses/split/preview",
+        headers=auth("owner@nour.example", NOUR),
+        json={
+            "expense_date": DAY.isoformat(),
+            "category_id": str(uuid.uuid4()),
+            "cash_account_id": str(NOUR_CASH),
+            "shares": [{"vehicle_id": car, "amount": "10"}, {"vehicle_id": car, "amount": "20"}],
+        },
+    )
+    assert response.status_code == 422

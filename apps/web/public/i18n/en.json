@@ -271,7 +271,8 @@
     "SIGNUP_LIMIT": "You already own three showrooms",
     "INVOICE_NOT_OPEN": "This invoice is not open",
     "RATE_LIMITED": "Too many requests; try again shortly",
-    "REQUEST_TOO_LARGE": "The request is too large"
+    "REQUEST_TOO_LARGE": "The request is too large",
+    "WITHDRAWAL_EXCEEDS_BALANCE": "The amount is more than the partner's net balance in the business; it cannot be withdrawn."
   },
   "finance": {
     "cashTitle": "Cash & bank",
@@ -580,7 +581,12 @@
     "doc_SALE_CONTRACT": "Sale contract",
     "doc_ID_COPY": "ID copy",
     "doc_OTHER": "Other",
-    "history": "History"
+    "history": "History",
+    "splitExpense": "Split this expense over several cars",
+    "splitWith": "The other cars",
+    "thisCar": "This car",
+    "splitGap": "Difference from the total",
+    "splitInvalid": "Choose at least one other car, and make the parts add up to the total"
   },
   "customers": {
     "title": "Customers",

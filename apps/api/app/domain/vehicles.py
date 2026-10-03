@@ -599,6 +599,47 @@ class VehicleExpenseOut(BaseModel):
     treatment: Literal["CAPITALIZE", "COGS", "RECOVERABLE", "SHOWROOM", "SHARED"]
     status: Literal["POSTED", "REVERSED"]
     entry_no: int
+    split_group_id: UUID | None = None
+
+
+class ExpenseShare(StrictModel):
+    vehicle_id: UUID
+    amount: PositiveMoney
+
+
+class SplitVehicleExpenseIn(StrictModel):
+    """One direct expense shared by several cars (pilot review, D-71): each car gets
+    its part as an ordinary vehicle expense, treated by that car's own rules."""
+
+    expense_date: date
+    category_id: UUID
+    funding: FundingKind = "CASH_ACCOUNT"
+    cash_account_id: UUID | None = None
+    supplier_id: UUID | None = None
+    paid_by_partner_id: UUID | None = None
+    partner_funding_mode: PartnerFundingMode | None = None
+    description: NoteText | None = None
+    shares: Annotated[list[ExpenseShare], Field(min_length=2, max_length=50)]
+
+    @model_validator(mode="after")
+    def _distinct_cars_and_one_funding(self) -> "SplitVehicleExpenseIn":
+        if len({share.vehicle_id for share in self.shares}) != len(self.shares):
+            raise ValueError("each car can appear once")
+        self.part(self.shares[0])  # the same funding rules as a single expense
+        return self
+
+    @property
+    def total(self) -> Decimal:
+        return sum((share.amount for share in self.shares), Decimal(0))
+
+    def part(self, share: ExpenseShare) -> VehicleExpenseIn:
+        return VehicleExpenseIn.model_validate({**self.model_dump(exclude={"shares"}), "amount": share.amount})
+
+
+class SplitVehicleExpenseOut(BaseModel):
+    split_group_id: UUID
+    total: Money
+    expenses: list[VehicleExpenseOut]
 
 
 # --- Uploads (D-15, D-74) ------------------------------------------------------------------------

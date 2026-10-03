@@ -18,8 +18,10 @@
           <p-button icon="pi pi-print" [outlined]="true" [label]="'sales.invoice' | transloco" (onClick)="print('invoice')"
                     data-testid="print-invoice" />
           <p-button icon="pi pi-file" [outlined]="true" [label]="'sales.contract' | transloco" (onClick)="print('contract')" />
-          <p-button *appCan="'sale.cancel'" icon="pi pi-times" severity="danger" [outlined]="true"
-                    [label]="'sales.cancel' | transloco" (onClick)="cancelOpen.set(true)" data-testid="cancel-sale" />
+          @if (canCancel()) {
+            <p-button icon="pi pi-times" severity="danger" [outlined]="true"
+                      [label]="'sales.cancel' | transloco" (onClick)="cancelOpen.set(true)" data-testid="cancel-sale" />
+          }
         }
       </div>
     }

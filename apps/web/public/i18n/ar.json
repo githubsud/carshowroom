@@ -271,7 +271,8 @@
     "SIGNUP_LIMIT": "لديك بالفعل ثلاثة معارض",
     "INVOICE_NOT_OPEN": "هذه الفاتورة ليست مفتوحة",
     "RATE_LIMITED": "طلبات كثيرة؛ حاول بعد قليل",
-    "REQUEST_TOO_LARGE": "الطلب أكبر من المسموح"
+    "REQUEST_TOO_LARGE": "الطلب أكبر من المسموح",
+    "WITHDRAWAL_EXCEEDS_BALANCE": "المبلغ أكبر من صافي رصيد الشريك؛ لا يمكن سحب أكثر من الرصيد."
   },
   "finance": {
     "cashTitle": "الخزنة والبنك",
@@ -580,7 +581,12 @@
     "doc_SALE_CONTRACT": "عقد البيع",
     "doc_ID_COPY": "صورة بطاقة",
     "doc_OTHER": "أخرى",
-    "history": "السجل"
+    "history": "السجل",
+    "splitExpense": "توزيع المصروف على أكثر من سيارة",
+    "splitWith": "السيارات الأخرى",
+    "thisCar": "هذه السيارة",
+    "splitGap": "الفرق عن الإجمالي",
+    "splitInvalid": "اختر سيارة أخرى على الأقل، ويجب أن تساوي الأجزاء إجمالي المصروف"
   },
   "customers": {
     "title": "العملاء",

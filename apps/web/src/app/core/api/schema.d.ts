@@ -2267,6 +2267,43 @@ export interface paths {
         patch: operations["update_user_api_v1_users__membership_id__patch"];
         trace?: never;
     };
+    "/api/v1/vehicle-expenses/split": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record Split Expense
+         * @description One direct expense shared by several cars (pilot review, D-71).
+         */
+        post: operations["record_split_expense_api_v1_vehicle_expenses_split_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vehicle-expenses/split/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Split Expense */
+        post: operations["preview_split_expense_api_v1_vehicle_expenses_split_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/vehicles": {
         parameters: {
             query?: never;
@@ -4025,6 +4062,19 @@ export interface components {
             /** Name En */
             name_en?: string | null;
         };
+        /** ExpenseShare */
+        ExpenseShare: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+        };
         /** ExternalCollectionIn */
         ExternalCollectionIn: {
             /**
@@ -5767,6 +5817,14 @@ export interface components {
             /** Warnings */
             warnings?: components["schemas"]["PostingWarning"][];
         };
+        /** PostingResult[SplitVehicleExpenseOut] */
+        PostingResult_SplitVehicleExpenseOut_: {
+            document: components["schemas"]["SplitVehicleExpenseOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
         /** PostingResult[SupplierPaymentOut] */
         PostingResult_SupplierPaymentOut_: {
             document: components["schemas"]["SupplierPaymentOut"];
@@ -6819,6 +6877,56 @@ export interface components {
              */
             tenant_id: string;
         };
+        /**
+         * SplitVehicleExpenseIn
+         * @description One direct expense shared by several cars (pilot review, D-71): each car gets
+         *     its part as an ordinary vehicle expense, treated by that car's own rules.
+         */
+        SplitVehicleExpenseIn: {
+            /** Cash Account Id */
+            cash_account_id?: string | null;
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Expense Date
+             * Format: date
+             */
+            expense_date: string;
+            /**
+             * Funding
+             * @default CASH_ACCOUNT
+             * @enum {string}
+             */
+            funding: "CASH_ACCOUNT" | "SUPPLIER_CREDIT" | "PARTNER";
+            /** Paid By Partner Id */
+            paid_by_partner_id?: string | null;
+            /** Partner Funding Mode */
+            partner_funding_mode?: ("CURRENT_ACCOUNT" | "LOAN") | null;
+            /** Shares */
+            shares: components["schemas"]["ExpenseShare"][];
+            /** Supplier Id */
+            supplier_id?: string | null;
+        };
+        /** SplitVehicleExpenseOut */
+        SplitVehicleExpenseOut: {
+            /** Expenses */
+            expenses: components["schemas"]["VehicleExpenseOut"][];
+            /**
+             * Split Group Id
+             * Format: uuid
+             */
+            split_group_id: string;
+            /**
+             * Total
+             * @example 25000.00
+             */
+            total: string;
+        };
         /** StatementRow */
         StatementRow: {
             /**
@@ -7626,6 +7734,8 @@ export interface components {
             id: string;
             /** Paid By Partner Name Ar */
             paid_by_partner_name_ar: string | null;
+            /** Split Group Id */
+            split_group_id?: string | null;
             /**
              * Status
              * @enum {string}
@@ -13549,6 +13659,77 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_split_expense_api_v1_vehicle_expenses_split_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SplitVehicleExpenseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_SplitVehicleExpenseOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_split_expense_api_v1_vehicle_expenses_split_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SplitVehicleExpenseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
                 };
             };
             /** @description Validation Error */

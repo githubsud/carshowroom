@@ -11,7 +11,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Connection, text
 from sqlalchemy.exc import DBAPIError
 
+from app.api.deps import TenantContext
+from app.api.routers.sales import _check_cancel_permission
 from app.core.errors import AppError
+from app.core.security import AuthenticatedUser
 from app.domain.consignment import (
     ConsignmentIn,
     ConsignmentReturnIn,
@@ -283,6 +286,47 @@ def test_cancelling_a_consigned_sale_mirrors_both_entries(client: TestClient) ->
             assert _ledger(conn, "CONSIGNMENT_COMMISSION", vehicle_id=agreement.vehicle_id) == 0
             current = consignment.get_consignment(conn, agreement.id, with_money=True)
             assert (current.status, current.vehicle_status) == ("ACTIVE", "AVAILABLE")
+            raise _Rollback
+
+    with pytest.raises(_Rollback):
+        scenario()
+
+
+@pytest.mark.parametrize(
+    ("role", "permissions", "allowed"),
+    [
+        ("ACCOUNTANT", {"sale.cancel"}, False),
+        ("MANAGER", {"sale.cancel_consigned"}, True),
+        ("OWNER", {"sale.cancel", "sale.cancel_consigned"}, True),
+    ],
+)
+def test_only_owner_and_manager_cancel_a_consigned_sale(
+    client: TestClient, role: str, permissions: set[str], allowed: bool
+) -> None:
+    """Pilot review (Q-41): an accountant cancels ordinary sales but not a consigned car's."""
+
+    def ctx() -> TenantContext:
+        return TenantContext(
+            user=AuthenticatedUser(id=OWNER_ID, email=None, claims={}),
+            tenant_id=uuid.UUID(NOUR),
+            membership_id=uuid.uuid4(),
+            role_code=role,
+            partner_id=None,
+            permissions=frozenset(permissions),
+            subscription_status="ACTIVE",
+        )
+
+    def scenario() -> None:
+        with _owner_tx(client) as conn:
+            agreement = _consign_in(conn, _customer(conn, "مالك"))
+            _, post = _sell(conn, agreement.vehicle_id, "700000")
+            sale = post().document
+            if allowed:
+                _check_cancel_permission(conn, ctx(), sale.id)
+            else:
+                with pytest.raises(AppError) as refused:
+                    _check_cancel_permission(conn, ctx(), sale.id)
+                assert refused.value.code == "PERMISSION_DENIED"
             raise _Rollback
 
     with pytest.raises(_Rollback):

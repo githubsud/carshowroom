@@ -502,12 +502,15 @@ def sale(
     source_id: UUID | None,
     financed: Decimal = ZERO,
     consignor_id: UUID | None = None,
+    discount: Decimal = ZERO,
 ) -> EntryDraft:
     """Rule 12 (cash/bank sale, deposit applied), rule 13 (the rest financed by
     installments, mode a: Dr installment receivable for the buyer) and rule 26 (trade-in):
     Dr each cash/bank leg + Dr customer deposits (buyer + vehicle) + Dr vehicle
     inventory (trade-in car, at the agreed value) / Cr vehicle sales (sold car).
-    The sale price is the net price after any discount (P-12).
+    `sale_price` is the net price the buyer pays. A discount is its own line
+    (P-12 as revised by the pilot review): Cr vehicle sales at the list price and
+    Dr sales discounts (sold car), so revenue is still the net price.
 
     Rule 16 entry A, a consigned-in car (`consignor_id` given): the full price is
     owed to the owner, so Cr payable to consignors (consignor + vehicle) instead
@@ -547,7 +550,11 @@ def sale(
             )
         )
     else:
-        lines.append(Line(account=Account.system("VEHICLE_SALES"), credit=sale_price, vehicle_id=vehicle_id))
+        if discount > 0:
+            lines.append(
+                Line(account=Account.system("SALES_DISCOUNTS"), debit=_positive_amount(discount), vehicle_id=vehicle_id)
+            )
+        lines.append(Line(account=Account.system("VEHICLE_SALES"), credit=sale_price + discount, vehicle_id=vehicle_id))
     draft = EntryDraft(
         entry_date=entry_date, description=description, source_type="SALE", source_id=source_id, lines=tuple(lines)
     )
@@ -586,14 +593,22 @@ def sale_cancellation_to_credit(
     description: str,
     source_id: UUID | None,
     receivable_outstanding: Decimal = ZERO,
+    discount: Decimal = ZERO,
 ) -> EntryDraft:
-    """P-03 (approved as the default cancellation method, D-41): reverse the revenue
+    """`discount` is the sales-discount line the sale itself posted (none for
+    sales posted before discounts had their own line).
+
+    P-03 (approved as the default cancellation method, D-41): reverse the revenue
     and owe the customer what they paid: Dr vehicle sales / Cr customer credits
     (customer) for money paid and deposit applied, Cr vehicle inventory for a
     trade-in car handed back, and Cr installment receivable for what was still
     to be collected. The refund itself is posted separately (P-02)."""
     sale_price = _positive_amount(sale_price)
-    lines = [Line(account=Account.system("VEHICLE_SALES"), debit=sale_price, vehicle_id=vehicle_id)]
+    lines = [Line(account=Account.system("VEHICLE_SALES"), debit=sale_price + discount, vehicle_id=vehicle_id)]
+    if discount > 0:
+        lines.append(
+            Line(account=Account.system("SALES_DISCOUNTS"), credit=_positive_amount(discount), vehicle_id=vehicle_id)
+        )
     if amount_paid > 0:
         lines.append(
             Line(account=Account.system("CUSTOMER_CREDITS"), credit=_positive_amount(amount_paid), customer_id=buyer_id)
@@ -615,6 +630,42 @@ def sale_cancellation_to_credit(
                 customer_id=buyer_id,
             )
         )
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="SALE_CANCELLATION",
+        source_id=source_id,
+        lines=tuple(lines),
+    )
+    draft.validate()
+    return draft
+
+
+def trade_in_expenses_to_customer(
+    *,
+    entry_date: date,
+    trade_in_vehicle_id: UUID,
+    customer_id: UUID,
+    amount: Decimal,
+    from_credit: Decimal,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """Pilot review (D-76 revised): a cancelled sale hands the trade-in car back with
+    what we spent on it charged to the customer. Dr customer credits (customer) for
+    the part taken off their refund, Dr other receivables (customer) for any rest
+    they owe us / Cr vehicle inventory (trade-in car), so the car leaves stock in full."""
+    amount = _positive_amount(amount)
+    if from_credit < 0 or from_credit > amount:
+        raise LedgerRuleError("the part taken from the customer's credit must be between zero and the amount")
+    lines = []
+    if from_credit > 0:
+        lines.append(Line(account=Account.system("CUSTOMER_CREDITS"), debit=from_credit, customer_id=customer_id))
+    if amount > from_credit:
+        lines.append(
+            Line(account=Account.system("OTHER_RECEIVABLE"), debit=amount - from_credit, customer_id=customer_id)
+        )
+    lines.append(Line(account=Account.system("VEHICLE_INVENTORY"), credit=amount, vehicle_id=trade_in_vehicle_id))
     draft = EntryDraft(
         entry_date=entry_date,
         description=description,

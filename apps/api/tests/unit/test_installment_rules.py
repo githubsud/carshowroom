@@ -43,13 +43,18 @@ def test_accounting_example_puts_the_remainder_on_the_last_installment() -> None
     assert [row.seq for row in rows] == list(range(1, 8))
 
 
-def test_monthly_dates_keep_the_day_and_clamp_to_month_end() -> None:
-    assert due_dates(date(2026, 1, 31), 4, "MONTHLY") == [
+def test_monthly_dates_keep_the_day_on_a_30_day_month() -> None:
+    # Pilot review (D-90): like payroll, the 31st becomes the 30th; February takes its last day.
+    assert due_dates(date(2026, 1, 31), 5, "MONTHLY") == [
         date(2026, 1, 31),
         date(2026, 2, 28),
-        date(2026, 3, 31),
+        date(2026, 3, 30),
         date(2026, 4, 30),
+        date(2026, 5, 30),
     ]
+    assert due_dates(date(2027, 12, 30), 3, "MONTHLY") == [date(2027, 12, 30), date(2028, 1, 30), date(2028, 2, 29)]
+    assert due_dates(date(2026, 1, 15), 3, "MONTHLY") == [date(2026, 1, 15), date(2026, 2, 15), date(2026, 3, 15)]
+    assert due_dates(date(2026, 5, 31), 2, "QUARTERLY") == [date(2026, 5, 31), date(2026, 8, 30)]
     assert due_dates(date(2026, 1, 5), 3, "QUARTERLY") == [date(2026, 1, 5), date(2026, 4, 5), date(2026, 7, 5)]
     assert due_dates(date(2026, 1, 5), 3, "WEEKLY") == [date(2026, 1, 5), date(2026, 1, 12), date(2026, 1, 19)]
     assert due_dates(date(2026, 1, 5), 2, "BIWEEKLY") == [date(2026, 1, 5), date(2026, 1, 19)]
