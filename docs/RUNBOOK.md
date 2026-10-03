@@ -140,7 +140,7 @@ alter role app_api with login password '<a long random password>';
 ```
 
 `DATABASE_URL` for the API and the worker uses the **session pooler** (IPv4) with that role:
-`postgresql://app_api.dzwfmotqnwyeuddwrkwf:<password>@<pooler-host>:5432/postgres` where `<pooler-host>` is shown under **Connect → Session pooler** (e.g. `aws-0-eu-central-1.pooler.supabase.com`).
+`postgresql://app_api.dzwfmotqnwyeuddwrkwf:<password>@<pooler-host>:5432/postgres` where `<pooler-host>` is shown under **Connect → Session pooler** (for this project: `aws-1-eu-central-1.pooler.supabase.com`).
 
 ### 6.2 Supabase Auth settings (dashboard)
 
