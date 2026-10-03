@@ -32,10 +32,10 @@ test('one expense is split over two cars, each taking its part', async ({ page }
 
 test('an installment sale carries the markup the owner sets', async ({ page }) => {
   test.setTimeout(120_000);
-  // Turned on in Settings → Policies (Q-03).
+  // Turned on in Settings → Policies (Q-03, docs/SHARIA.md).
   await page.goto(`/t/${NOUR}/settings/policies`);
   await page.locator('#pol-installment_markup_mode').click();
-  await page.getByRole('option', { name: 'بفائدة يحددها المعرض في كل بيعة' }).click();
+  await page.getByRole('option', { name: 'بثمن تقسيط يحدده المعرض في كل بيعة' }).click();
   await page.getByTestId('policies-save').locator('button').click();
   await expect(page.getByText('تم الحفظ').first()).toBeVisible();
 
@@ -55,7 +55,7 @@ test('an installment sale carries the markup the owner sets', async ({ page }) =
   await expect(page.getByTestId('schedule-preview')).toContainText('110,000.00');
 
   await page.getByTestId('post-sale').locator('button').click();
-  await expect(page.getByTestId('preview-summary')).toContainText('فائدة تقسيط');
+  await expect(page.getByTestId('preview-summary')).toContainText('فرق سعر التقسيط');
   await page.getByTestId('confirm').locator('button').click();
   await expect(page.getByTestId('sale-status')).toContainText('مرحّل');
 });

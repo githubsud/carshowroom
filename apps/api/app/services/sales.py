@@ -859,9 +859,16 @@ def preview_post(conn: Connection, sale_id: UUID, *, with_lines: bool, with_prof
     if plan.financed > 0:
         frequency_ar = {"MONTHLY": "شهرية", "BIWEEKLY": "كل أسبوعين", "WEEKLY": "أسبوعية", "QUARTERLY": "ربع سنوية"}
         first = plan.schedule[0]
-        markup_ar = f" + فائدة تقسيط {_money(plan.markup, info, 'ar')} تُسجل ربحاً اليوم" if plan.markup > 0 else ""
+        markup_ar = (
+            f" + فرق سعر التقسيط {_money(plan.markup, info, 'ar')} (ربح البيع، يُسجل اليوم؛ الثمن ثابت لا يزيد بالتأخير)"
+            if plan.markup > 0
+            else ""
+        )
         markup_en = (
-            f" + an installment markup of {_money(plan.markup, info, 'en')}, income today" if plan.markup > 0 else ""
+            f" + an installment price difference of {_money(plan.markup, info, 'en')} (sale profit, recorded today; "
+            "the price is fixed and never grows with late payment)"
+            if plan.markup > 0
+            else ""
         )
         parts_ar.append(
             f"والباقي {_money(plan.financed, info, 'ar')}{markup_ar} على {len(plan.schedule)} قسط "

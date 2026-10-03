@@ -44,7 +44,7 @@
 | 2200 | Payable to consignors | مستحقات لأصحاب سيارات الأمانة | Liability | Cr | CONSIGNOR | ✓ |
 | 2300 | Customer deposits | عرابين العملاء | Liability | Cr | CUSTOMER (+vehicle) | ✓ |
 | 2310 | Customer credits / refunds owed (D-41) | أرصدة دائنة للعملاء / مبالغ مستحقة الرد | Liability | Cr | CUSTOMER | ✓ |
-| 2400 | Deferred installment income (markup mode only) | إيرادات تقسيط مؤجلة | Liability | Cr | CUSTOMER | ✓ |
+| 2400 | Deferred installment sale profit (markup mode only) | أرباح بيع بالتقسيط مؤجلة | Liability | Cr | CUSTOMER | ✓ |
 | 2500 | Taxes payable | ضرائب مستحقة | Liability | Cr | | ✓ (unused until Q-11) |
 | 2600 | Loans from partners | قروض من الشركاء | Liability | Cr | PARTNER | ✓ |
 | 2700 | Payable to suppliers | مستحقات للموردين | Liability | Cr | SUPPLIER | ✓ |
@@ -58,7 +58,7 @@
 | 4100 | Vehicle sales | مبيعات السيارات | Income | Cr | VEHICLE | ✓ |
 | 4150 | Sales discounts (contra-income) | خصومات المبيعات | Income | Dr | VEHICLE | ✓ |
 | 4200 | Consignment commission income | عمولات بيع سيارات الأمانة | Income | Cr | VEHICLE | ✓ |
-| 4300 | Installment financing income | إيرادات التقسيط | Income | Cr | CUSTOMER | ✓ |
+| 4300 | Installment sale profit | أرباح البيع بالتقسيط | Income | Cr | CUSTOMER | ✓ |
 | 4900 | Other income | إيرادات أخرى | Income | Cr | | ✓ |
 | 5000 | Cost of vehicles sold | تكلفة السيارات المباعة | Expense | Dr | VEHICLE | ✓ (DECISION: 5000 is postable, as in the spec) |
 | 6000 | Expenses | المصروفات | Expense | Dr | | header |
@@ -253,14 +253,14 @@ The gross profit on V1 is 480,000 − 415,000 = **65,000** (13.54% of the sale p
 
 Schedule rule (FACT, SPEC §4.8): equal split, with the rounding remainder on the **last** installment. For example, if the same 450,000 were split into 7 installments: 450,000 ÷ 7 = 64,285.71, the first 6 total 385,714.26, so the last installment is 64,285.74.
 
-**Rule 14: Installment sale (mode b, markup).** The cash price is 600,000 and the financing markup is 60,000. A down payment of 150,000 leaves a receivable of 450,000 + 60,000 = 510,000 (6 × 85,000).
+**Rule 14: Installment sale (mode b, installment price difference; a deferred-price sale, not interest: docs/SHARIA.md).** The cash price is 600,000 and the financing markup is 60,000. A down payment of 150,000 leaves a receivable of 450,000 + 60,000 = 510,000 (6 × 85,000).
 
 | Account | Dr | Cr |
 |---|---:|---:|
 | 1101 Main cash box | 150,000.00 | |
 | 1400 Installment receivables (Mariam) | 510,000.00 | |
 | 4100 Vehicle sales (V2) | | 600,000.00 |
-| 2400 Deferred installment income (Mariam) | | 60,000.00 |
+| 2400 Deferred installment sale profit (Mariam) | | 60,000.00 |
 
 Cost recognition is the same as in rule 13.
 
@@ -281,8 +281,8 @@ Cost recognition is the same as in rule 13.
 |---|---:|---:|
 | 1101 Main cash box | 85,000.00 | |
 | 1400 Installment receivables (Mariam) | | 85,000.00 |
-| 2400 Deferred installment income (Mariam) | 10,000.00 | |
-| 4300 Installment financing income (Mariam) | | 10,000.00 |
+| 2400 Deferred installment sale profit (Mariam) | 10,000.00 | |
+| 4300 Installment sale profit (Mariam) | | 10,000.00 |
 
 **Rule 27: Post-dated cheque bounced (after being recorded as collected).** Mariam's 75,000 cheque, already recorded as collected into CIB, bounces. Installment #2 reopens, and the customer is flagged.
 

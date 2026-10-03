@@ -37,6 +37,13 @@ _L: dict[str, dict[Language, str]] = {
     "payments": {"ar": "طريقة السداد", "en": "Payment"},
     "deposit": {"ar": "عربون مدفوع مسبقاً", "en": "Deposit paid earlier"},
     "trade_in": {"ar": "سيارة مستبدلة", "en": "Trade-in vehicle"},
+    "markup": {"ar": "فرق سعر التقسيط", "en": "Installment price difference"},
+    "deferred_total": {"ar": "الثمن الإجمالي (بيع بالتقسيط)", "en": "Total price (installment sale)"},
+    "installments": {"ar": "الباقي على {n} قسط، أولها {first}", "en": "The rest in {n} installments from {first}"},
+    "fixed_price": {
+        "ar": "الثمن المذكور متفق عليه عند العقد وثابت، ولا يزيد بأي حال عند التأخر في السداد.",
+        "en": "The price above is agreed at the contract and fixed; it never increases if a payment is late.",
+    },
     "sign_seller": {"ar": "توقيع البائع", "en": "Seller signature"},
     "sign_buyer": {"ar": "توقيع المشتري", "en": "Buyer signature"},
     "contract_text": {
@@ -81,9 +88,22 @@ def render_html(context: dict[str, Any], kind: Kind, language: Language, logo_ur
             f"<tr><td>{t('trade_in')}: {escape(label)} {escape(trade_in.vin or '')}</td>"
             f"<td class='num'>{money(trade_in.agreed_value)}</td></tr>"
         )
+    # An installment sale is one agreed deferred price (docs/SHARIA.md): show it whole.
+    plan = sale.get("installment_plan") or None
+    markup = Decimal(str(plan.get("markup") or 0)) if plan else Decimal(0)
+    if plan and Decimal(sale["receivable_amount"]) > 0:
+        schedule = plan.get("schedule") or []
+        count = plan.get("count") or len(schedule)
+        first = plan.get("first_due_date") or (schedule[0]["due_date"] if schedule else "")
+        lines.append(
+            f"<tr><td>{escape(t('installments').format(n=count, first=first))}</td>"
+            f"<td class='num'>{money(sale['receivable_amount'])}</td></tr>"
+        )
+    total_price = Decimal(sale["sale_price"]) + markup
+    fixed = f"<p class='terms'>{t('fixed_price')}</p>" if plan else ""
     logo = f"<img class='logo' src='{escape(logo_url)}'>" if logo_url else ""
     contract = (
-        f"<p class='terms'>{t('contract_text')}</p>"
+        f"<p class='terms'>{t('contract_text')}</p>{fixed}"
         f"<table class='signatures'><tr><td>{t('sign_seller')}</td><td>{t('sign_buyer')}</td></tr></table>"
         if kind == "contract"
         else ""
@@ -127,7 +147,8 @@ def render_html(context: dict[str, Any], kind: Kind, language: Language, logo_ur
   <table class="money">
     <tr><td>{t("list_price")}</td><td class="num">{money(sale["list_price"])}</td></tr>
     {f'<tr><td>{t("discount")}</td><td class="num">{money(sale["discount"])}</td></tr>' if Decimal(sale["discount"]) > 0 else ""}
-    <tr class="grand"><td>{t("total")}</td><td class="num">{money(sale["sale_price"])}</td></tr>
+    {f'<tr><td>{t("markup")}</td><td class="num">{money(markup)}</td></tr>' if markup > 0 else ""}
+    <tr class="grand"><td>{t("deferred_total") if markup > 0 else t("total")}</td><td class="num">{money(total_price)}</td></tr>
   </table>
   <h2>{t("payments")}</h2>
   <table class="money">{"".join(lines)}</table>

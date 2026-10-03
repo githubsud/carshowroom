@@ -59,3 +59,26 @@ def test_contract_has_signature_lines_in_english() -> None:
     assert "Seller signature" in html
     assert "Buyer signature" in html
     assert sale_documents.filename(CONTEXT, "contract") == "contract-INV-2026-00001.pdf"
+
+
+def test_an_installment_contract_states_one_fixed_deferred_price() -> None:
+    """docs/SHARIA.md: cash price 600,000, 150,000 down, a 60,000 installment price
+    difference -> one agreed price of 660,000, the rest in 6 installments, and the
+    price never increases with late payment."""
+    sale = {
+        **CONTEXT["sale"],
+        "list_price": Decimal("600000.00"),
+        "discount": Decimal("0.00"),
+        "sale_price": Decimal("600000.00"),
+        "installment_plan": {"frequency": "MONTHLY", "count": 6, "first_due_date": "2026-11-01", "markup": "60000.00"},
+        "receivable_amount": Decimal("510000.00"),
+    }
+    context = {**CONTEXT, "sale": sale, "trade_in": None}
+    html = sale_documents.render_html(context, "contract", "ar")
+    assert "فرق سعر التقسيط" in html
+    assert "الثمن الإجمالي (بيع بالتقسيط)" in html
+    assert "660,000.00" in html
+    assert "الباقي على 6 قسط، أولها 2026-11-01" in html
+    assert "510,000.00" in html
+    assert "لا يزيد بأي حال عند التأخر في السداد" in html
+    assert "فائدة" not in html

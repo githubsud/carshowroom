@@ -273,7 +273,7 @@
     "RATE_LIMITED": "Too many requests; try again shortly",
     "REQUEST_TOO_LARGE": "The request is too large",
     "WITHDRAWAL_EXCEEDS_BALANCE": "The amount is more than the partner's net balance in the business; it cannot be withdrawn.",
-    "MARKUP_DISABLED": "Installment markup is off; turn it on in Settings → Policies"
+    "MARKUP_DISABLED": "Selling on installments above the cash price is off; turn it on in Settings → Policies"
   },
   "finance": {
     "cashTitle": "Cash & bank",
@@ -730,8 +730,8 @@
     "due48h": "Next 48 hours ({{n}})",
     "due7d": "Next 7 days ({{n}})",
     "overdueN": "Overdue ({{n}})",
-    "markup": "Installment markup",
-    "markupPct": "or a percentage",
+    "markup": "Installment price difference",
+    "markupPct": "or a % of the rest",
     "totalWithMarkup": "Installments total"
   },
   "papers": {
@@ -1014,10 +1014,10 @@
     "cash_negative_policy_hint": "Warn only, or refuse the movement.",
     "cash_negative_policy_WARN": "Warn",
     "cash_negative_policy_BLOCK": "Refuse",
-    "installment_markup_mode": "Installment markup",
-    "installment_markup_mode_hint": "When on, each installment sale can carry a markup, recorded as income on the sale date.",
-    "installment_markup_mode_A": "No markup (installments = the rest of the price)",
-    "installment_markup_mode_B_ENABLED": "A markup set on each sale"
+    "installment_markup_mode": "Installment sale price",
+    "installment_markup_mode_hint": "When on, each installment sale can have a price above the cash price, agreed in the contract. It never increases afterwards and there are no late fees.",
+    "installment_markup_mode_A": "At the cash price (installments = the rest)",
+    "installment_markup_mode_B_ENABLED": "At an installment price set on each sale"
   },
   "imports": {
     "title": "Import from Excel",

@@ -273,7 +273,7 @@
     "RATE_LIMITED": "طلبات كثيرة؛ حاول بعد قليل",
     "REQUEST_TOO_LARGE": "الطلب أكبر من المسموح",
     "WITHDRAWAL_EXCEEDS_BALANCE": "المبلغ أكبر من صافي رصيد الشريك؛ لا يمكن سحب أكثر من الرصيد.",
-    "MARKUP_DISABLED": "فائدة التقسيط غير مفعّلة؛ فعّلها من الإعدادات ← السياسات"
+    "MARKUP_DISABLED": "البيع بثمن تقسيط أعلى من الكاش غير مفعّل؛ فعّله من الإعدادات ← السياسات"
   },
   "finance": {
     "cashTitle": "الخزنة والبنك",
@@ -730,8 +730,8 @@
     "due48h": "خلال 48 ساعة ({{n}})",
     "due7d": "خلال 7 أيام ({{n}})",
     "overdueN": "متأخرة ({{n}})",
-    "markup": "فائدة التقسيط",
-    "markupPct": "أو نسبة %",
+    "markup": "فرق سعر التقسيط",
+    "markupPct": "أو نسبة % من الباقي",
     "totalWithMarkup": "إجمالي الأقساط"
   },
   "papers": {
@@ -1014,10 +1014,10 @@
     "cash_negative_policy_hint": "تحذير فقط أو منع الحركة.",
     "cash_negative_policy_WARN": "تحذير",
     "cash_negative_policy_BLOCK": "منع",
-    "installment_markup_mode": "فائدة التقسيط",
-    "installment_markup_mode_hint": "عند التفعيل تقدر تضيف فائدة على كل بيعة بالتقسيط، وتُسجل ربحاً يوم البيع.",
-    "installment_markup_mode_A": "بدون فائدة (الأقساط = باقي السعر)",
-    "installment_markup_mode_B_ENABLED": "بفائدة يحددها المعرض في كل بيعة"
+    "installment_markup_mode": "ثمن البيع بالتقسيط",
+    "installment_markup_mode_hint": "عند التفعيل يحدد المعرض في كل بيعة بالتقسيط ثمناً أعلى من ثمن الكاش. الثمن يُتفق عليه عند العقد ولا يزيد بعد ذلك أبداً، ولا توجد غرامات تأخير.",
+    "installment_markup_mode_A": "بثمن الكاش (الأقساط = باقي الثمن)",
+    "installment_markup_mode_B_ENABLED": "بثمن تقسيط يحدده المعرض في كل بيعة"
   },
   "imports": {
     "title": "استيراد من Excel",
