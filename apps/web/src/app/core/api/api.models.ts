@@ -129,7 +129,7 @@ export type TradeInInput = Schemas['TradeInIn'];
 
 // --- Installments, deferred papers, notifications (Phase 5) --------------------------
 
-export type InstallmentPlanInput = Schemas['InstallmentPlanIn'];
+export type InstallmentPlanInput = Schemas['InstallmentPlanIn-Input'];
 export type ScheduleRow = Schemas['ScheduleRowOut'];
 export type Installment = Schemas['InstallmentOut'];
 export type InstallmentState = Installment['state'];

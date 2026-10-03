@@ -42,6 +42,8 @@ from app.services.posting import engine, rules
 
 
 def build_schedule(financed: Decimal, plan: InstallmentPlanIn) -> list[ScheduleRow]:
+    """The installments of `financed` (the unpaid part of the price) plus the plan's markup."""
+    financed = financed + plan.markup
     try:
         if plan.frequency == "MANUAL":
             rows = [ScheduleRow(i + 1, r.due_date, r.amount) for i, r in enumerate(plan.schedule or [])]

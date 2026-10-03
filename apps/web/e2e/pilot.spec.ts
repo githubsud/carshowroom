@@ -29,3 +29,33 @@ test('one expense is split over two cars, each taking its part', async ({ page }
   await page.getByTestId('confirm').locator('button').click();
   await expect(page.getByTestId('total-cost')).toContainText('331,500.00');
 });
+
+test('an installment sale carries the markup the owner sets', async ({ page }) => {
+  test.setTimeout(120_000);
+  // Turned on in Settings → Policies (Q-03).
+  await page.goto(`/t/${NOUR}/settings/policies`);
+  await page.locator('#pol-installment_markup_mode').click();
+  await page.getByRole('option', { name: 'بفائدة يحددها المعرض في كل بيعة' }).click();
+  await page.getByTestId('policies-save').locator('button').click();
+  await expect(page.getByText('تم الحفظ').first()).toBeVisible();
+
+  // Nissan Sentra, asking 585,000: 85,000 down, the 500,000 left plus 10% over 5 months.
+  await page.goto(`/t/${NOUR}/vehicles/e1000000-0000-0000-0000-000000000010`);
+  await page.getByTestId('sell').locator('button').click();
+  await page.getByTestId('buyer-picker').locator('input').fill('حسن');
+  await page.getByRole('option', { name: /حسن علي/ }).click();
+  await page.getByTestId('payment-amount-0').locator('input').fill('85000');
+  await page.getByTestId('use-installments').click();
+  await page.getByTestId('inst-count').fill('5');
+  await page.getByTestId('inst-markup-pct').fill('10');
+  await page.getByTestId('inst-markup-pct').press('Tab');
+  await expect(page.getByTestId('financed')).toContainText('500,000.00');
+  await expect(page.getByTestId('installments-total')).toContainText('550,000.00');
+  await expect(page.getByTestId('schedule-preview').locator('li')).toHaveCount(5);
+  await expect(page.getByTestId('schedule-preview')).toContainText('110,000.00');
+
+  await page.getByTestId('post-sale').locator('button').click();
+  await expect(page.getByTestId('preview-summary')).toContainText('فائدة تقسيط');
+  await page.getByTestId('confirm').locator('button').click();
+  await expect(page.getByTestId('sale-status')).toContainText('مرحّل');
+});

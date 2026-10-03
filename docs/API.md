@@ -63,6 +63,7 @@ Endpoint status codes: `200` read, `201` created/posted, `204` no content, `400`
 | `PARTNER_INVALID` | 422 | Unknown, archived or another showroom's partner |
 | `SHARE_DATE_INVALID` | 422 | New batch not after the latest change (D-64) |
 | `REPAYMENT_EXCEEDS_LOAN` | 422 | More than is owed (D-63) |
+| `MARKUP_DISABLED` | 422 | An installment markup while the showroom's `installment_markup_mode` is `A` (D-130) |
 | `WITHDRAWAL_EXCEEDS_BALANCE` | 422 | A drawing or capital withdrawal above the partner's net balance; `details.available` (D-123) |
 | `PARTNER_NOT_SETTLED` | 409 | Archive refused: open share or balance (D-62) |
 | `PARTNER_ALREADY_LINKED` | 409 | Partner already linked to another user (D-66) |

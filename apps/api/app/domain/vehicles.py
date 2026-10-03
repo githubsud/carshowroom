@@ -45,7 +45,14 @@ FundingKind = Literal["CASH_ACCOUNT", "SUPPLIER_CREDIT", "PARTNER"]
 PartnerFundingMode = Literal["CURRENT_ACCOUNT", "LOAN"]
 DocumentEntity = Literal["VEHICLE", "CUSTOMER", "SALE", "SUPPLIER"]
 DocumentType = Literal[
-    "LICENSE", "PURCHASE_CONTRACT", "SELLER_RECEIPT", "INSPECTION_REPORT", "SALE_CONTRACT", "ID_COPY", "OTHER"
+    "LICENSE",
+    "PURCHASE_CONTRACT",
+    "SELLER_RECEIPT",
+    "INSPECTION_REPORT",
+    "SALE_CONTRACT",
+    "ID_COPY",
+    "POWER_OF_ATTORNEY",
+    "OTHER",
 ]
 ImageType = Literal["image/webp", "image/jpeg", "image/png"]
 DocumentContentType = Literal["application/pdf", "image/webp", "image/jpeg", "image/png"]

@@ -22,6 +22,7 @@ type Choice = keyof Pick<
   | 'sale_cancellation_method'
   | 'overpayment_policy'
   | 'cash_negative_policy'
+  | 'installment_markup_mode'
 >;
 
 const CHOICES: Record<Choice, readonly string[]> = {
@@ -33,6 +34,7 @@ const CHOICES: Record<Choice, readonly string[]> = {
   sale_cancellation_method: ['REFUND_LIABILITY', 'MIRROR'],
   overpayment_policy: ['BLOCK', 'ALLOW_AS_CREDIT'],
   cash_negative_policy: ['WARN', 'BLOCK'],
+  installment_markup_mode: ['A', 'B_ENABLED'],
 };
 
 /** Settings → Policies (D-40, D-41): how profit is distributed, how sales are cancelled, aging colours. */

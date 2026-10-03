@@ -272,7 +272,8 @@
     "INVOICE_NOT_OPEN": "هذه الفاتورة ليست مفتوحة",
     "RATE_LIMITED": "طلبات كثيرة؛ حاول بعد قليل",
     "REQUEST_TOO_LARGE": "الطلب أكبر من المسموح",
-    "WITHDRAWAL_EXCEEDS_BALANCE": "المبلغ أكبر من صافي رصيد الشريك؛ لا يمكن سحب أكثر من الرصيد."
+    "WITHDRAWAL_EXCEEDS_BALANCE": "المبلغ أكبر من صافي رصيد الشريك؛ لا يمكن سحب أكثر من الرصيد.",
+    "MARKUP_DISABLED": "فائدة التقسيط غير مفعّلة؛ فعّلها من الإعدادات ← السياسات"
   },
   "finance": {
     "cashTitle": "الخزنة والبنك",
@@ -586,7 +587,8 @@
     "splitWith": "السيارات الأخرى",
     "thisCar": "هذه السيارة",
     "splitGap": "الفرق عن الإجمالي",
-    "splitInvalid": "اختر سيارة أخرى على الأقل، ويجب أن تساوي الأجزاء إجمالي المصروف"
+    "splitInvalid": "اختر سيارة أخرى على الأقل، ويجب أن تساوي الأجزاء إجمالي المصروف",
+    "doc_POWER_OF_ATTORNEY": "توكيل"
   },
   "customers": {
     "title": "العملاء",
@@ -727,7 +729,10 @@
     "openPlan": "فتح جدول الأقساط",
     "due48h": "خلال 48 ساعة ({{n}})",
     "due7d": "خلال 7 أيام ({{n}})",
-    "overdueN": "متأخرة ({{n}})"
+    "overdueN": "متأخرة ({{n}})",
+    "markup": "فائدة التقسيط",
+    "markupPct": "أو نسبة %",
+    "totalWithMarkup": "إجمالي الأقساط"
   },
   "papers": {
     "title": "سجل الأوراق الآجلة",
@@ -1008,7 +1013,11 @@
     "cash_negative_policy": "الخزنة بالسالب",
     "cash_negative_policy_hint": "تحذير فقط أو منع الحركة.",
     "cash_negative_policy_WARN": "تحذير",
-    "cash_negative_policy_BLOCK": "منع"
+    "cash_negative_policy_BLOCK": "منع",
+    "installment_markup_mode": "فائدة التقسيط",
+    "installment_markup_mode_hint": "عند التفعيل تقدر تضيف فائدة على كل بيعة بالتقسيط، وتُسجل ربحاً يوم البيع.",
+    "installment_markup_mode_A": "بدون فائدة (الأقساط = باقي السعر)",
+    "installment_markup_mode_B_ENABLED": "بفائدة يحددها المعرض في كل بيعة"
   },
   "imports": {
     "title": "استيراد من Excel",

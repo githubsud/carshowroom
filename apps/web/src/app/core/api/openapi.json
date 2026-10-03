@@ -3678,6 +3678,7 @@
               "INSPECTION_REPORT",
               "SALE_CONTRACT",
               "ID_COPY",
+              "POWER_OF_ATTORNEY",
               "OTHER"
             ],
             "title": "Doc Type",
@@ -3755,6 +3756,7 @@
               "INSPECTION_REPORT",
               "SALE_CONTRACT",
               "ID_COPY",
+              "POWER_OF_ATTORNEY",
               "OTHER"
             ],
             "title": "Doc Type",
@@ -3826,6 +3828,7 @@
               "INSPECTION_REPORT",
               "SALE_CONTRACT",
               "ID_COPY",
+              "POWER_OF_ATTORNEY",
               "OTHER"
             ],
             "title": "Doc Type",
@@ -5713,9 +5716,9 @@
         "title": "InstallmentOut",
         "type": "object"
       },
-      "InstallmentPlanIn": {
+      "InstallmentPlanIn-Input": {
         "additionalProperties": false,
-        "description": "How the rest of a sale price is paid (mode a, SPEC §4.8): an equal split\nby frequency, or a manual schedule that adds up exactly.",
+        "description": "How the rest of a sale price is paid (SPEC §4.8): an equal split by\nfrequency, or a manual schedule that adds up exactly. `markup` is the\ninstallment premium the owner sets on this sale (mode b, Q-03 answered by the\npilot): the installments total the rest of the price plus the markup.",
         "properties": {
           "count": {
             "anyOf": [
@@ -5752,6 +5755,84 @@
               "MANUAL"
             ],
             "title": "Frequency",
+            "type": "string"
+          },
+          "markup": {
+            "default": "0",
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Markup",
+            "type": "string"
+          },
+          "schedule": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ScheduleRowIn"
+                },
+                "maxItems": 360,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule"
+          }
+        },
+        "title": "InstallmentPlanIn",
+        "type": "object"
+      },
+      "InstallmentPlanIn-Output": {
+        "additionalProperties": false,
+        "description": "How the rest of a sale price is paid (SPEC §4.8): an equal split by\nfrequency, or a manual schedule that adds up exactly. `markup` is the\ninstallment premium the owner sets on this sale (mode b, Q-03 answered by the\npilot): the installments total the rest of the price plus the markup.",
+        "properties": {
+          "count": {
+            "anyOf": [
+              {
+                "maximum": 360.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "first_due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Due Date"
+          },
+          "frequency": {
+            "default": "MONTHLY",
+            "enum": [
+              "MONTHLY",
+              "BIWEEKLY",
+              "WEEKLY",
+              "QUARTERLY",
+              "MANUAL"
+            ],
+            "title": "Frequency",
+            "type": "string"
+          },
+          "markup": {
+            "default": "0.00",
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Markup",
             "type": "string"
           },
           "schedule": {
@@ -10520,7 +10601,7 @@
           "installments": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/InstallmentPlanIn"
+                "$ref": "#/components/schemas/InstallmentPlanIn-Input"
               },
               {
                 "type": "null"
@@ -10873,7 +10954,7 @@
           "installment_plan": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/InstallmentPlanIn"
+                "$ref": "#/components/schemas/InstallmentPlanIn-Output"
               },
               {
                 "type": "null"
@@ -10897,6 +10978,15 @@
             ],
             "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
             "title": "List Price",
+            "type": "string"
+          },
+          "markup": {
+            "default": "0.00",
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Markup",
             "type": "string"
           },
           "notes": {
@@ -11340,7 +11430,7 @@
             "type": "string"
           },
           "plan": {
-            "$ref": "#/components/schemas/InstallmentPlanIn"
+            "$ref": "#/components/schemas/InstallmentPlanIn-Input"
           }
         },
         "required": [

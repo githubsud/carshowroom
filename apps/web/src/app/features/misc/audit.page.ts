@@ -162,7 +162,11 @@ export class AuditPage implements OnInit {
     void this.load(1);
   }
 
+  /** Only the latest search may fill the list: an earlier, slower answer is dropped. */
+  private requestNo = 0;
+
   protected async load(page: number): Promise<void> {
+    const request = ++this.requestNo;
     try {
       const result = await this.api.audit({
         entity_type: this.entity.trim() || null,
@@ -172,12 +176,17 @@ export class AuditPage implements OnInit {
         page,
         page_size: 50,
       });
+      if (request !== this.requestNo) {
+        return;
+      }
       this.page = page;
       this.rows.set(result.items);
       this.pages.set(Math.max(1, Math.ceil(result.total / result.page_size)));
       this.error.set(null);
     } catch (error) {
-      this.error.set(this.errors.message(error));
+      if (request === this.requestNo) {
+        this.error.set(this.errors.message(error));
+      }
     }
   }
 

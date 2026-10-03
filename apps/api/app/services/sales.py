@@ -379,8 +379,11 @@ def get_sale(conn: Connection, sale_id: UUID, *, viewer_id: UUID, see_all_drafts
     trade_in_value = Decimal(row["trade_in_value"])
     plan = InstallmentPlanIn.model_validate(row["installment_plan"]) if row["installment_plan"] else None
     open_amount = Decimal(row["sale_price"]) - paid - deposit - trade_in_value
+    markup = plan.markup if plan else ZERO
     financed = (
-        (Decimal(row["receivable_amount"]) if row["status"] != "DRAFT" else max(open_amount, ZERO)) if plan else ZERO
+        (Decimal(row["receivable_amount"]) - markup if row["status"] != "DRAFT" else max(open_amount, ZERO))
+        if plan
+        else ZERO
     )
     sale = SaleOut(
         id=row["id"],
@@ -410,6 +413,7 @@ def get_sale(conn: Connection, sale_id: UUID, *, viewer_id: UUID, see_all_drafts
         paid_total=paid,
         installment_plan=plan,
         financed=financed,
+        markup=markup,
         plan_id=installments.plan_id_for_sale(conn, row["id"]) if row["status"] != "DRAFT" else None,
         remaining=open_amount - financed,
         invoice_no=row["invoice_no"],
@@ -639,6 +643,10 @@ class _SalePlan:
     schedule: list[ScheduleRow]
     consignment: "_ConsignmentSale | None" = None
 
+    @property
+    def markup(self) -> Decimal:
+        return self.plan.markup if self.plan else ZERO
+
 
 @dataclass(frozen=True)
 class _ConsignmentSale:
@@ -757,6 +765,14 @@ def _plan_post(
             raise AppError("FEATURE_DISABLED", "Installments are not enabled for this showroom", status_code=403)
         if financed <= 0:
             raise AppError("NOTHING_TO_FINANCE", "Nothing is left to pay by installments", status_code=422)
+        if plan.markup > 0:
+            mode = conn.execute(text("select installment_markup_mode from public.tenant_settings")).scalar_one()
+            if mode != "B_ENABLED":
+                raise AppError(
+                    "MARKUP_DISABLED",
+                    "Installment markup is not enabled for this showroom (Settings → Policies)",
+                    status_code=422,
+                )
         schedule = installments.build_schedule(financed, plan)
     if paid + deposit + trade_value + financed != sale_price:
         raise AppError(
@@ -784,6 +800,7 @@ def _plan_post(
         description=description,
         source_id=sale_id,
         financed=financed,
+        markup=plan.markup if plan else ZERO,
         consignor_id=consignment_sale.consignor_id if consignment_sale else None,
         # A consigned car's price is owed to its owner in full (rule 16): no discount line of ours.
         discount=ZERO if consignment_sale else Decimal(sale["discount"]),
@@ -842,12 +859,16 @@ def preview_post(conn: Connection, sale_id: UUID, *, with_lines: bool, with_prof
     if plan.financed > 0:
         frequency_ar = {"MONTHLY": "شهرية", "BIWEEKLY": "كل أسبوعين", "WEEKLY": "أسبوعية", "QUARTERLY": "ربع سنوية"}
         first = plan.schedule[0]
+        markup_ar = f" + فائدة تقسيط {_money(plan.markup, info, 'ar')} تُسجل ربحاً اليوم" if plan.markup > 0 else ""
+        markup_en = (
+            f" + an installment markup of {_money(plan.markup, info, 'en')}, income today" if plan.markup > 0 else ""
+        )
         parts_ar.append(
-            f"والباقي {_money(plan.financed, info, 'ar')} على {len(plan.schedule)} قسط "
+            f"والباقي {_money(plan.financed, info, 'ar')}{markup_ar} على {len(plan.schedule)} قسط "
             f"{frequency_ar.get(plan.plan.frequency if plan.plan else '', '')} أولها {ltr(first.due_date.isoformat())}"
         )
         parts_en.append(
-            f"the remaining {_money(plan.financed, info, 'en')} in {len(plan.schedule)} installments from "
+            f"the remaining {_money(plan.financed, info, 'en')}{markup_en} in {len(plan.schedule)} installments from "
             f"{first.due_date.isoformat()}"
         )
     discount = Decimal(plan.sale["discount"])
@@ -980,7 +1001,7 @@ def post_sale(conn: Connection, sale_id: UUID, *, user_id: UUID, with_profit: bo
                 "trade_in_vehicle": created_trade_in,
                 "einvoice_status": einvoice.status,
                 "einvoice_uuid": einvoice.document_uuid,
-                "financed": plan.financed,
+                "financed": plan.financed + plan.markup,
                 "id": sale_id,
             },
         )
@@ -989,7 +1010,7 @@ def post_sale(conn: Connection, sale_id: UUID, *, user_id: UUID, with_profit: bo
             conn,
             sale_id=sale_id,
             customer_id=plan.sale["buyer_customer_id"],
-            financed=plan.financed,
+            financed=plan.financed + plan.markup,
             plan=plan.plan,
             schedule=plan.schedule,
         )
@@ -1122,7 +1143,8 @@ def _plan_cancel(
             amount_paid=paid,
             trade_in=(sale["trade_in_vehicle_id"], trade_value) if trade_value > 0 else None,
             receivable_outstanding=Decimal(sale["receivable_amount"]) - collected,
-            discount=_posted_discount(conn, sale["journal_entry_id"]),
+            discount=_posted(conn, sale["journal_entry_id"], "SALES_DISCOUNTS"),
+            markup=-_posted(conn, sale["journal_entry_id"], "INSTALLMENT_FINANCING_INCOME"),
             description=f"إلغاء بيع {vehicle.label} ({vehicle.stock_no}) — {sale['sale_no']}: {payload.reason}",
             source_id=sale_id,
         )
@@ -1175,16 +1197,16 @@ def _trade_in_expenses(conn: Connection, trade_in_vehicle_id: UUID, agreed_value
     return max(vehicles.inventory_cost(conn, trade_in_vehicle_id) - agreed_value, ZERO)
 
 
-def _posted_discount(conn: Connection, entry_id: UUID) -> Decimal:
-    """The sales-discount line of a sale's entry, so a cancellation mirrors what was posted."""
+def _posted(conn: Connection, entry_id: UUID, system_key: str) -> Decimal:
+    """Debit minus credit on one account in a sale's entry, so a cancellation mirrors what was posted."""
     return Decimal(
         conn.execute(
             text(
                 "select coalesce(sum(l.debit - l.credit), 0) from public.journal_lines l "
                 "join public.ledger_accounts a on a.id = l.ledger_account_id "
-                "where l.journal_entry_id = :id and a.system_key = 'SALES_DISCOUNTS'"
+                "where l.journal_entry_id = :id and a.system_key = :key"
             ),
-            {"id": entry_id},
+            {"id": entry_id, "key": system_key},
         ).scalar_one()
     )
 

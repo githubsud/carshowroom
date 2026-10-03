@@ -272,7 +272,8 @@
     "INVOICE_NOT_OPEN": "This invoice is not open",
     "RATE_LIMITED": "Too many requests; try again shortly",
     "REQUEST_TOO_LARGE": "The request is too large",
-    "WITHDRAWAL_EXCEEDS_BALANCE": "The amount is more than the partner's net balance in the business; it cannot be withdrawn."
+    "WITHDRAWAL_EXCEEDS_BALANCE": "The amount is more than the partner's net balance in the business; it cannot be withdrawn.",
+    "MARKUP_DISABLED": "Installment markup is off; turn it on in Settings → Policies"
   },
   "finance": {
     "cashTitle": "Cash & bank",
@@ -586,7 +587,8 @@
     "splitWith": "The other cars",
     "thisCar": "This car",
     "splitGap": "Difference from the total",
-    "splitInvalid": "Choose at least one other car, and make the parts add up to the total"
+    "splitInvalid": "Choose at least one other car, and make the parts add up to the total",
+    "doc_POWER_OF_ATTORNEY": "Power of attorney"
   },
   "customers": {
     "title": "Customers",
@@ -727,7 +729,10 @@
     "openPlan": "Open the installment plan",
     "due48h": "Next 48 hours ({{n}})",
     "due7d": "Next 7 days ({{n}})",
-    "overdueN": "Overdue ({{n}})"
+    "overdueN": "Overdue ({{n}})",
+    "markup": "Installment markup",
+    "markupPct": "or a percentage",
+    "totalWithMarkup": "Installments total"
   },
   "papers": {
     "title": "Deferred papers",
@@ -1008,7 +1013,11 @@
     "cash_negative_policy": "Cash going negative",
     "cash_negative_policy_hint": "Warn only, or refuse the movement.",
     "cash_negative_policy_WARN": "Warn",
-    "cash_negative_policy_BLOCK": "Refuse"
+    "cash_negative_policy_BLOCK": "Refuse",
+    "installment_markup_mode": "Installment markup",
+    "installment_markup_mode_hint": "When on, each installment sale can carry a markup, recorded as income on the sale date.",
+    "installment_markup_mode_A": "No markup (installments = the rest of the price)",
+    "installment_markup_mode_B_ENABLED": "A markup set on each sale"
   },
   "imports": {
     "title": "Import from Excel",

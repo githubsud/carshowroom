@@ -3862,7 +3862,7 @@ export interface components {
              * Doc Type
              * @enum {string}
              */
-            doc_type: "LICENSE" | "PURCHASE_CONTRACT" | "SELLER_RECEIPT" | "INSPECTION_REPORT" | "SALE_CONTRACT" | "ID_COPY" | "OTHER";
+            doc_type: "LICENSE" | "PURCHASE_CONTRACT" | "SELLER_RECEIPT" | "INSPECTION_REPORT" | "SALE_CONTRACT" | "ID_COPY" | "POWER_OF_ATTORNEY" | "OTHER";
             /**
              * Entity Id
              * Format: uuid
@@ -3899,7 +3899,7 @@ export interface components {
              * Doc Type
              * @enum {string}
              */
-            doc_type: "LICENSE" | "PURCHASE_CONTRACT" | "SELLER_RECEIPT" | "INSPECTION_REPORT" | "SALE_CONTRACT" | "ID_COPY" | "OTHER";
+            doc_type: "LICENSE" | "PURCHASE_CONTRACT" | "SELLER_RECEIPT" | "INSPECTION_REPORT" | "SALE_CONTRACT" | "ID_COPY" | "POWER_OF_ATTORNEY" | "OTHER";
             /**
              * Entity Id
              * Format: uuid
@@ -3928,7 +3928,7 @@ export interface components {
              * Doc Type
              * @enum {string}
              */
-            doc_type: "LICENSE" | "PURCHASE_CONTRACT" | "SELLER_RECEIPT" | "INSPECTION_REPORT" | "SALE_CONTRACT" | "ID_COPY" | "OTHER";
+            doc_type: "LICENSE" | "PURCHASE_CONTRACT" | "SELLER_RECEIPT" | "INSPECTION_REPORT" | "SALE_CONTRACT" | "ID_COPY" | "POWER_OF_ATTORNEY" | "OTHER";
             /**
              * Entity Id
              * Format: uuid
@@ -4611,10 +4611,12 @@ export interface components {
         };
         /**
          * InstallmentPlanIn
-         * @description How the rest of a sale price is paid (mode a, SPEC §4.8): an equal split
-         *     by frequency, or a manual schedule that adds up exactly.
+         * @description How the rest of a sale price is paid (SPEC §4.8): an equal split by
+         *     frequency, or a manual schedule that adds up exactly. `markup` is the
+         *     installment premium the owner sets on this sale (mode b, Q-03 answered by the
+         *     pilot): the installments total the rest of the price plus the markup.
          */
-        InstallmentPlanIn: {
+        "InstallmentPlanIn-Input": {
             /** Count */
             count?: number | null;
             /** First Due Date */
@@ -4625,6 +4627,39 @@ export interface components {
              * @enum {string}
              */
             frequency: "MONTHLY" | "BIWEEKLY" | "WEEKLY" | "QUARTERLY" | "MANUAL";
+            /**
+             * Markup
+             * @default 0
+             * @example 25000.00
+             */
+            markup: string;
+            /** Schedule */
+            schedule?: components["schemas"]["ScheduleRowIn"][] | null;
+        };
+        /**
+         * InstallmentPlanIn
+         * @description How the rest of a sale price is paid (SPEC §4.8): an equal split by
+         *     frequency, or a manual schedule that adds up exactly. `markup` is the
+         *     installment premium the owner sets on this sale (mode b, Q-03 answered by the
+         *     pilot): the installments total the rest of the price plus the markup.
+         */
+        "InstallmentPlanIn-Output": {
+            /** Count */
+            count?: number | null;
+            /** First Due Date */
+            first_due_date?: string | null;
+            /**
+             * Frequency
+             * @default MONTHLY
+             * @enum {string}
+             */
+            frequency: "MONTHLY" | "BIWEEKLY" | "WEEKLY" | "QUARTERLY" | "MANUAL";
+            /**
+             * Markup
+             * @default 0.00
+             * @example 25000.00
+             */
+            markup: string;
             /** Schedule */
             schedule?: components["schemas"]["ScheduleRowIn"][] | null;
         };
@@ -6354,7 +6389,7 @@ export interface components {
              * @example 25000.00
              */
             discount: string;
-            installments?: components["schemas"]["InstallmentPlanIn"] | null;
+            installments?: components["schemas"]["InstallmentPlanIn-Input"] | null;
             /**
              * List Price
              * @example 25000.00
@@ -6479,7 +6514,7 @@ export interface components {
              * Format: uuid
              */
             id: string;
-            installment_plan: components["schemas"]["InstallmentPlanIn"] | null;
+            installment_plan: components["schemas"]["InstallmentPlanIn-Output"] | null;
             /** Invoice No */
             invoice_no: string | null;
             /**
@@ -6487,6 +6522,12 @@ export interface components {
              * @example 25000.00
              */
             list_price: string;
+            /**
+             * Markup
+             * @default 0.00
+             * @example 25000.00
+             */
+            markup: string;
             /** Notes */
             notes: string | null;
             /**
@@ -6635,7 +6676,7 @@ export interface components {
              * @example 25000.00
              */
             financed: string;
-            plan: components["schemas"]["InstallmentPlanIn"];
+            plan: components["schemas"]["InstallmentPlanIn-Input"];
         };
         /** ScheduleRowIn */
         ScheduleRowIn: {

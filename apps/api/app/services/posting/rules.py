@@ -503,6 +503,7 @@ def sale(
     financed: Decimal = ZERO,
     consignor_id: UUID | None = None,
     discount: Decimal = ZERO,
+    markup: Decimal = ZERO,
 ) -> EntryDraft:
     """Rule 12 (cash/bank sale, deposit applied), rule 13 (the rest financed by
     installments, mode a: Dr installment receivable for the buyer) and rule 26 (trade-in):
@@ -511,6 +512,10 @@ def sale(
     `sale_price` is the net price the buyer pays. A discount is its own line
     (P-12 as revised by the pilot review): Cr vehicle sales at the list price and
     Dr sales discounts (sold car), so revenue is still the net price.
+
+    Rule 14 with the pilot's recognition (Q-03): an installment `markup` is added
+    to the receivable and recognised at once, Cr installment financing income
+    (buyer), instead of the deferred 2400 of the spec's illustration.
 
     Rule 16 entry A, a consigned-in car (`consignor_id` given): the full price is
     owed to the owner, so Cr payable to consignors (consignor + vehicle) instead
@@ -532,14 +537,20 @@ def sale(
                 vehicle_id=trade_in_vehicle_id,
             )
         )
+    if markup < 0 or (markup > 0 and financed <= 0):
+        raise LedgerRuleError("a markup needs an installment plan")
     if financed > 0:
         lines.append(
             Line(
-                account=Account.system("INSTALLMENT_RECEIVABLE"), debit=_positive_amount(financed), customer_id=buyer_id
+                account=Account.system("INSTALLMENT_RECEIVABLE"),
+                debit=_positive_amount(financed + markup),
+                customer_id=buyer_id,
             )
         )
-    if sum((line.debit for line in lines), ZERO) != sale_price:
+    if sum((line.debit for line in lines), ZERO) != sale_price + markup:
         raise LedgerRuleError("payments, deposit, trade-in and financed amount must add up to the sale price")
+    if markup > 0:
+        lines.append(Line(account=Account.system("INSTALLMENT_FINANCING_INCOME"), credit=markup, customer_id=buyer_id))
     if consignor_id is not None:
         lines.append(
             Line(
@@ -594,9 +605,11 @@ def sale_cancellation_to_credit(
     source_id: UUID | None,
     receivable_outstanding: Decimal = ZERO,
     discount: Decimal = ZERO,
+    markup: Decimal = ZERO,
 ) -> EntryDraft:
     """`discount` is the sales-discount line the sale itself posted (none for
-    sales posted before discounts had their own line).
+    sales posted before discounts had their own line); `markup` the installment
+    income it recognised, taken back out (Dr installment financing income).
 
     P-03 (approved as the default cancellation method, D-41): reverse the revenue
     and owe the customer what they paid: Dr vehicle sales / Cr customer credits
@@ -609,6 +622,8 @@ def sale_cancellation_to_credit(
         lines.append(
             Line(account=Account.system("SALES_DISCOUNTS"), credit=_positive_amount(discount), vehicle_id=vehicle_id)
         )
+    if markup > 0:
+        lines.append(Line(account=Account.system("INSTALLMENT_FINANCING_INCOME"), debit=markup, customer_id=buyer_id))
     if amount_paid > 0:
         lines.append(
             Line(account=Account.system("CUSTOMER_CREDITS"), credit=_positive_amount(amount_paid), customer_id=buyer_id)

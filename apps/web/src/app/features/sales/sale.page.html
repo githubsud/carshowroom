@@ -165,7 +165,18 @@
                   <input pInputText id="inst-first" type="date" formControlName="inst_first_due"
                          (change)="refreshSchedule()" data-testid="inst-first" /></div>
               </div>
+              <div class="row">
+                <div class="field"><label for="inst-markup">{{ 'installments.markup' | transloco }}</label>
+                  <app-money-input inputId="inst-markup" formControlName="inst_markup" (focusout)="refreshSchedule()"
+                                   data-testid="inst-markup" /></div>
+                <div class="field"><label for="inst-markup-pct">{{ 'installments.markupPct' | transloco }}</label>
+                  <input pInputText id="inst-markup-pct" inputmode="decimal" dir="ltr" [value]="markupPct()"
+                         (change)="applyMarkupPct($any($event.target).value)" data-testid="inst-markup-pct" /></div>
+              </div>
               <p>{{ 'installments.financed' | transloco }}: <strong data-testid="financed">{{ financed() | money }}</strong>
+                @if (markup() !== '0.00') {
+                  — {{ 'installments.totalWithMarkup' | transloco }}: <strong data-testid="installments-total">{{ installmentsTotal() | money }}</strong>
+                }
                 @if (editable()) {
                   <p-button type="button" [text]="true" size="small" icon="pi pi-refresh"
                             [label]="'installments.showSchedule' | transloco" (onClick)="refreshSchedule()"

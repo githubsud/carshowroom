@@ -273,7 +273,9 @@ Cost recognition is the same as in rule 13.
 | 1101 Main cash box | 75,000.00 | |
 | 1400 Installment receivables (Mariam) | | 75,000.00 |
 
-*Mode b:* Mariam pays installment #1, 85,000 cash. The markup portion is then recognized. **The recognition method is an OPEN QUESTION (Q-03).** The figures below are **illustrative only** and use a proportional split: 60,000 / 510,000 × 85,000 = 10,000.
+**Answered by the pilot showroom (D-130):** the markup is recognised in full on the sale date, Cr 4300 instead of 2400 in rule 14, so collections post exactly as mode a and nothing below is deferred. The deferred variant is kept for reference only.
+
+*Mode b (deferred variant, not used):* Mariam pays installment #1, 85,000 cash. The markup portion is then recognized. **The recognition method was an OPEN QUESTION (Q-03).** The figures below are **illustrative only** and use a proportional split: 60,000 / 510,000 × 85,000 = 10,000.
 
 | Account | Dr | Cr |
 |---|---:|---:|

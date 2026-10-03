@@ -120,6 +120,7 @@ export class SalePage implements OnInit {
     inst_count: ['6', Validators.pattern(/^\d{1,3}$/)],
     inst_frequency: ['MONTHLY' as 'MONTHLY' | 'BIWEEKLY' | 'WEEKLY' | 'QUARTERLY'],
     inst_first_due: [''],
+    inst_markup: ['', optionalMoney],
     notes: [''],
     payments: this.payments,
   });
@@ -165,6 +166,12 @@ export class SalePage implements OnInit {
     this.values().use_installments && !this.open().startsWith('-') ? this.open() : '0.00',
   );
   protected readonly remaining = computed(() => moneyMinus(this.open(), this.financed()));
+  /** The installment markup the owner sets on this sale (mode b, Q-03): income on the sale date. */
+  protected readonly markup = computed(() =>
+    this.values().use_installments && this.values().inst_markup ? moneyMinus(this.values().inst_markup, '0') : '0.00',
+  );
+  protected readonly installmentsTotal = computed(() => moneySum(this.financed(), this.markup()));
+  protected readonly markupPct = signal('');
   protected readonly schedule = signal<ScheduleRow[]>([]);
   protected readonly installmentsEnabled = computed(() => this.context.flags()['installments'] === true);
   protected readonly frequencyOptions = computed(() => {
@@ -264,6 +271,7 @@ export class SalePage implements OnInit {
       inst_count: String(sale.installment_plan?.count ?? 6),
       inst_frequency: (sale.installment_plan?.frequency ?? 'MONTHLY') as 'MONTHLY',
       inst_first_due: sale.installment_plan?.first_due_date ?? '',
+      inst_markup: sale.installment_plan?.markup && sale.installment_plan.markup !== '0.00' ? sale.installment_plan.markup : '',
       notes: sale.notes ?? '',
     });
     void this.refreshSchedule();
@@ -307,10 +315,27 @@ export class SalePage implements OnInit {
           }
         : null,
       installments: v.use_installments
-        ? { frequency: v.inst_frequency, count: Number(v.inst_count), first_due_date: v.inst_first_due }
+        ? {
+            frequency: v.inst_frequency,
+            count: Number(v.inst_count),
+            first_due_date: v.inst_first_due,
+            markup: v.inst_markup || '0',
+          }
         : null,
       notes: v.notes.trim() || null,
     };
+  }
+
+  /** A percentage of what is financed, turned into the markup amount (rounded to the cent). */
+  protected applyMarkupPct(value: string): void {
+    this.markupPct.set(value);
+    const pct = Number(value.replace(',', '.'));
+    if (!value.trim() || Number.isNaN(pct) || pct < 0) {
+      return;
+    }
+    const cents = Math.round(Number(this.financed()) * pct);
+    this.form.patchValue({ inst_markup: (cents / 100).toFixed(2) });
+    void this.refreshSchedule();
   }
 
   /** Show the schedule the API will create (equal split, remainder on the last installment). */
@@ -326,6 +351,7 @@ export class SalePage implements OnInit {
           frequency: v.inst_frequency,
           count: Number(v.inst_count),
           first_due_date: v.inst_first_due,
+          markup: v.inst_markup || '0',
         }),
       );
       this.error.set(null);

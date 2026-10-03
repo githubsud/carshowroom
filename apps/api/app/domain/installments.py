@@ -2,6 +2,7 @@
 notifications (SPEC §4.8, §4.17)."""
 
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Annotated, Literal
 from uuid import UUID
 
@@ -37,16 +38,21 @@ class ScheduleRowOut(BaseModel):
 
 
 class InstallmentPlanIn(StrictModel):
-    """How the rest of a sale price is paid (mode a, SPEC §4.8): an equal split
-    by frequency, or a manual schedule that adds up exactly."""
+    """How the rest of a sale price is paid (SPEC §4.8): an equal split by
+    frequency, or a manual schedule that adds up exactly. `markup` is the
+    installment premium the owner sets on this sale (mode b, Q-03 answered by the
+    pilot): the installments total the rest of the price plus the markup."""
 
     frequency: PlanFrequency = "MONTHLY"
     count: int | None = Field(default=None, ge=1, le=360)
     first_due_date: date | None = None
     schedule: list[ScheduleRowIn] | None = Field(default=None, max_length=360)
+    markup: Money = Decimal(0)
 
     @model_validator(mode="after")
     def _complete(self) -> "InstallmentPlanIn":
+        if self.markup < 0:
+            raise ValueError("the markup cannot be negative")
         if self.frequency == "MANUAL":
             if not self.schedule:
                 raise ValueError("a manual plan needs its schedule")

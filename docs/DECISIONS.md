@@ -264,6 +264,8 @@
 | D-127 | **Pilot review.** One direct expense can be split over several cars (`POST /vehicle-expenses/split`): each car's part is an ordinary vehicle expense with its own entry and treatment (cost, P-04 cost of sales, or consignment terms), the parts share a `split_group_id`, the cash check runs once on the total. The dialog offers an equal split, editable per car. Indirect expenses stay general expenses and are never charged to cars | Accountant follow-up item 5 |
 | D-128 | **Pilot review.** D-76 revised: a sale whose trade-in car has had expenses can be cancelled. The car goes back to the customer and a second entry charges what was spent on it (its inventory beyond the agreed value): Dr customer credits up to what the customer is owed (REFUND_LIABILITY), the rest Dr other receivables (always so under MIRROR, which refunds the money as it came) / Cr vehicle inventory. A trade-in car already sold or reserved still blocks the cancellation (open) | Accountant follow-up item 11 |
 | D-129 | **Pilot review.** D-90 revised: monthly and quarterly schedules use a 30-day month, as for payroll: the first date stays as chosen, later dates keep its day capped at 30 and at the month's last day (31 Jan → 28 Feb → 30 Mar) | Accountant follow-up item 14 |
+| D-130 | **Pilot answer, Q-03.** Installment markup (mode b) is set on each sale (`installments.markup`, an amount; the sale screen also turns a percentage of what is financed into the amount) and recognised **at once**: Dr 1400 receivable (rest + markup) / Cr 4100 cash price / Cr 4300 installment financing income (buyer). No deferral to 2400, so collections stay as rule 15 mode a. Allowed only when the tenant setting `installment_markup_mode` is `B_ENABLED` (Settings → Policies; `MARKUP_DISABLED` otherwise). A cancellation to customer credit takes the markup income back out (Dr 4300). Car profit stays price − cost; the markup is showroom income, settled at the period close under PER_CAR | Pilot owner |
+| D-131 | **Pilot answer.** Power of attorney (توكيل) is a document type; the car file offers it with the purchase and sale contracts and the ID copy. All remain normal-sensitivity documents except the purchase contract and seller receipt (cost data, G-09) | Pilot owner |
 
 ---
 
@@ -365,3 +367,17 @@
 | 2026-10-03 | D-90 | Follow-up: confirmed; February falls on its last day (28, or 29 in a leap year) | Accountant (pilot) |
 | 2026-10-03 | D-100 | **Approved**; profit is distributed on net profit (after expenses), not gross profit | Accountant (pilot) |
 | 2026-10-03 | Review | Follow-up items 5, 11 and 14 implemented (D-127 to D-129). Open: item 9 (approval workflow), item 3 (to discuss), and the sold-trade-in case of item 11 | Claude |
+| 2026-10-03 | Q-35 | **Pilot owner (Sharqia, Egypt):** will fill in our Excel template; the Arabic template was sent | Pilot owner |
+| 2026-10-03 | Q-03 | **Answered:** installment sales carry a markup the owner sets per sale (it depends on the term: 3, 6 or 12 months); the whole profit, markup included, is recognised on the sale date. Mode (b) can be unlocked with immediate recognition (no deferral) | Pilot owner |
+| 2026-10-03 | Q-23 | **Answered:** no late fees. A repossessed car would be put back to its original state, but in practice it does not happen | Pilot owner |
+| 2026-10-03 | Q-08 | **Answered:** post-dated cheques and trade-ins both happen often | Pilot owner |
+| 2026-10-03 | Q-20 | **Answered:** bank charges on a bounced cheque are borne by the showroom (the existing default: an expense, not recharged) | Pilot owner |
+| 2026-10-03 | Q-39 | **Answered:** when a buyer backs out, the deposit is refunded in full (refund stays the usual action; forfeit remains available) | Pilot owner |
+| 2026-10-03 | Q-01 | **Answered:** a trader may put money into one specific car and take its profit only. Car-level investors are needed (not built yet); terms to confirm | Pilot owner |
+| 2026-10-03 | Q-04 | Answer unclear ("no partners ... there is financing"); to confirm whether the showroom has partners at all | Pilot owner |
+| 2026-10-03 | Q-15 | **Answered:** consigned cars are taken at a net price agreed with the owner; the rest is the showroom's profit, and the car's expenses come off that profit (net-price terms, expenses borne by the showroom: both already supported) | Pilot owner |
+| 2026-10-03 | Documents | Every purchase and sale keeps a copy of the power of attorney or contract, the ID card and the other party's details (power of attorney is not a document type yet) | Pilot owner |
+| 2026-10-03 | Q-29 | **Answered:** two users, the owner and a salesperson; the salesperson works from a mobile phone | Pilot owner |
+| 2026-10-03 | Q-40, prices | No answer yet | Pilot owner |
+| 2026-10-03 | Q-35 | Mohamed El-Hout will send the showroom's real working sheet with personal data removed | Product owner |
+| 2026-10-03 | Review | Installment markup and the power-of-attorney document type implemented (D-130, D-131). Waiting on the owner for car-level investor terms, partners, markup input, contract copy | Claude |

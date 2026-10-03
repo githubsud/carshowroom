@@ -154,6 +154,8 @@ class SaleOut(BaseModel):
     installment_plan: InstallmentPlanIn | None
     # Financed by installments: what payments, deposit and trade-in leave open, when a plan is set.
     financed: Money
+    # The installment markup (mode b), on top of `financed`; income on the sale date.
+    markup: Money = Decimal(0)
     plan_id: UUID | None
     # Still to be covered before the sale can be posted (sale price - paid - deposit - trade-in - financed).
     remaining: Money

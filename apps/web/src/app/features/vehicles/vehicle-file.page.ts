@@ -51,7 +51,16 @@ const NEXT: Partial<Record<VehicleStatus, VehicleStatus[]>> = {
   AVAILABLE: ['ARCHIVED'],
   SOLD: ['DELIVERED'],
 };
-const DOC_TYPES: DocumentType[] = ['LICENSE', 'INSPECTION_REPORT', 'PURCHASE_CONTRACT', 'SELLER_RECEIPT', 'OTHER'];
+const DOC_TYPES: DocumentType[] = [
+  'LICENSE',
+  'POWER_OF_ATTORNEY',
+  'PURCHASE_CONTRACT',
+  'SALE_CONTRACT',
+  'ID_COPY',
+  'INSPECTION_REPORT',
+  'SELLER_RECEIPT',
+  'OTHER',
+];
 
 /**
  * The vehicle file (ملف العربية, SPEC §4.3): everything about one car on one

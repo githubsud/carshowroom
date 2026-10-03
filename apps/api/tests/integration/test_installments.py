@@ -63,6 +63,7 @@ def _installment_sale(
     first_due: date,
     sale_date: date | None = None,
     buyer: uuid.UUID | None = None,
+    markup: str = "0",
 ) -> tuple[uuid.UUID, uuid.UUID, uuid.UUID]:
     """Buy a car by bank for `cost`, sell it with `down` in cash and the rest in
     `count` monthly installments. Returns (customer, sale, plan)."""
@@ -93,7 +94,7 @@ def _installment_sale(
                 "sale_date": day,
                 "list_price": price,
                 "payments": [{"cash_account_id": NOUR_CASH, "amount": down}],
-                "installments": {"frequency": "MONTHLY", "count": count, "first_due_date": first_due},
+                "installments": {"frequency": "MONTHLY", "count": count, "first_due_date": first_due, "markup": markup},
             }
         ),
         viewer_id=OWNER_ID,
@@ -429,6 +430,57 @@ def test_cancelling_an_installment_sale_owes_back_what_was_collected(client: Tes
             with pytest.raises(AppError) as late:
                 _receive(conn, plan_id, "1000")
             assert late.value.code == "SALE_CANCELLED"
+            raise _Rollback
+
+    with pytest.raises(_Rollback):
+        scenario()
+
+
+def _ledger(conn: Connection, customer_id: uuid.UUID, system_key: str) -> Decimal:
+    return Decimal(
+        conn.execute(
+            text(
+                "select coalesce(sum(l.credit - l.debit), 0) from public.journal_lines l "
+                "join public.ledger_accounts a on a.id = l.ledger_account_id "
+                "where l.customer_id = :c and a.system_key = :k"
+            ),
+            {"c": customer_id, "k": system_key},
+        ).scalar_one()
+    )
+
+
+def test_an_installment_markup_is_income_on_the_sale_date(client: TestClient) -> None:
+    """Rule 14 figures with the pilot's recognition (Q-03): cash price 600,000,
+    150,000 down, a 60,000 markup over 6 months -> 6 x 85,000; the 60,000 is
+    installment income on the sale date. Cancelling owes back what was paid and
+    takes the markup income back out."""
+
+    def scenario() -> None:
+        with _owner_tx(client) as conn:
+            today = finance.tenant_info(conn).today
+            args = {"cost": "500000", "price": "600000", "down": "150000", "count": 6, "first_due": today}
+            with pytest.raises(AppError) as off:
+                _installment_sale(conn, **args, markup="60000")
+            assert off.value.code == "MARKUP_DISABLED"
+
+            conn.execute(text("update public.tenant_settings set installment_markup_mode = 'B_ENABLED'"))
+            buyer, sale_id, plan_id = _installment_sale(conn, **args, markup="60000")
+            plan = installments.get_plan(conn, plan_id, with_papers=False)
+            assert [i.amount_due for i in plan.installments] == [Decimal("85000.00")] * 6
+            assert _receivable(conn, buyer) == Decimal("510000.00")
+            assert _ledger(conn, buyer, "INSTALLMENT_FINANCING_INCOME") == Decimal("60000.00")
+            sale = sales.get_sale(conn, sale_id, viewer_id=OWNER_ID, see_all_drafts=True, with_profit=True)
+            assert (sale.financed, sale.markup, sale.remaining) == (
+                Decimal("450000.00"),
+                Decimal("60000.00"),
+                Decimal("0.00"),
+            )
+
+            _receive(conn, plan_id, "85000")
+            sales.cancel_sale(conn, sale_id, SaleCancelIn(reason="تراجع العميل"), user_id=OWNER_ID, with_profit=True)
+            assert customers.credit_owed(conn, buyer) == Decimal("235000.00")  # 150,000 down + 85,000 collected
+            assert _receivable(conn, buyer) == Decimal("0.00")
+            assert _ledger(conn, buyer, "INSTALLMENT_FINANCING_INCOME") == Decimal("0.00")
             raise _Rollback
 
     with pytest.raises(_Rollback):
