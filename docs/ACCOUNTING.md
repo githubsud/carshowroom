@@ -69,6 +69,7 @@
 | 6250 | Government fees | رسوم حكومية | Expense | Dr | | ✓ |
 | 6260 | Tips (إكرامية) | إكراميات | Expense | Dr | | ✓ |
 | 6270 | Bank charges (P-07, added in Phase 5) | مصاريف بنكية | Expense | Dr | | ✓ |
+| 6280 | Consigned-car expenses borne by the showroom (P-05, added in Phase 6; vehicle subledger) | مصاريف سيارات الأمانة على المعرض | Expense | Dr | | ✓ |
 | 6290 | Other general expenses | مصروفات عامة أخرى | Expense | Dr | | ✓ |
 
 **ASSUMPTION.** Codes 6210–6290 for the seeded general categories are our numbering; the spec only says "6200..". A tenant-added category gets the next free 62xx code.
@@ -525,8 +526,8 @@ The spec has no rule for each event below. The **candidate treatment** is a prop
 | P-02 | Customer overpayment kept as credit (business rule 3) | **Refund leg implemented in Phase 4; overpayment as credit arrives with Phase 5 payments.** **Approved as tenant option (D-41)**: `BLOCK` (default) or `ALLOW_AS_CREDIT` → Dr Cash / Cr 2310 (customer); later applied or refunded (Dr 2310 / Cr Cash) | G-02, Q-13 |
 | P-03 | Sale cancellation without an immediate refund (fixes C-06) | **Implemented in Phase 4 (both methods).** **Approved as tenant option (D-41)**: `REFUND_LIABILITY` (default) reverses revenue and cost, and all amounts received move to 2310; the refund is posted separately. `MIRROR` = literal rule 33 | C-06, Q-12 |
 | P-04 | Expense recorded on a car that is already SOLD | Dr 5000 COGS (vehicle) / Cr Cash; the car's profit is recalculated | G-03, Q-14. **Approved (Q-26); implemented in Phase 4** |
-| P-05 | Expense on a consigned-in car **borne by the showroom** (terms: showroom/shared) | Dr a showroom expense account (not specified in the COA) / Cr Cash; for the shared portion, split between 1430 and the expense | G-10, Q-15 |
-| P-06 | Consignor reimburses recoverable expenses when the car is returned unsold (§4.4 "settle any recoverable expenses") | Dr Cash / Cr 1430 (consignor) | G-10 |
+| P-05 | Expense on a consigned-in car **borne by the showroom** (terms: showroom/shared) | Dr a showroom expense account (not specified in the COA) / Cr Cash; for the shared portion, split between 1430 and the expense | G-10, Q-15. **Approved (Q-26); implemented in Phase 6 with the new account 6280 Consigned-car expenses (D-93)** |
+| P-06 | Consignor reimburses recoverable expenses when the car is returned unsold (§4.4 "settle any recoverable expenses") | Dr Cash / Cr 1430 (consignor) | G-10. **Approved (Q-26); implemented in Phase 6 (D-96)** |
 | P-07 | Bank charges on a bounced cheque, possibly recharged to the customer | Dr bank-charges expense (no account in the COA) / Cr Bank; optionally Dr 1410 (customer) | Q-20. **Approved (Q-26); implemented in Phase 5 with the new account 6270 (D-85)** |
 | P-08 | Clearing Opening Balance Equity 3900 | Allocate to partner capital or current accounts by agreement | Q-16 |
 | P-09 | Distribution of a **loss** | **Approved as tenant option (D-40)**: `ALLOCATE_TO_PARTNERS` (default) Dr 3200 per partner / Cr 3300 by %; or `CARRY_FORWARD` (stays in 3300) | G-07 |

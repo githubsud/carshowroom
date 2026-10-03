@@ -367,10 +367,34 @@ class VehicleSaleInfo(BaseModel):
     id: UUID
     sale_no: str
     sale_date: date
-    buyer_customer_id: UUID
+    buyer_customer_id: UUID | None
+    # For an external-showroom sale: the showroom that sold it.
     buyer_name: str
     sale_price: Money
     invoice_no: str | None
+    channel: Literal["DIRECT", "EXTERNAL_SHOWROOM"] = "DIRECT"
+
+
+class VehicleConsignment(BaseModel):
+    """A consigned-in car's agreement (SPEC §4.4)."""
+
+    id: UUID
+    consignor_id: UUID
+    consignor_name: str
+    status: Literal["ACTIVE", "SOLD", "RETURNED"]
+    end_date: date | None
+
+
+class VehicleConsignedOut(BaseModel):
+    """Our car at another showroom (SPEC §4.5)."""
+
+    id: UUID
+    external_showroom_id: UUID
+    external_showroom_name: str
+    sent_date: date
+    commission_type: Literal["FIXED", "PCT"]
+    commission_value: Decimal
+    expected_price: Money | None
 
 
 class CostLine(BaseModel):
@@ -396,8 +420,12 @@ class PurchaseSummary(BaseModel):
 
 
 class VehicleProfit(BaseModel):
+    # CONSIGNMENT: sale_price is the commission earned and cost what the showroom bore (P-05).
+    kind: Literal["SALE", "CONSIGNMENT"] = "SALE"
     sale_price: Money
     cost: Money
+    # Kept by an external showroom that sold the car; profit is after it (Q-34).
+    external_commission: Money = Decimal(0)
     gross_profit: Money
     profit_pct: Decimal
     # True while expected cost categories are missing: shown as an estimate.
@@ -449,6 +477,8 @@ class VehicleDetail(BaseModel):
     documents: list[DocumentOut]
     reservation: ActiveReservation | None
     sale: VehicleSaleInfo | None
+    consignment: "VehicleConsignment | None" = None
+    consigned_out: "VehicleConsignedOut | None" = None
     min_price: Money | None = None
     purchase: PurchaseSummary | None = None
     cost: VehicleCost | None = None
@@ -565,7 +595,7 @@ class VehicleExpenseOut(BaseModel):
     cash_account_name_ar: str | None
     supplier_name: str | None
     paid_by_partner_name_ar: str | None
-    treatment: Literal["CAPITALIZE", "COGS"]
+    treatment: Literal["CAPITALIZE", "COGS", "RECOVERABLE", "SHOWROOM", "SHARED"]
     status: Literal["POSTED", "REVERSED"]
     entry_no: int
 

@@ -14,7 +14,7 @@
     </div>
     @if (sale(); as s) {
       <div class="header-actions">
-        @if (s.status === 'POSTED') {
+        @if (s.status === 'POSTED' && s.channel === 'DIRECT') {
           <p-button icon="pi pi-print" [outlined]="true" [label]="'sales.invoice' | transloco" (onClick)="print('invoice')"
                     data-testid="print-invoice" />
           <p-button icon="pi pi-file" [outlined]="true" [label]="'sales.contract' | transloco" (onClick)="print('contract')" />
@@ -45,9 +45,20 @@
       }
     </section>
 
+    @if (sale()?.consignor_name || car()?.consignment) {
+      <p-message severity="info" data-testid="sale-consigned">
+        {{ 'consignment.consignedBy' | transloco: { name: sale()?.consignor_name ?? car()?.consignment?.consignor_name } }}
+        — {{ 'consignment.saleHint' | transloco }}
+      </p-message>
+    }
     <section class="card">
       <h2>{{ 'sales.buyer' | transloco }}</h2>
-      <app-customer-picker inputId="buyer" formControlName="buyer_customer_id" testId="buyer-picker" />
+      @if (sale()?.channel === 'EXTERNAL_SHOWROOM') {
+        <p data-testid="sold-by-showroom">{{ 'consignment.soldBy' | transloco: { name: sale()?.external_showroom_name } }}
+          @if (sale()?.notes) { — {{ sale()?.notes }} }</p>
+      } @else {
+        <app-customer-picker inputId="buyer" formControlName="buyer_customer_id" testId="buyer-picker" />
+      }
       @if (reservedForOther()) {
         <p class="negative">{{ 'sales.reservedForOther' | transloco: { name: car()?.reservation?.customer_name } }}</p>
       }
@@ -132,7 +143,7 @@
         <p class="sub">{{ 'sales.paymentsByAccountant' | transloco }}</p>
       }
 
-      @if (installmentsEnabled() && (editable() || sale()?.installment_plan)) {
+      @if (installmentsEnabled() && !car()?.consignment && (editable() || sale()?.installment_plan)) {
         <div class="installments" data-testid="installments-section">
           <div class="check">
             <p-checkbox formControlName="use_installments" [binary]="true" inputId="use-inst"
@@ -183,8 +194,21 @@
     @if (sale()?.profit; as p) {
       <section class="card" data-testid="sale-profit">
         <h2>{{ 'vehicles.profit' | transloco }}</h2>
-        <p>{{ 'vehicles.totalCost' | transloco }} {{ p.cost | money }} — {{ 'vehicles.profit' | transloco }}
-          <strong>{{ p.gross_profit | money }}</strong> ({{ p.profit_pct | percent }})</p>
+        @if (p.kind === 'CONSIGNMENT') {
+          <p>{{ 'consignment.commission' | transloco }} <strong data-testid="sale-commission">{{ p.commission | money }}</strong>
+            @if (p.recovered_expenses && p.recovered_expenses !== '0.00') {
+              — {{ 'consignment.recoveredExpenses' | transloco }} {{ p.recovered_expenses | money }} }
+            — {{ 'consignment.dueToOwner' | transloco }} <strong data-testid="sale-due-owner">{{ p.due_to_owner | money }}</strong></p>
+          @if (p.cost !== '0.00') {
+            <p class="sub">{{ 'consignment.showroomBore' | transloco }} {{ p.cost | money }} —
+              {{ 'vehicles.profit' | transloco }} {{ p.gross_profit | money }}</p>
+          }
+        } @else {
+          <p>{{ 'vehicles.totalCost' | transloco }} {{ p.cost | money }}
+            @if (p.external_commission !== '0.00') { — {{ 'consignment.theirCommission' | transloco }} {{ p.external_commission | money }} }
+            — {{ 'vehicles.profit' | transloco }}
+            <strong>{{ p.gross_profit | money }}</strong> ({{ p.profit_pct | percent }})</p>
+        }
       </section>
     }
 

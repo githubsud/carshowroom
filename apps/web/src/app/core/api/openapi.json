@@ -528,6 +528,1051 @@
         "title": "CashLegIn",
         "type": "object"
       },
+      "ConsignOutIn": {
+        "additionalProperties": false,
+        "properties": {
+          "commission_type": {
+            "enum": [
+              "FIXED",
+              "PCT"
+            ],
+            "title": "Commission Type",
+            "type": "string"
+          },
+          "commission_value": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,19}0*$)\\d{0,16}\\.\\d{0,2}0*$)",
+                "type": "string"
+              }
+            ],
+            "title": "Commission Value"
+          },
+          "expected_price": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Price"
+          },
+          "external_showroom_id": {
+            "format": "uuid",
+            "title": "External Showroom Id",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "sent_date": {
+            "format": "date",
+            "title": "Sent Date",
+            "type": "string"
+          },
+          "vehicle_id": {
+            "format": "uuid",
+            "title": "Vehicle Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "vehicle_id",
+          "external_showroom_id",
+          "sent_date",
+          "commission_type",
+          "commission_value"
+        ],
+        "title": "ConsignOutIn",
+        "type": "object"
+      },
+      "ConsignOutReturnIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "return_date": {
+            "format": "date",
+            "title": "Return Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_date"
+        ],
+        "title": "ConsignOutReturnIn",
+        "type": "object"
+      },
+      "ConsignmentIn": {
+        "additionalProperties": false,
+        "description": "Receive a consigned car: the vehicle record and the agreement together.",
+        "properties": {
+          "agreement_date": {
+            "format": "date",
+            "title": "Agreement Date",
+            "type": "string"
+          },
+          "commission_value": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commission Value"
+          },
+          "consignor_id": {
+            "format": "uuid",
+            "title": "Consignor Id",
+            "type": "string"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "expenses_borne_by": {
+            "default": "OWNER",
+            "enum": [
+              "OWNER",
+              "SHOWROOM",
+              "SHARED"
+            ],
+            "title": "Expenses Borne By",
+            "type": "string"
+          },
+          "net_price_to_owner": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net Price To Owner"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "shared_owner_pct": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 100.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,3}|(?=[\\d.]{1,6}0*$)\\d{0,3}\\.\\d{0,2}0*$)",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shared Owner Pct"
+          },
+          "terms_type": {
+            "enum": [
+              "NET_PRICE",
+              "COMMISSION_FIXED",
+              "COMMISSION_PCT"
+            ],
+            "title": "Terms Type",
+            "type": "string"
+          },
+          "vehicle": {
+            "$ref": "#/components/schemas/VehicleIn"
+          }
+        },
+        "required": [
+          "agreement_date",
+          "terms_type",
+          "consignor_id",
+          "vehicle"
+        ],
+        "title": "ConsignmentIn",
+        "type": "object"
+      },
+      "ConsignmentOut": {
+        "properties": {
+          "agreement_date": {
+            "format": "date",
+            "title": "Agreement Date",
+            "type": "string"
+          },
+          "asking_price": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asking Price"
+          },
+          "commission": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commission"
+          },
+          "commission_value": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commission Value"
+          },
+          "consignor_id": {
+            "format": "uuid",
+            "title": "Consignor Id",
+            "type": "string"
+          },
+          "consignor_name": {
+            "title": "Consignor Name",
+            "type": "string"
+          },
+          "consignor_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consignor Phone"
+          },
+          "days_with_us": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days With Us"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "expenses_borne_by": {
+            "enum": [
+              "OWNER",
+              "SHOWROOM",
+              "SHARED"
+            ],
+            "title": "Expenses Borne By",
+            "type": "string"
+          },
+          "expired": {
+            "title": "Expired",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "net_price_to_owner": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net Price To Owner"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "payable": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payable"
+          },
+          "recoverable": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recoverable"
+          },
+          "returned_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Returned Date"
+          },
+          "sale_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale Id"
+          },
+          "sale_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale No"
+          },
+          "sale_price": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale Price"
+          },
+          "settlements": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ConsignorSettlementOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Settlements"
+          },
+          "shared_owner_pct": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shared Owner Pct"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "SOLD",
+              "RETURNED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "stock_no": {
+            "title": "Stock No",
+            "type": "string"
+          },
+          "terms_type": {
+            "enum": [
+              "NET_PRICE",
+              "COMMISSION_FIXED",
+              "COMMISSION_PCT"
+            ],
+            "title": "Terms Type",
+            "type": "string"
+          },
+          "vehicle_id": {
+            "format": "uuid",
+            "title": "Vehicle Id",
+            "type": "string"
+          },
+          "vehicle_label": {
+            "title": "Vehicle Label",
+            "type": "string"
+          },
+          "vehicle_status": {
+            "title": "Vehicle Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "vehicle_id",
+          "stock_no",
+          "vehicle_label",
+          "vehicle_status",
+          "consignor_id",
+          "consignor_name",
+          "consignor_phone",
+          "agreement_date",
+          "end_date",
+          "expired",
+          "terms_type",
+          "net_price_to_owner",
+          "commission_value",
+          "expenses_borne_by",
+          "shared_owner_pct",
+          "asking_price",
+          "status",
+          "returned_date",
+          "days_with_us",
+          "notes"
+        ],
+        "title": "ConsignmentOut",
+        "type": "object"
+      },
+      "ConsignmentOutOut": {
+        "properties": {
+          "commission_type": {
+            "enum": [
+              "FIXED",
+              "PCT"
+            ],
+            "title": "Commission Type",
+            "type": "string"
+          },
+          "commission_value": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Commission Value",
+            "type": "string"
+          },
+          "days_out": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Out"
+          },
+          "expected_price": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Price"
+          },
+          "external_showroom_id": {
+            "format": "uuid",
+            "title": "External Showroom Id",
+            "type": "string"
+          },
+          "external_showroom_name": {
+            "title": "External Showroom Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "returned_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Returned Date"
+          },
+          "sale_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale Id"
+          },
+          "sale_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale No"
+          },
+          "sale_price": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sale Price"
+          },
+          "sent_date": {
+            "format": "date",
+            "title": "Sent Date",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "OUT",
+              "SOLD",
+              "RETURNED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "stock_no": {
+            "title": "Stock No",
+            "type": "string"
+          },
+          "vehicle_id": {
+            "format": "uuid",
+            "title": "Vehicle Id",
+            "type": "string"
+          },
+          "vehicle_label": {
+            "title": "Vehicle Label",
+            "type": "string"
+          },
+          "vehicle_status": {
+            "title": "Vehicle Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "vehicle_id",
+          "stock_no",
+          "vehicle_label",
+          "vehicle_status",
+          "external_showroom_id",
+          "external_showroom_name",
+          "sent_date",
+          "days_out",
+          "commission_type",
+          "commission_value",
+          "expected_price",
+          "status",
+          "returned_date",
+          "sale_id",
+          "sale_no",
+          "sale_price",
+          "notes"
+        ],
+        "title": "ConsignmentOutOut",
+        "type": "object"
+      },
+      "ConsignmentReturnIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          },
+          "return_date": {
+            "format": "date",
+            "title": "Return Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_date",
+          "reason"
+        ],
+        "title": "ConsignmentReturnIn",
+        "type": "object"
+      },
+      "ConsignmentUpdate": {
+        "additionalProperties": false,
+        "description": "New terms for an ACTIVE agreement (before the car is sold).",
+        "properties": {
+          "agreement_date": {
+            "format": "date",
+            "title": "Agreement Date",
+            "type": "string"
+          },
+          "commission_value": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commission Value"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "expenses_borne_by": {
+            "default": "OWNER",
+            "enum": [
+              "OWNER",
+              "SHOWROOM",
+              "SHARED"
+            ],
+            "title": "Expenses Borne By",
+            "type": "string"
+          },
+          "net_price_to_owner": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net Price To Owner"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "shared_owner_pct": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 100.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,3}|(?=[\\d.]{1,6}0*$)\\d{0,3}\\.\\d{0,2}0*$)",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shared Owner Pct"
+          },
+          "terms_type": {
+            "enum": [
+              "NET_PRICE",
+              "COMMISSION_FIXED",
+              "COMMISSION_PCT"
+            ],
+            "title": "Terms Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "agreement_date",
+          "terms_type"
+        ],
+        "title": "ConsignmentUpdate",
+        "type": "object"
+      },
+      "ConsignorSettlementIn": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "cash_account_id": {
+            "format": "uuid",
+            "title": "Cash Account Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "PAYOUT",
+              "RECOVERY"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "settle_date": {
+            "format": "date",
+            "title": "Settle Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "settle_date",
+          "amount",
+          "cash_account_id"
+        ],
+        "title": "ConsignorSettlementIn",
+        "type": "object"
+      },
+      "ConsignorSettlementOut": {
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "cash_account_name_ar": {
+            "title": "Cash Account Name Ar",
+            "type": "string"
+          },
+          "entry_no": {
+            "title": "Entry No",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "PAYOUT",
+              "RECOVERY"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "settle_date": {
+            "format": "date",
+            "title": "Settle Date",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "POSTED",
+              "REVERSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "settle_date",
+          "amount",
+          "cash_account_name_ar",
+          "status",
+          "entry_no",
+          "notes"
+        ],
+        "title": "ConsignorSettlementOut",
+        "type": "object"
+      },
+      "ConsignorStatement": {
+        "description": "What the showroom owes the owner (2200) less what the owner owes back (1430).",
+        "properties": {
+          "as_of": {
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "consignments": {
+            "items": {
+              "$ref": "#/components/schemas/ConsignmentOut"
+            },
+            "title": "Consignments",
+            "type": "array"
+          },
+          "consignor_id": {
+            "format": "uuid",
+            "title": "Consignor Id",
+            "type": "string"
+          },
+          "consignor_name": {
+            "title": "Consignor Name",
+            "type": "string"
+          },
+          "consignor_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consignor Phone"
+          },
+          "currency_code": {
+            "title": "Currency Code",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/app__domain__consignment__StatementLine"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "net_due_to_owner": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Net Due To Owner",
+            "type": "string"
+          },
+          "payable": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Payable",
+            "type": "string"
+          },
+          "recoverable": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Recoverable",
+            "type": "string"
+          }
+        },
+        "required": [
+          "consignor_id",
+          "consignor_name",
+          "consignor_phone",
+          "as_of",
+          "currency_code",
+          "lines",
+          "payable",
+          "recoverable",
+          "net_due_to_owner",
+          "consignments"
+        ],
+        "title": "ConsignorStatement",
+        "type": "object"
+      },
+      "ContactedIn": {
+        "properties": {
+          "contacted": {
+            "default": true,
+            "title": "Contacted",
+            "type": "boolean"
+          }
+        },
+        "title": "ContactedIn",
+        "type": "object"
+      },
       "CostLine": {
         "properties": {
           "amount": {
@@ -1093,6 +2138,582 @@
         "title": "CustomerRefundOut",
         "type": "object"
       },
+      "CustomerRequestIn": {
+        "additionalProperties": false,
+        "properties": {
+          "assigned_to": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To"
+          },
+          "budget_max": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,19}0*$)\\d{0,16}\\.\\d{0,2}0*$)",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Max"
+          },
+          "budget_min": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,19}0*$)\\d{0,16}\\.\\d{0,2}0*$)",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Min"
+          },
+          "color_pref": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color Pref"
+          },
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "financing_needed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Financing Needed"
+          },
+          "make": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Make"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "trade_in_offered": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trade In Offered"
+          },
+          "year_from": {
+            "anyOf": [
+              {
+                "maximum": 2100.0,
+                "minimum": 1950.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year From"
+          },
+          "year_to": {
+            "anyOf": [
+              {
+                "maximum": 2100.0,
+                "minimum": 1950.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year To"
+          }
+        },
+        "required": [
+          "customer_id"
+        ],
+        "title": "CustomerRequestIn",
+        "type": "object"
+      },
+      "CustomerRequestOut": {
+        "properties": {
+          "assigned_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned Name"
+          },
+          "assigned_to": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To"
+          },
+          "budget_max": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Max"
+          },
+          "budget_min": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Min"
+          },
+          "color_pref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color Pref"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "customer_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Phone"
+          },
+          "financing_needed": {
+            "title": "Financing Needed",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "make": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Make"
+          },
+          "match_count": {
+            "title": "Match Count",
+            "type": "integer"
+          },
+          "matches": {
+            "items": {
+              "$ref": "#/components/schemas/RequestMatch"
+            },
+            "title": "Matches",
+            "type": "array"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "status": {
+            "enum": [
+              "NEW",
+              "CONTACTED",
+              "VEHICLE_FOUND",
+              "NEGOTIATING",
+              "DEPOSIT",
+              "WON",
+              "LOST",
+              "ON_HOLD"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "trade_in_offered": {
+            "title": "Trade In Offered",
+            "type": "boolean"
+          },
+          "year_from": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year From"
+          },
+          "year_to": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year To"
+          }
+        },
+        "required": [
+          "id",
+          "customer_id",
+          "customer_name",
+          "customer_phone",
+          "make",
+          "model",
+          "year_from",
+          "year_to",
+          "budget_min",
+          "budget_max",
+          "color_pref",
+          "notes",
+          "status",
+          "assigned_to",
+          "assigned_name",
+          "source",
+          "financing_needed",
+          "trade_in_offered",
+          "created_at",
+          "match_count"
+        ],
+        "title": "CustomerRequestOut",
+        "type": "object"
+      },
+      "CustomerRequestUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "assigned_to": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To"
+          },
+          "budget_max": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,19}0*$)\\d{0,16}\\.\\d{0,2}0*$)",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Max"
+          },
+          "budget_min": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,19}0*$)\\d{0,16}\\.\\d{0,2}0*$)",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Min"
+          },
+          "color_pref": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color Pref"
+          },
+          "financing_needed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Financing Needed"
+          },
+          "make": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Make"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "NEW",
+                  "CONTACTED",
+                  "VEHICLE_FOUND",
+                  "NEGOTIATING",
+                  "DEPOSIT",
+                  "WON",
+                  "LOST",
+                  "ON_HOLD"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "trade_in_offered": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trade In Offered"
+          },
+          "year_from": {
+            "anyOf": [
+              {
+                "maximum": 2100.0,
+                "minimum": 1950.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year From"
+          },
+          "year_to": {
+            "anyOf": [
+              {
+                "maximum": 2100.0,
+                "minimum": 1950.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year To"
+          }
+        },
+        "title": "CustomerRequestUpdate",
+        "type": "object"
+      },
       "CustomerUpdate": {
         "additionalProperties": false,
         "properties": {
@@ -1576,6 +3197,775 @@
           }
         },
         "title": "ExpenseCategoryUpdate",
+        "type": "object"
+      },
+      "ExternalCollectionIn": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "cash_account_id": {
+            "format": "uuid",
+            "title": "Cash Account Id",
+            "type": "string"
+          },
+          "collect_date": {
+            "format": "date",
+            "title": "Collect Date",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "required": [
+          "collect_date",
+          "amount",
+          "cash_account_id"
+        ],
+        "title": "ExternalCollectionIn",
+        "type": "object"
+      },
+      "ExternalCollectionOut": {
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "cash_account_name_ar": {
+            "title": "Cash Account Name Ar",
+            "type": "string"
+          },
+          "collect_date": {
+            "format": "date",
+            "title": "Collect Date",
+            "type": "string"
+          },
+          "entry_no": {
+            "title": "Entry No",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "status": {
+            "enum": [
+              "POSTED",
+              "REVERSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "collect_date",
+          "amount",
+          "cash_account_name_ar",
+          "status",
+          "entry_no",
+          "notes"
+        ],
+        "title": "ExternalCollectionOut",
+        "type": "object"
+      },
+      "ExternalSaleIn": {
+        "additionalProperties": false,
+        "properties": {
+          "buyer_name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buyer Name"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "sale_date": {
+            "format": "date",
+            "title": "Sale Date",
+            "type": "string"
+          },
+          "sale_price": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Sale Price",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sale_date",
+          "sale_price"
+        ],
+        "title": "ExternalSaleIn",
+        "type": "object"
+      },
+      "ExternalShowroomIn": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "contact_name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Name"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "maxLength": 25,
+                "minLength": 6,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ExternalShowroomIn",
+        "type": "object"
+      },
+      "ExternalShowroomOut": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "archived": {
+            "title": "Archived",
+            "type": "boolean"
+          },
+          "cars_out": {
+            "title": "Cars Out",
+            "type": "integer"
+          },
+          "contact_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "receivable": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receivable"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "contact_name",
+          "phone",
+          "address",
+          "notes",
+          "archived",
+          "cars_out"
+        ],
+        "title": "ExternalShowroomOut",
+        "type": "object"
+      },
+      "ExternalShowroomStatement": {
+        "properties": {
+          "as_of": {
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "cars": {
+            "items": {
+              "$ref": "#/components/schemas/ConsignmentOutOut"
+            },
+            "title": "Cars",
+            "type": "array"
+          },
+          "collections": {
+            "items": {
+              "$ref": "#/components/schemas/ExternalCollectionOut"
+            },
+            "title": "Collections",
+            "type": "array"
+          },
+          "currency_code": {
+            "title": "Currency Code",
+            "type": "string"
+          },
+          "external_showroom_id": {
+            "format": "uuid",
+            "title": "External Showroom Id",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/app__domain__consignment__StatementLine"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "receivable": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Receivable",
+            "type": "string"
+          }
+        },
+        "required": [
+          "external_showroom_id",
+          "name",
+          "phone",
+          "as_of",
+          "currency_code",
+          "lines",
+          "receivable",
+          "cars",
+          "collections"
+        ],
+        "title": "ExternalShowroomStatement",
+        "type": "object"
+      },
+      "ExternalShowroomUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "archived": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived"
+          },
+          "contact_name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Name"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "maxLength": 25,
+                "minLength": 6,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "title": "ExternalShowroomUpdate",
+        "type": "object"
+      },
+      "FollowUpDue": {
+        "description": "A customer whose latest follow-up asks to be called back by today.",
+        "properties": {
+          "follow_up": {
+            "$ref": "#/components/schemas/FollowUpOut"
+          },
+          "overdue_days": {
+            "title": "Overdue Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "follow_up",
+          "overdue_days"
+        ],
+        "title": "FollowUpDue",
+        "type": "object"
+      },
+      "FollowUpIn": {
+        "additionalProperties": false,
+        "properties": {
+          "assigned_to": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To"
+          },
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "kind": {
+            "default": "CALL",
+            "enum": [
+              "CALL",
+              "VISIT",
+              "TEST_DRIVE",
+              "NOTE"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "next_action": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "next_follow_up_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Follow Up Date"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "priority": {
+            "default": "NORMAL",
+            "enum": [
+              "LOW",
+              "NORMAL",
+              "HIGH"
+            ],
+            "title": "Priority",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ANSWERED",
+                  "NO_ANSWER",
+                  "INTERESTED",
+                  "NOT_INTERESTED",
+                  "CALL_BACK",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          }
+        },
+        "required": [
+          "customer_id"
+        ],
+        "title": "FollowUpIn",
+        "type": "object"
+      },
+      "FollowUpOut": {
+        "properties": {
+          "assigned_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned Name"
+          },
+          "assigned_to": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To"
+          },
+          "created_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Name"
+          },
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "customer_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Phone"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "CALL",
+              "VISIT",
+              "TEST_DRIVE",
+              "NOTE"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "next_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "next_follow_up_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Follow Up Date"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "priority": {
+            "enum": [
+              "LOW",
+              "NORMAL",
+              "HIGH"
+            ],
+            "title": "Priority",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ANSWERED",
+                  "NO_ANSWER",
+                  "INTERESTED",
+                  "NOT_INTERESTED",
+                  "CALL_BACK",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          }
+        },
+        "required": [
+          "id",
+          "customer_id",
+          "customer_name",
+          "customer_phone",
+          "request_id",
+          "kind",
+          "occurred_at",
+          "result",
+          "notes",
+          "next_action",
+          "next_follow_up_date",
+          "assigned_to",
+          "assigned_name",
+          "priority",
+          "created_by_name"
+        ],
+        "title": "FollowUpOut",
         "type": "object"
       },
       "GeneralExpenseIn": {
@@ -4175,7 +6565,7 @@
           },
           "lines": {
             "items": {
-              "$ref": "#/components/schemas/StatementLine"
+              "$ref": "#/components/schemas/app__domain__partners__StatementLine"
             },
             "title": "Lines",
             "type": "array"
@@ -4651,6 +7041,60 @@
         "title": "PeriodOut",
         "type": "object"
       },
+      "PostingResult_ConsignmentOutOut_": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/ConsignmentOutOut"
+          },
+          "journal_entries": {
+            "items": {
+              "$ref": "#/components/schemas/EntryRef"
+            },
+            "title": "Journal Entries",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "journal_entries"
+        ],
+        "title": "PostingResult[ConsignmentOutOut]",
+        "type": "object"
+      },
+      "PostingResult_ConsignmentOut_": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/ConsignmentOut"
+          },
+          "journal_entries": {
+            "items": {
+              "$ref": "#/components/schemas/EntryRef"
+            },
+            "title": "Journal Entries",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "journal_entries"
+        ],
+        "title": "PostingResult[ConsignmentOut]",
+        "type": "object"
+      },
       "PostingResult_CustomerRefundOut_": {
         "properties": {
           "document": {
@@ -4676,6 +7120,33 @@
           "journal_entries"
         ],
         "title": "PostingResult[CustomerRefundOut]",
+        "type": "object"
+      },
+      "PostingResult_ExternalCollectionOut_": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/ExternalCollectionOut"
+          },
+          "journal_entries": {
+            "items": {
+              "$ref": "#/components/schemas/EntryRef"
+            },
+            "title": "Journal Entries",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "journal_entries"
+        ],
+        "title": "PostingResult[ExternalCollectionOut]",
         "type": "object"
       },
       "PostingResult_GeneralExpenseOut_": {
@@ -5530,6 +8001,115 @@
         "title": "ReceiptOut",
         "type": "object"
       },
+      "RequestMatch": {
+        "properties": {
+          "asking_price": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asking Price"
+          },
+          "contacted": {
+            "title": "Contacted",
+            "type": "boolean"
+          },
+          "contacted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contacted At"
+          },
+          "customer_id": {
+            "format": "uuid",
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "customer_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Phone"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "matched_at": {
+            "format": "date-time",
+            "title": "Matched At",
+            "type": "string"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "request_summary": {
+            "title": "Request Summary",
+            "type": "string"
+          },
+          "stock_no": {
+            "title": "Stock No",
+            "type": "string"
+          },
+          "vehicle_id": {
+            "format": "uuid",
+            "title": "Vehicle Id",
+            "type": "string"
+          },
+          "vehicle_label": {
+            "title": "Vehicle Label",
+            "type": "string"
+          },
+          "vehicle_status": {
+            "title": "Vehicle Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "request_id",
+          "vehicle_id",
+          "stock_no",
+          "vehicle_label",
+          "vehicle_status",
+          "asking_price",
+          "customer_id",
+          "customer_name",
+          "customer_phone",
+          "request_summary",
+          "matched_at",
+          "contacted",
+          "contacted_at"
+        ],
+        "title": "RequestMatch",
+        "type": "object"
+      },
       "ReservationIn": {
         "additionalProperties": false,
         "properties": {
@@ -5958,7 +8538,22 @@
       "SaleListRow": {
         "properties": {
           "buyer_name": {
-            "title": "Buyer Name",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buyer Name"
+          },
+          "channel": {
+            "enum": [
+              "DIRECT",
+              "EXTERNAL_SHOWROOM"
+            ],
+            "title": "Channel",
             "type": "string"
           },
           "id": {
@@ -6025,6 +8620,7 @@
           "stock_no",
           "vehicle_label",
           "buyer_name",
+          "channel",
           "sale_date",
           "sale_price",
           "invoice_no"
@@ -6035,13 +8631,27 @@
       "SaleOut": {
         "properties": {
           "buyer_customer_id": {
-            "format": "uuid",
-            "title": "Buyer Customer Id",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buyer Customer Id"
           },
           "buyer_name": {
-            "title": "Buyer Name",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buyer Name"
           },
           "buyer_phone": {
             "anyOf": [
@@ -6091,6 +8701,25 @@
               }
             ],
             "title": "Cancellation Method"
+          },
+          "channel": {
+            "enum": [
+              "DIRECT",
+              "EXTERNAL_SHOWROOM"
+            ],
+            "title": "Channel",
+            "type": "string"
+          },
+          "consignor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consignor Name"
           },
           "cost_entry_no": {
             "anyOf": [
@@ -6142,6 +8771,29 @@
               }
             ],
             "title": "Entry No"
+          },
+          "external_showroom_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Showroom Id"
+          },
+          "external_showroom_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Showroom Name"
           },
           "financed": {
             "examples": [
@@ -6195,6 +8847,14 @@
               }
             ],
             "title": "Notes"
+          },
+          "ownership_type": {
+            "enum": [
+              "OWNED",
+              "CONSIGNED_IN"
+            ],
+            "title": "Ownership Type",
+            "type": "string"
           },
           "paid_total": {
             "examples": [
@@ -6330,9 +8990,14 @@
           "vehicle_id",
           "stock_no",
           "vehicle_label",
+          "ownership_type",
+          "channel",
           "buyer_customer_id",
           "buyer_name",
           "buyer_phone",
+          "external_showroom_id",
+          "external_showroom_name",
+          "consignor_name",
           "sale_date",
           "list_price",
           "discount",
@@ -6508,12 +9173,51 @@
       },
       "SaleProfit": {
         "properties": {
+          "commission": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commission"
+          },
           "cost": {
             "examples": [
               "25000.00"
             ],
             "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
             "title": "Cost",
+            "type": "string"
+          },
+          "due_to_owner": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due To Owner"
+          },
+          "external_commission": {
+            "default": "0.00",
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "External Commission",
             "type": "string"
           },
           "gross_profit": {
@@ -6524,10 +9228,34 @@
             "title": "Gross Profit",
             "type": "string"
           },
+          "kind": {
+            "default": "SALE",
+            "enum": [
+              "SALE",
+              "CONSIGNMENT"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
           "profit_pct": {
             "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
             "title": "Profit Pct",
             "type": "string"
+          },
+          "recovered_expenses": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recovered Expenses"
           }
         },
         "required": [
@@ -6888,83 +9616,6 @@
           "url"
         ],
         "title": "SignedUrlOut",
-        "type": "object"
-      },
-      "StatementLine": {
-        "properties": {
-          "amount_in": {
-            "examples": [
-              "25000.00"
-            ],
-            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
-            "title": "Amount In",
-            "type": "string"
-          },
-          "amount_out": {
-            "examples": [
-              "25000.00"
-            ],
-            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
-            "title": "Amount Out",
-            "type": "string"
-          },
-          "bucket": {
-            "enum": [
-              "CAPITAL",
-              "CURRENT",
-              "LOAN_TO",
-              "LOAN_FROM"
-            ],
-            "title": "Bucket",
-            "type": "string"
-          },
-          "description": {
-            "title": "Description",
-            "type": "string"
-          },
-          "entry_date": {
-            "format": "date",
-            "title": "Entry Date",
-            "type": "string"
-          },
-          "entry_no": {
-            "title": "Entry No",
-            "type": "integer"
-          },
-          "is_reversal": {
-            "title": "Is Reversal",
-            "type": "boolean"
-          },
-          "reversed": {
-            "title": "Reversed",
-            "type": "boolean"
-          },
-          "running_net": {
-            "examples": [
-              "25000.00"
-            ],
-            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
-            "title": "Running Net",
-            "type": "string"
-          },
-          "source_type": {
-            "title": "Source Type",
-            "type": "string"
-          }
-        },
-        "required": [
-          "entry_date",
-          "entry_no",
-          "description",
-          "source_type",
-          "bucket",
-          "amount_in",
-          "amount_out",
-          "running_net",
-          "is_reversal",
-          "reversed"
-        ],
-        "title": "StatementLine",
         "type": "object"
       },
       "StatementRow": {
@@ -8438,6 +11089,118 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "VehicleConsignedOut": {
+        "description": "Our car at another showroom (SPEC §4.5).",
+        "properties": {
+          "commission_type": {
+            "enum": [
+              "FIXED",
+              "PCT"
+            ],
+            "title": "Commission Type",
+            "type": "string"
+          },
+          "commission_value": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Commission Value",
+            "type": "string"
+          },
+          "expected_price": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Price"
+          },
+          "external_showroom_id": {
+            "format": "uuid",
+            "title": "External Showroom Id",
+            "type": "string"
+          },
+          "external_showroom_name": {
+            "title": "External Showroom Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "sent_date": {
+            "format": "date",
+            "title": "Sent Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "external_showroom_id",
+          "external_showroom_name",
+          "sent_date",
+          "commission_type",
+          "commission_value",
+          "expected_price"
+        ],
+        "title": "VehicleConsignedOut",
+        "type": "object"
+      },
+      "VehicleConsignment": {
+        "description": "A consigned-in car's agreement (SPEC §4.4).",
+        "properties": {
+          "consignor_id": {
+            "format": "uuid",
+            "title": "Consignor Id",
+            "type": "string"
+          },
+          "consignor_name": {
+            "title": "Consignor Name",
+            "type": "string"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "SOLD",
+              "RETURNED"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "consignor_id",
+          "consignor_name",
+          "status",
+          "end_date"
+        ],
+        "title": "VehicleConsignment",
+        "type": "object"
+      },
       "VehicleCost": {
         "properties": {
           "cost_complete": {
@@ -8557,6 +11320,26 @@
               }
             ],
             "title": "Color Int"
+          },
+          "consigned_out": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VehicleConsignedOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "consignment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VehicleConsignment"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "cost": {
             "anyOf": [
@@ -9153,7 +11936,10 @@
           "treatment": {
             "enum": [
               "CAPITALIZE",
-              "COGS"
+              "COGS",
+              "RECOVERABLE",
+              "SHOWROOM",
+              "SHARED"
             ],
             "title": "Treatment",
             "type": "string"
@@ -9585,12 +12371,30 @@
             "title": "Estimate",
             "type": "boolean"
           },
+          "external_commission": {
+            "default": "0.00",
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "External Commission",
+            "type": "string"
+          },
           "gross_profit": {
             "examples": [
               "25000.00"
             ],
             "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
             "title": "Gross Profit",
+            "type": "string"
+          },
+          "kind": {
+            "default": "SALE",
+            "enum": [
+              "SALE",
+              "CONSIGNMENT"
+            ],
+            "title": "Kind",
             "type": "string"
           },
           "profit_pct": {
@@ -9871,12 +12675,28 @@
       "VehicleSaleInfo": {
         "properties": {
           "buyer_customer_id": {
-            "format": "uuid",
-            "title": "Buyer Customer Id",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buyer Customer Id"
           },
           "buyer_name": {
             "title": "Buyer Name",
+            "type": "string"
+          },
+          "channel": {
+            "default": "DIRECT",
+            "enum": [
+              "DIRECT",
+              "EXTERNAL_SHOWROOM"
+            ],
+            "title": "Channel",
             "type": "string"
           },
           "id": {
@@ -10213,6 +13033,146 @@
         },
         "title": "VehicleUpdate",
         "type": "object"
+      },
+      "app__domain__consignment__StatementLine": {
+        "properties": {
+          "balance": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Balance",
+            "type": "string"
+          },
+          "credit": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Credit",
+            "type": "string"
+          },
+          "debit": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Debit",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "entry_date": {
+            "format": "date",
+            "title": "Entry Date",
+            "type": "string"
+          },
+          "entry_no": {
+            "title": "Entry No",
+            "type": "integer"
+          },
+          "stock_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stock No"
+          }
+        },
+        "required": [
+          "entry_date",
+          "entry_no",
+          "description",
+          "stock_no",
+          "debit",
+          "credit",
+          "balance"
+        ],
+        "title": "StatementLine",
+        "type": "object"
+      },
+      "app__domain__partners__StatementLine": {
+        "properties": {
+          "amount_in": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount In",
+            "type": "string"
+          },
+          "amount_out": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount Out",
+            "type": "string"
+          },
+          "bucket": {
+            "enum": [
+              "CAPITAL",
+              "CURRENT",
+              "LOAN_TO",
+              "LOAN_FROM"
+            ],
+            "title": "Bucket",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "entry_date": {
+            "format": "date",
+            "title": "Entry Date",
+            "type": "string"
+          },
+          "entry_no": {
+            "title": "Entry No",
+            "type": "integer"
+          },
+          "is_reversal": {
+            "title": "Is Reversal",
+            "type": "boolean"
+          },
+          "reversed": {
+            "title": "Reversed",
+            "type": "boolean"
+          },
+          "running_net": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Running Net",
+            "type": "string"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entry_date",
+          "entry_no",
+          "description",
+          "source_type",
+          "bucket",
+          "amount_in",
+          "amount_out",
+          "running_net",
+          "is_reversal",
+          "reversed"
+        ],
+        "title": "StatementLine",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -10429,6 +13389,1351 @@
         "summary": "Update Cash Account",
         "tags": [
           "cash"
+        ]
+      }
+    },
+    "/api/v1/consignments": {
+      "get": {
+        "operationId": "list_consignments_api_v1_consignments_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "ACTIVE",
+                    "SOLD",
+                    "RETURNED"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "consignor_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Consignor Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConsignmentOut"
+                  },
+                  "title": "Response List Consignments Api V1 Consignments Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Consignments",
+        "tags": [
+          "consignment"
+        ]
+      },
+      "post": {
+        "operationId": "create_consignment_api_v1_consignments_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsignmentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsignmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Consignment",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/consignments-out": {
+      "get": {
+        "operationId": "list_out_api_v1_consignments_out_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "OUT",
+                    "SOLD",
+                    "RETURNED"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "external_showroom_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "External Showroom Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConsignmentOutOut"
+                  },
+                  "title": "Response List Out Api V1 Consignments Out Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Out",
+        "tags": [
+          "consignment"
+        ]
+      },
+      "post": {
+        "operationId": "consign_out_api_v1_consignments_out_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsignOutIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsignmentOutOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Consign Out",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/consignments-out/{out_id}/return": {
+      "post": {
+        "operationId": "return_out_api_v1_consignments_out__out_id__return_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "out_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Out Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsignOutReturnIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsignmentOutOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Return Out",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/consignments-out/{out_id}/sale": {
+      "post": {
+        "operationId": "record_external_sale_api_v1_consignments_out__out_id__sale_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "out_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Out Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalSaleIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingResult_ConsignmentOutOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Record External Sale",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/consignments-out/{out_id}/sale/preview": {
+      "post": {
+        "operationId": "preview_external_sale_api_v1_consignments_out__out_id__sale_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "out_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Out Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalSaleIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview External Sale",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/consignments/{consignment_id}": {
+      "get": {
+        "operationId": "get_consignment_api_v1_consignments__consignment_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "consignment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Consignment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsignmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Consignment",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/consignments/{consignment_id}/agreement": {
+      "get": {
+        "operationId": "agreement_api_v1_consignments__consignment_id__agreement_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "consignment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Consignment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": "ar",
+              "enum": [
+                "ar",
+                "en"
+              ],
+              "title": "Lang",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Agreement",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/consignments/{consignment_id}/return": {
+      "post": {
+        "operationId": "return_to_owner_api_v1_consignments__consignment_id__return_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "consignment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Consignment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsignmentReturnIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsignmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Return To Owner",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/consignments/{consignment_id}/settlements": {
+      "post": {
+        "operationId": "record_settlement_api_v1_consignments__consignment_id__settlements_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "consignment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Consignment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsignorSettlementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingResult_ConsignmentOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Record Settlement",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/consignments/{consignment_id}/settlements/preview": {
+      "post": {
+        "operationId": "preview_settlement_api_v1_consignments__consignment_id__settlements_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "consignment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Consignment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsignorSettlementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Settlement",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/consignments/{consignment_id}/terms": {
+      "put": {
+        "operationId": "update_terms_api_v1_consignments__consignment_id__terms_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "consignment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Consignment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsignmentUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsignmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Terms",
+        "tags": [
+          "consignment"
+        ]
+      }
+    },
+    "/api/v1/customer-requests": {
+      "get": {
+        "operationId": "list_requests_api_v1_customer_requests_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "NEW",
+                    "CONTACTED",
+                    "VEHICLE_FOUND",
+                    "NEGOTIATING",
+                    "DEPOSIT",
+                    "WON",
+                    "LOST",
+                    "ON_HOLD"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "customer_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Customer Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "open_only",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Open Only",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerRequestOut"
+                  },
+                  "title": "Response List Requests Api V1 Customer Requests Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Requests",
+        "tags": [
+          "customer requests"
+        ]
+      },
+      "post": {
+        "operationId": "create_request_api_v1_customer_requests_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerRequestIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerRequestOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Request",
+        "tags": [
+          "customer requests"
+        ]
+      }
+    },
+    "/api/v1/customer-requests/{request_id}": {
+      "get": {
+        "operationId": "get_request_api_v1_customer_requests__request_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerRequestOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Request",
+        "tags": [
+          "customer requests"
+        ]
+      },
+      "patch": {
+        "operationId": "update_request_api_v1_customer_requests__request_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerRequestUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerRequestOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Request",
+        "tags": [
+          "customer requests"
         ]
       }
     },
@@ -10751,6 +15056,99 @@
         "summary": "Update Customer",
         "tags": [
           "customers"
+        ]
+      }
+    },
+    "/api/v1/customers/{customer_id}/consignor-statement": {
+      "get": {
+        "operationId": "consignor_statement_api_v1_customers__customer_id__consignor_statement_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "customer_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Customer Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "json",
+              "enum": [
+                "json",
+                "pdf"
+              ],
+              "title": "Format",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": "ar",
+              "enum": [
+                "ar",
+                "en"
+              ],
+              "title": "Lang",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsignorStatement"
+                }
+              },
+              "application/pdf": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Consignor Statement",
+        "tags": [
+          "consignment"
         ]
       }
     },
@@ -12056,6 +16454,693 @@
         "summary": "Update Category",
         "tags": [
           "settings"
+        ]
+      }
+    },
+    "/api/v1/external-showrooms": {
+      "get": {
+        "operationId": "list_showrooms_api_v1_external_showrooms_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "include_archived",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Archived",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExternalShowroomOut"
+                  },
+                  "title": "Response List Showrooms Api V1 External Showrooms Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Showrooms",
+        "tags": [
+          "consignment",
+          "external showrooms"
+        ]
+      },
+      "post": {
+        "operationId": "create_showroom_api_v1_external_showrooms_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalShowroomIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalShowroomOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Showroom",
+        "tags": [
+          "consignment",
+          "external showrooms"
+        ]
+      }
+    },
+    "/api/v1/external-showrooms/{showroom_id}": {
+      "patch": {
+        "operationId": "update_showroom_api_v1_external_showrooms__showroom_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "showroom_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Showroom Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalShowroomUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalShowroomOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Showroom",
+        "tags": [
+          "consignment",
+          "external showrooms"
+        ]
+      }
+    },
+    "/api/v1/external-showrooms/{showroom_id}/collections": {
+      "post": {
+        "operationId": "record_collection_api_v1_external_showrooms__showroom_id__collections_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "showroom_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Showroom Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalCollectionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingResult_ExternalCollectionOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Record Collection",
+        "tags": [
+          "consignment",
+          "external showrooms"
+        ]
+      }
+    },
+    "/api/v1/external-showrooms/{showroom_id}/collections/preview": {
+      "post": {
+        "operationId": "preview_collection_api_v1_external_showrooms__showroom_id__collections_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "showroom_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Showroom Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalCollectionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Collection",
+        "tags": [
+          "consignment",
+          "external showrooms"
+        ]
+      }
+    },
+    "/api/v1/external-showrooms/{showroom_id}/statement": {
+      "get": {
+        "operationId": "showroom_statement_api_v1_external_showrooms__showroom_id__statement_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "showroom_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Showroom Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "json",
+              "enum": [
+                "json",
+                "pdf"
+              ],
+              "title": "Format",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": "ar",
+              "enum": [
+                "ar",
+                "en"
+              ],
+              "title": "Lang",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalShowroomStatement"
+                }
+              },
+              "application/pdf": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Showroom Statement",
+        "tags": [
+          "consignment",
+          "external showrooms"
+        ]
+      }
+    },
+    "/api/v1/follow-ups": {
+      "get": {
+        "operationId": "list_follow_ups_api_v1_follow_ups_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "customer_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Customer Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FollowUpOut"
+                  },
+                  "title": "Response List Follow Ups Api V1 Follow Ups Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Follow Ups",
+        "tags": [
+          "customer requests",
+          "follow-ups"
+        ]
+      },
+      "post": {
+        "operationId": "log_follow_up_api_v1_follow_ups_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FollowUpIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowUpOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Log Follow Up",
+        "tags": [
+          "customer requests",
+          "follow-ups"
+        ]
+      }
+    },
+    "/api/v1/follow-ups/due": {
+      "get": {
+        "operationId": "due_follow_ups_api_v1_follow_ups_due_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Mine",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FollowUpDue"
+                  },
+                  "title": "Response Due Follow Ups Api V1 Follow Ups Due Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Due Follow Ups",
+        "tags": [
+          "customer requests",
+          "follow-ups"
         ]
       }
     },
@@ -15323,6 +20408,80 @@
         "summary": "Cash Book Report Endpoint",
         "tags": [
           "reports"
+        ]
+      }
+    },
+    "/api/v1/request-matches/{match_id}/contacted": {
+      "put": {
+        "operationId": "set_contacted_api_v1_request_matches__match_id__contacted_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Match Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactedIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestMatch"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Set Contacted",
+        "tags": [
+          "customer requests"
         ]
       }
     },
@@ -18843,6 +24002,75 @@
         ],
         "summary": "Preview Purchase",
         "tags": [
+          "vehicles"
+        ]
+      }
+    },
+    "/api/v1/vehicles/{vehicle_id}/request-matches": {
+      "get": {
+        "operationId": "vehicle_matches_api_v1_vehicles__vehicle_id__request_matches_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vehicle_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Vehicle Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RequestMatch"
+                  },
+                  "title": "Response Vehicle Matches Api V1 Vehicles  Vehicle Id  Request Matches Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Vehicle Matches",
+        "tags": [
+          "customer requests",
           "vehicles"
         ]
       }

@@ -144,3 +144,31 @@ export type PaperPosting = Schemas['PostingResult_PaperOut_'];
 export type NotificationItem = Schemas['NotificationOut'];
 export type NotificationPage = Schemas['NotificationPage'];
 export type InstallmentStatement = Schemas['CustomerInstallmentStatement'];
+
+// --- Consignment, external showrooms, requests and follow-ups (Phase 6) ---------------
+
+export type ExternalShowroom = Schemas['ExternalShowroomOut'];
+export type ExternalShowroomInput = Schemas['ExternalShowroomIn'];
+export type Consignment = Schemas['ConsignmentOut'];
+export type ConsignmentInput = Schemas['ConsignmentIn'];
+export type ConsignmentTerms = Schemas['ConsignmentUpdate'];
+export type ConsignmentReturnInput = Schemas['ConsignmentReturnIn'];
+export type ConsignorSettlementInput = Schemas['ConsignorSettlementIn'];
+export type ConsignmentPosting = Schemas['PostingResult_ConsignmentOut_'];
+export type ConsignorStatement = Schemas['ConsignorStatement'];
+export type ConsignmentOutRow = Schemas['ConsignmentOutOut'];
+export type ConsignOutInput = Schemas['ConsignOutIn'];
+export type ExternalSaleInput = Schemas['ExternalSaleIn'];
+export type ConsignmentOutPosting = Schemas['PostingResult_ConsignmentOutOut_'];
+export type ExternalCollectionInput = Schemas['ExternalCollectionIn'];
+export type ExternalCollectionPosting = Schemas['PostingResult_ExternalCollectionOut_'];
+export type ExternalShowroomStatement = Schemas['ExternalShowroomStatement'];
+export type CustomerRequest = Schemas['CustomerRequestOut'];
+export type CustomerRequestInput = Schemas['CustomerRequestIn'];
+export type CustomerRequestUpdate = Schemas['CustomerRequestUpdate'];
+export type RequestStatus = CustomerRequest['status'];
+export type RequestMatch = Schemas['RequestMatch'];
+export type FollowUp = Schemas['FollowUpOut'];
+export type FollowUpInput = Schemas['FollowUpIn'];
+export type FollowUpResult = NonNullable<FollowUpInput['result']>;
+export type FollowUpDue = Schemas['FollowUpDue'];

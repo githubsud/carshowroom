@@ -39,6 +39,231 @@ export interface paths {
         patch: operations["update_cash_account_api_v1_cash_accounts__cash_account_id__patch"];
         trace?: never;
     };
+    "/api/v1/consignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Consignments */
+        get: operations["list_consignments_api_v1_consignments_get"];
+        put?: never;
+        /** Create Consignment */
+        post: operations["create_consignment_api_v1_consignments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/consignments-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Out */
+        get: operations["list_out_api_v1_consignments_out_get"];
+        put?: never;
+        /** Consign Out */
+        post: operations["consign_out_api_v1_consignments_out_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/consignments-out/{out_id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Return Out */
+        post: operations["return_out_api_v1_consignments_out__out_id__return_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/consignments-out/{out_id}/sale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record External Sale */
+        post: operations["record_external_sale_api_v1_consignments_out__out_id__sale_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/consignments-out/{out_id}/sale/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview External Sale */
+        post: operations["preview_external_sale_api_v1_consignments_out__out_id__sale_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/consignments/{consignment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Consignment */
+        get: operations["get_consignment_api_v1_consignments__consignment_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/consignments/{consignment_id}/agreement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Agreement */
+        get: operations["agreement_api_v1_consignments__consignment_id__agreement_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/consignments/{consignment_id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Return To Owner */
+        post: operations["return_to_owner_api_v1_consignments__consignment_id__return_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/consignments/{consignment_id}/settlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Settlement */
+        post: operations["record_settlement_api_v1_consignments__consignment_id__settlements_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/consignments/{consignment_id}/settlements/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Settlement */
+        post: operations["preview_settlement_api_v1_consignments__consignment_id__settlements_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/consignments/{consignment_id}/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Terms */
+        put: operations["update_terms_api_v1_consignments__consignment_id__terms_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customer-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Requests */
+        get: operations["list_requests_api_v1_customer_requests_get"];
+        put?: never;
+        /** Create Request */
+        post: operations["create_request_api_v1_customer_requests_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customer-requests/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Request */
+        get: operations["get_request_api_v1_customer_requests__request_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Request */
+        patch: operations["update_request_api_v1_customer_requests__request_id__patch"];
+        trace?: never;
+    };
     "/api/v1/customers": {
         parameters: {
             query?: never;
@@ -73,6 +298,23 @@ export interface paths {
         head?: never;
         /** Update Customer */
         patch: operations["update_customer_api_v1_customers__customer_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/customers/{customer_id}/consignor-statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consignor Statement */
+        get: operations["consignor_statement_api_v1_customers__customer_id__consignor_statement_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/customers/{customer_id}/installment-statement": {
@@ -314,6 +556,127 @@ export interface paths {
         head?: never;
         /** Update Category */
         patch: operations["update_category_api_v1_expense_categories__category_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/external-showrooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Showrooms */
+        get: operations["list_showrooms_api_v1_external_showrooms_get"];
+        put?: never;
+        /** Create Showroom */
+        post: operations["create_showroom_api_v1_external_showrooms_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-showrooms/{showroom_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Showroom */
+        patch: operations["update_showroom_api_v1_external_showrooms__showroom_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/external-showrooms/{showroom_id}/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Collection */
+        post: operations["record_collection_api_v1_external_showrooms__showroom_id__collections_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-showrooms/{showroom_id}/collections/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Collection */
+        post: operations["preview_collection_api_v1_external_showrooms__showroom_id__collections_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-showrooms/{showroom_id}/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Showroom Statement */
+        get: operations["showroom_statement_api_v1_external_showrooms__showroom_id__statement_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/follow-ups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Follow Ups */
+        get: operations["list_follow_ups_api_v1_follow_ups_get"];
+        put?: never;
+        /** Log Follow Up */
+        post: operations["log_follow_up_api_v1_follow_ups_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/follow-ups/due": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Due Follow Ups */
+        get: operations["due_follow_ups_api_v1_follow_ups_due_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/general-expenses": {
@@ -931,6 +1294,23 @@ export interface paths {
         /** Cash Book Report Endpoint */
         get: operations["cash_book_report_endpoint_api_v1_reports_cash_book_get"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/request-matches/{match_id}/contacted": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Contacted */
+        put: operations["set_contacted_api_v1_request_matches__match_id__contacted_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1559,6 +1939,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/vehicles/{vehicle_id}/request-matches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vehicle Matches */
+        get: operations["vehicle_matches_api_v1_vehicles__vehicle_id__request_matches_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/vehicles/{vehicle_id}/seller-payments": {
         parameters: {
             query?: never;
@@ -1849,6 +2246,370 @@ export interface components {
              */
             cash_account_id: string;
         };
+        /** ConsignOutIn */
+        ConsignOutIn: {
+            /**
+             * Commission Type
+             * @enum {string}
+             */
+            commission_type: "FIXED" | "PCT";
+            /** Commission Value */
+            commission_value: number | string;
+            /** Expected Price */
+            expected_price?: string | null;
+            /**
+             * External Showroom Id
+             * Format: uuid
+             */
+            external_showroom_id: string;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Sent Date
+             * Format: date
+             */
+            sent_date: string;
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+        };
+        /** ConsignOutReturnIn */
+        ConsignOutReturnIn: {
+            /** Reason */
+            reason?: string | null;
+            /**
+             * Return Date
+             * Format: date
+             */
+            return_date: string;
+        };
+        /**
+         * ConsignmentIn
+         * @description Receive a consigned car: the vehicle record and the agreement together.
+         */
+        ConsignmentIn: {
+            /**
+             * Agreement Date
+             * Format: date
+             */
+            agreement_date: string;
+            /** Commission Value */
+            commission_value?: string | null;
+            /**
+             * Consignor Id
+             * Format: uuid
+             */
+            consignor_id: string;
+            /** End Date */
+            end_date?: string | null;
+            /**
+             * Expenses Borne By
+             * @default OWNER
+             * @enum {string}
+             */
+            expenses_borne_by: "OWNER" | "SHOWROOM" | "SHARED";
+            /** Net Price To Owner */
+            net_price_to_owner?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Shared Owner Pct */
+            shared_owner_pct?: number | string | null;
+            /**
+             * Terms Type
+             * @enum {string}
+             */
+            terms_type: "NET_PRICE" | "COMMISSION_FIXED" | "COMMISSION_PCT";
+            vehicle: components["schemas"]["VehicleIn"];
+        };
+        /** ConsignmentOut */
+        ConsignmentOut: {
+            /**
+             * Agreement Date
+             * Format: date
+             */
+            agreement_date: string;
+            /** Asking Price */
+            asking_price: string | null;
+            /** Commission */
+            commission?: string | null;
+            /** Commission Value */
+            commission_value: string | null;
+            /**
+             * Consignor Id
+             * Format: uuid
+             */
+            consignor_id: string;
+            /** Consignor Name */
+            consignor_name: string;
+            /** Consignor Phone */
+            consignor_phone: string | null;
+            /** Days With Us */
+            days_with_us: number | null;
+            /** End Date */
+            end_date: string | null;
+            /**
+             * Expenses Borne By
+             * @enum {string}
+             */
+            expenses_borne_by: "OWNER" | "SHOWROOM" | "SHARED";
+            /** Expired */
+            expired: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Net Price To Owner */
+            net_price_to_owner: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Payable */
+            payable?: string | null;
+            /** Recoverable */
+            recoverable?: string | null;
+            /** Returned Date */
+            returned_date: string | null;
+            /** Sale Id */
+            sale_id?: string | null;
+            /** Sale No */
+            sale_no?: string | null;
+            /** Sale Price */
+            sale_price?: string | null;
+            /** Settlements */
+            settlements?: components["schemas"]["ConsignorSettlementOut"][] | null;
+            /** Shared Owner Pct */
+            shared_owner_pct: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ACTIVE" | "SOLD" | "RETURNED";
+            /** Stock No */
+            stock_no: string;
+            /**
+             * Terms Type
+             * @enum {string}
+             */
+            terms_type: "NET_PRICE" | "COMMISSION_FIXED" | "COMMISSION_PCT";
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+            /** Vehicle Label */
+            vehicle_label: string;
+            /** Vehicle Status */
+            vehicle_status: string;
+        };
+        /** ConsignmentOutOut */
+        ConsignmentOutOut: {
+            /**
+             * Commission Type
+             * @enum {string}
+             */
+            commission_type: "FIXED" | "PCT";
+            /** Commission Value */
+            commission_value: string;
+            /** Days Out */
+            days_out: number | null;
+            /** Expected Price */
+            expected_price: string | null;
+            /**
+             * External Showroom Id
+             * Format: uuid
+             */
+            external_showroom_id: string;
+            /** External Showroom Name */
+            external_showroom_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Notes */
+            notes: string | null;
+            /** Returned Date */
+            returned_date: string | null;
+            /** Sale Id */
+            sale_id: string | null;
+            /** Sale No */
+            sale_no: string | null;
+            /** Sale Price */
+            sale_price: string | null;
+            /**
+             * Sent Date
+             * Format: date
+             */
+            sent_date: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "OUT" | "SOLD" | "RETURNED";
+            /** Stock No */
+            stock_no: string;
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+            /** Vehicle Label */
+            vehicle_label: string;
+            /** Vehicle Status */
+            vehicle_status: string;
+        };
+        /** ConsignmentReturnIn */
+        ConsignmentReturnIn: {
+            /** Reason */
+            reason: string;
+            /**
+             * Return Date
+             * Format: date
+             */
+            return_date: string;
+        };
+        /**
+         * ConsignmentUpdate
+         * @description New terms for an ACTIVE agreement (before the car is sold).
+         */
+        ConsignmentUpdate: {
+            /**
+             * Agreement Date
+             * Format: date
+             */
+            agreement_date: string;
+            /** Commission Value */
+            commission_value?: string | null;
+            /** End Date */
+            end_date?: string | null;
+            /**
+             * Expenses Borne By
+             * @default OWNER
+             * @enum {string}
+             */
+            expenses_borne_by: "OWNER" | "SHOWROOM" | "SHARED";
+            /** Net Price To Owner */
+            net_price_to_owner?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Shared Owner Pct */
+            shared_owner_pct?: number | string | null;
+            /**
+             * Terms Type
+             * @enum {string}
+             */
+            terms_type: "NET_PRICE" | "COMMISSION_FIXED" | "COMMISSION_PCT";
+        };
+        /** ConsignorSettlementIn */
+        ConsignorSettlementIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "PAYOUT" | "RECOVERY";
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Settle Date
+             * Format: date
+             */
+            settle_date: string;
+        };
+        /** ConsignorSettlementOut */
+        ConsignorSettlementOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /** Cash Account Name Ar */
+            cash_account_name_ar: string;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "PAYOUT" | "RECOVERY";
+            /** Notes */
+            notes: string | null;
+            /**
+             * Settle Date
+             * Format: date
+             */
+            settle_date: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED";
+        };
+        /**
+         * ConsignorStatement
+         * @description What the showroom owes the owner (2200) less what the owner owes back (1430).
+         */
+        ConsignorStatement: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Consignments */
+            consignments: components["schemas"]["ConsignmentOut"][];
+            /**
+             * Consignor Id
+             * Format: uuid
+             */
+            consignor_id: string;
+            /** Consignor Name */
+            consignor_name: string;
+            /** Consignor Phone */
+            consignor_phone: string | null;
+            /** Currency Code */
+            currency_code: string;
+            /** Lines */
+            lines: components["schemas"]["app__domain__consignment__StatementLine"][];
+            /**
+             * Net Due To Owner
+             * @example 25000.00
+             */
+            net_due_to_owner: string;
+            /**
+             * Payable
+             * @example 25000.00
+             */
+            payable: string;
+            /**
+             * Recoverable
+             * @example 25000.00
+             */
+            recoverable: string;
+        };
+        /** ContactedIn */
+        ContactedIn: {
+            /**
+             * Contacted
+             * @default true
+             */
+            contacted: boolean;
+        };
         /** CostLine */
         CostLine: {
             /**
@@ -2085,6 +2846,124 @@ export interface components {
              */
             status: "POSTED" | "REVERSED";
         };
+        /** CustomerRequestIn */
+        CustomerRequestIn: {
+            /** Assigned To */
+            assigned_to?: string | null;
+            /** Budget Max */
+            budget_max?: number | string | null;
+            /** Budget Min */
+            budget_min?: number | string | null;
+            /** Color Pref */
+            color_pref?: string | null;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Financing Needed */
+            financing_needed?: boolean | null;
+            /** Make */
+            make?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Source */
+            source?: string | null;
+            /** Trade In Offered */
+            trade_in_offered?: boolean | null;
+            /** Year From */
+            year_from?: number | null;
+            /** Year To */
+            year_to?: number | null;
+        };
+        /** CustomerRequestOut */
+        CustomerRequestOut: {
+            /** Assigned Name */
+            assigned_name: string | null;
+            /** Assigned To */
+            assigned_to: string | null;
+            /** Budget Max */
+            budget_max: string | null;
+            /** Budget Min */
+            budget_min: string | null;
+            /** Color Pref */
+            color_pref: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Customer Name */
+            customer_name: string;
+            /** Customer Phone */
+            customer_phone: string | null;
+            /** Financing Needed */
+            financing_needed: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Make */
+            make: string | null;
+            /** Match Count */
+            match_count: number;
+            /** Matches */
+            matches?: components["schemas"]["RequestMatch"][];
+            /** Model */
+            model: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Source */
+            source: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "NEW" | "CONTACTED" | "VEHICLE_FOUND" | "NEGOTIATING" | "DEPOSIT" | "WON" | "LOST" | "ON_HOLD";
+            /** Trade In Offered */
+            trade_in_offered: boolean;
+            /** Year From */
+            year_from: number | null;
+            /** Year To */
+            year_to: number | null;
+        };
+        /** CustomerRequestUpdate */
+        CustomerRequestUpdate: {
+            /** Assigned To */
+            assigned_to?: string | null;
+            /** Budget Max */
+            budget_max?: number | string | null;
+            /** Budget Min */
+            budget_min?: number | string | null;
+            /** Color Pref */
+            color_pref?: string | null;
+            /** Financing Needed */
+            financing_needed?: boolean | null;
+            /** Make */
+            make?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Source */
+            source?: string | null;
+            /** Status */
+            status?: ("NEW" | "CONTACTED" | "VEHICLE_FOUND" | "NEGOTIATING" | "DEPOSIT" | "WON" | "LOST" | "ON_HOLD") | null;
+            /** Trade In Offered */
+            trade_in_offered?: boolean | null;
+            /** Year From */
+            year_from?: number | null;
+            /** Year To */
+            year_to?: number | null;
+        };
         /** CustomerUpdate */
         CustomerUpdate: {
             /** Address */
@@ -2256,6 +3135,243 @@ export interface components {
             name_ar?: string | null;
             /** Name En */
             name_en?: string | null;
+        };
+        /** ExternalCollectionIn */
+        ExternalCollectionIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Cash Account Id
+             * Format: uuid
+             */
+            cash_account_id: string;
+            /**
+             * Collect Date
+             * Format: date
+             */
+            collect_date: string;
+            /** Notes */
+            notes?: string | null;
+        };
+        /** ExternalCollectionOut */
+        ExternalCollectionOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /** Cash Account Name Ar */
+            cash_account_name_ar: string;
+            /**
+             * Collect Date
+             * Format: date
+             */
+            collect_date: string;
+            /** Entry No */
+            entry_no: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED";
+        };
+        /** ExternalSaleIn */
+        ExternalSaleIn: {
+            /** Buyer Name */
+            buyer_name?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Sale Date
+             * Format: date
+             */
+            sale_date: string;
+            /**
+             * Sale Price
+             * @example 25000.00
+             */
+            sale_price: string;
+        };
+        /** ExternalShowroomIn */
+        ExternalShowroomIn: {
+            /** Address */
+            address?: string | null;
+            /** Contact Name */
+            contact_name?: string | null;
+            /** Name */
+            name: string;
+            /** Notes */
+            notes?: string | null;
+            /** Phone */
+            phone?: string | null;
+        };
+        /** ExternalShowroomOut */
+        ExternalShowroomOut: {
+            /** Address */
+            address: string | null;
+            /** Archived */
+            archived: boolean;
+            /** Cars Out */
+            cars_out: number;
+            /** Contact Name */
+            contact_name: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Notes */
+            notes: string | null;
+            /** Phone */
+            phone: string | null;
+            /** Receivable */
+            receivable?: string | null;
+        };
+        /** ExternalShowroomStatement */
+        ExternalShowroomStatement: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Cars */
+            cars: components["schemas"]["ConsignmentOutOut"][];
+            /** Collections */
+            collections: components["schemas"]["ExternalCollectionOut"][];
+            /** Currency Code */
+            currency_code: string;
+            /**
+             * External Showroom Id
+             * Format: uuid
+             */
+            external_showroom_id: string;
+            /** Lines */
+            lines: components["schemas"]["app__domain__consignment__StatementLine"][];
+            /** Name */
+            name: string;
+            /** Phone */
+            phone: string | null;
+            /**
+             * Receivable
+             * @example 25000.00
+             */
+            receivable: string;
+        };
+        /** ExternalShowroomUpdate */
+        ExternalShowroomUpdate: {
+            /** Address */
+            address?: string | null;
+            /** Archived */
+            archived?: boolean | null;
+            /** Contact Name */
+            contact_name?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Phone */
+            phone?: string | null;
+        };
+        /**
+         * FollowUpDue
+         * @description A customer whose latest follow-up asks to be called back by today.
+         */
+        FollowUpDue: {
+            follow_up: components["schemas"]["FollowUpOut"];
+            /** Overdue Days */
+            overdue_days: number;
+        };
+        /** FollowUpIn */
+        FollowUpIn: {
+            /** Assigned To */
+            assigned_to?: string | null;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /**
+             * Kind
+             * @default CALL
+             * @enum {string}
+             */
+            kind: "CALL" | "VISIT" | "TEST_DRIVE" | "NOTE";
+            /** Next Action */
+            next_action?: string | null;
+            /** Next Follow Up Date */
+            next_follow_up_date?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Priority
+             * @default NORMAL
+             * @enum {string}
+             */
+            priority: "LOW" | "NORMAL" | "HIGH";
+            /** Request Id */
+            request_id?: string | null;
+            /** Result */
+            result?: ("ANSWERED" | "NO_ANSWER" | "INTERESTED" | "NOT_INTERESTED" | "CALL_BACK" | "OTHER") | null;
+        };
+        /** FollowUpOut */
+        FollowUpOut: {
+            /** Assigned Name */
+            assigned_name: string | null;
+            /** Assigned To */
+            assigned_to: string | null;
+            /** Created By Name */
+            created_by_name: string | null;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Customer Name */
+            customer_name: string;
+            /** Customer Phone */
+            customer_phone: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "CALL" | "VISIT" | "TEST_DRIVE" | "NOTE";
+            /** Next Action */
+            next_action: string | null;
+            /** Next Follow Up Date */
+            next_follow_up_date: string | null;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /**
+             * Priority
+             * @enum {string}
+             */
+            priority: "LOW" | "NORMAL" | "HIGH";
+            /** Request Id */
+            request_id: string | null;
+            /** Result */
+            result: ("ANSWERED" | "NO_ANSWER" | "INTERESTED" | "NOT_INTERESTED" | "CALL_BACK" | "OTHER") | null;
         };
         /**
          * GeneralExpenseIn
@@ -3219,7 +4335,7 @@ export interface components {
              */
             date_to: string;
             /** Lines */
-            lines: components["schemas"]["StatementLine"][];
+            lines: components["schemas"]["app__domain__partners__StatementLine"][];
             opening: components["schemas"]["PartnerPosition"];
             partner: components["schemas"]["PartnerOut"];
         };
@@ -3403,9 +4519,33 @@ export interface components {
              */
             status: "OPEN" | "LOCKED";
         };
+        /** PostingResult[ConsignmentOutOut] */
+        PostingResult_ConsignmentOutOut_: {
+            document: components["schemas"]["ConsignmentOutOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[ConsignmentOut] */
+        PostingResult_ConsignmentOut_: {
+            document: components["schemas"]["ConsignmentOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
         /** PostingResult[CustomerRefundOut] */
         PostingResult_CustomerRefundOut_: {
             document: components["schemas"]["CustomerRefundOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
+        /** PostingResult[ExternalCollectionOut] */
+        PostingResult_ExternalCollectionOut_: {
+            document: components["schemas"]["ExternalCollectionOut"];
             /** Journal Entries */
             journal_entries: components["schemas"]["EntryRef"][];
             /** Warnings */
@@ -3755,6 +4895,52 @@ export interface components {
              */
             status: "POSTED" | "REVERSED" | "BOUNCED";
         };
+        /** RequestMatch */
+        RequestMatch: {
+            /** Asking Price */
+            asking_price: string | null;
+            /** Contacted */
+            contacted: boolean;
+            /** Contacted At */
+            contacted_at: string | null;
+            /**
+             * Customer Id
+             * Format: uuid
+             */
+            customer_id: string;
+            /** Customer Name */
+            customer_name: string;
+            /** Customer Phone */
+            customer_phone: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Matched At
+             * Format: date-time
+             */
+            matched_at: string;
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /** Request Summary */
+            request_summary: string;
+            /** Stock No */
+            stock_no: string;
+            /**
+             * Vehicle Id
+             * Format: uuid
+             */
+            vehicle_id: string;
+            /** Vehicle Label */
+            vehicle_label: string;
+            /** Vehicle Status */
+            vehicle_status: string;
+        };
         /** ReservationIn */
         ReservationIn: {
             /**
@@ -3927,7 +5113,12 @@ export interface components {
         /** SaleListRow */
         SaleListRow: {
             /** Buyer Name */
-            buyer_name: string;
+            buyer_name: string | null;
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "DIRECT" | "EXTERNAL_SHOWROOM";
             /**
              * Id
              * Format: uuid
@@ -3964,13 +5155,10 @@ export interface components {
         };
         /** SaleOut */
         SaleOut: {
-            /**
-             * Buyer Customer Id
-             * Format: uuid
-             */
-            buyer_customer_id: string;
+            /** Buyer Customer Id */
+            buyer_customer_id: string | null;
             /** Buyer Name */
-            buyer_name: string;
+            buyer_name: string | null;
             /** Buyer Phone */
             buyer_phone: string | null;
             /** Cancel Date */
@@ -3979,6 +5167,13 @@ export interface components {
             cancel_reason: string | null;
             /** Cancellation Method */
             cancellation_method: ("REFUND_LIABILITY" | "MIRROR") | null;
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "DIRECT" | "EXTERNAL_SHOWROOM";
+            /** Consignor Name */
+            consignor_name: string | null;
             /** Cost Entry No */
             cost_entry_no: number | null;
             /**
@@ -4002,6 +5197,10 @@ export interface components {
             einvoice_status: string;
             /** Entry No */
             entry_no: number | null;
+            /** External Showroom Id */
+            external_showroom_id: string | null;
+            /** External Showroom Name */
+            external_showroom_name: string | null;
             /**
              * Financed
              * @example 25000.00
@@ -4022,6 +5221,11 @@ export interface components {
             list_price: string;
             /** Notes */
             notes: string | null;
+            /**
+             * Ownership Type
+             * @enum {string}
+             */
+            ownership_type: "OWNED" | "CONSIGNED_IN";
             /**
              * Paid Total
              * @example 25000.00
@@ -4125,18 +5329,36 @@ export interface components {
         };
         /** SaleProfit */
         SaleProfit: {
+            /** Commission */
+            commission?: string | null;
             /**
              * Cost
              * @example 25000.00
              */
             cost: string;
+            /** Due To Owner */
+            due_to_owner?: string | null;
+            /**
+             * External Commission
+             * @default 0.00
+             * @example 25000.00
+             */
+            external_commission: string;
             /**
              * Gross Profit
              * @example 25000.00
              */
             gross_profit: string;
+            /**
+             * Kind
+             * @default SALE
+             * @enum {string}
+             */
+            kind: "SALE" | "CONSIGNMENT";
             /** Profit Pct */
             profit_pct: string;
+            /** Recovered Expenses */
+            recovered_expenses?: string | null;
         };
         /** SchedulePreviewIn */
         SchedulePreviewIn: {
@@ -4299,44 +5521,6 @@ export interface components {
         SignedUrlOut: {
             /** Url */
             url: string;
-        };
-        /** StatementLine */
-        StatementLine: {
-            /**
-             * Amount In
-             * @example 25000.00
-             */
-            amount_in: string;
-            /**
-             * Amount Out
-             * @example 25000.00
-             */
-            amount_out: string;
-            /**
-             * Bucket
-             * @enum {string}
-             */
-            bucket: "CAPITAL" | "CURRENT" | "LOAN_TO" | "LOAN_FROM";
-            /** Description */
-            description: string;
-            /**
-             * Entry Date
-             * Format: date
-             */
-            entry_date: string;
-            /** Entry No */
-            entry_no: number;
-            /** Is Reversal */
-            is_reversal: boolean;
-            /** Reversed */
-            reversed: boolean;
-            /**
-             * Running Net
-             * @example 25000.00
-             */
-            running_net: string;
-            /** Source Type */
-            source_type: string;
         };
         /** StatementRow */
         StatementRow: {
@@ -4820,6 +6004,63 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /**
+         * VehicleConsignedOut
+         * @description Our car at another showroom (SPEC §4.5).
+         */
+        VehicleConsignedOut: {
+            /**
+             * Commission Type
+             * @enum {string}
+             */
+            commission_type: "FIXED" | "PCT";
+            /** Commission Value */
+            commission_value: string;
+            /** Expected Price */
+            expected_price: string | null;
+            /**
+             * External Showroom Id
+             * Format: uuid
+             */
+            external_showroom_id: string;
+            /** External Showroom Name */
+            external_showroom_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Sent Date
+             * Format: date
+             */
+            sent_date: string;
+        };
+        /**
+         * VehicleConsignment
+         * @description A consigned-in car's agreement (SPEC §4.4).
+         */
+        VehicleConsignment: {
+            /**
+             * Consignor Id
+             * Format: uuid
+             */
+            consignor_id: string;
+            /** Consignor Name */
+            consignor_name: string;
+            /** End Date */
+            end_date: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ACTIVE" | "SOLD" | "RETURNED";
+        };
         /** VehicleCost */
         VehicleCost: {
             /** Cost Complete */
@@ -4853,6 +6094,8 @@ export interface components {
             color_ext: string | null;
             /** Color Int */
             color_int: string | null;
+            consigned_out?: components["schemas"]["VehicleConsignedOut"] | null;
+            consignment?: components["schemas"]["VehicleConsignment"] | null;
             cost?: components["schemas"]["VehicleCost"] | null;
             /** Current Location Id */
             current_location_id: string | null;
@@ -5012,7 +6255,7 @@ export interface components {
              * Treatment
              * @enum {string}
              */
-            treatment: "CAPITALIZE" | "COGS";
+            treatment: "CAPITALIZE" | "COGS" | "RECOVERABLE" | "SHOWROOM" | "SHARED";
             /**
              * Vehicle Id
              * Format: uuid
@@ -5118,10 +6361,22 @@ export interface components {
             /** Estimate */
             estimate: boolean;
             /**
+             * External Commission
+             * @default 0.00
+             * @example 25000.00
+             */
+            external_commission: string;
+            /**
              * Gross Profit
              * @example 25000.00
              */
             gross_profit: string;
+            /**
+             * Kind
+             * @default SALE
+             * @enum {string}
+             */
+            kind: "SALE" | "CONSIGNMENT";
             /** Profit Pct */
             profit_pct: string;
             /**
@@ -5189,13 +6444,16 @@ export interface components {
         };
         /** VehicleSaleInfo */
         VehicleSaleInfo: {
-            /**
-             * Buyer Customer Id
-             * Format: uuid
-             */
-            buyer_customer_id: string;
+            /** Buyer Customer Id */
+            buyer_customer_id: string | null;
             /** Buyer Name */
             buyer_name: string;
+            /**
+             * Channel
+             * @default DIRECT
+             * @enum {string}
+             */
+            channel: "DIRECT" | "EXTERNAL_SHOWROOM";
             /**
              * Id
              * Format: uuid
@@ -5264,6 +6522,73 @@ export interface components {
             vin?: string | null;
             /** Year */
             year?: number | null;
+        };
+        /** StatementLine */
+        app__domain__consignment__StatementLine: {
+            /**
+             * Balance
+             * @example 25000.00
+             */
+            balance: string;
+            /**
+             * Credit
+             * @example 25000.00
+             */
+            credit: string;
+            /**
+             * Debit
+             * @example 25000.00
+             */
+            debit: string;
+            /** Description */
+            description: string;
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /** Entry No */
+            entry_no: number;
+            /** Stock No */
+            stock_no: string | null;
+        };
+        /** StatementLine */
+        app__domain__partners__StatementLine: {
+            /**
+             * Amount In
+             * @example 25000.00
+             */
+            amount_in: string;
+            /**
+             * Amount Out
+             * @example 25000.00
+             */
+            amount_out: string;
+            /**
+             * Bucket
+             * @enum {string}
+             */
+            bucket: "CAPITAL" | "CURRENT" | "LOAN_TO" | "LOAN_FROM";
+            /** Description */
+            description: string;
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /** Entry No */
+            entry_no: number;
+            /** Is Reversal */
+            is_reversal: boolean;
+            /** Reversed */
+            reversed: boolean;
+            /**
+             * Running Net
+             * @example 25000.00
+             */
+            running_net: string;
+            /** Source Type */
+            source_type: string;
         };
     };
     responses: never;
@@ -5366,6 +6691,615 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CashAccountOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_consignments_api_v1_consignments_get: {
+        parameters: {
+            query?: {
+                status?: ("ACTIVE" | "SOLD" | "RETURNED") | null;
+                consignor_id?: string | null;
+                q?: string | null;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsignmentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_consignment_api_v1_consignments_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsignmentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsignmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_out_api_v1_consignments_out_get: {
+        parameters: {
+            query?: {
+                status?: ("OUT" | "SOLD" | "RETURNED") | null;
+                external_showroom_id?: string | null;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsignmentOutOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    consign_out_api_v1_consignments_out_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsignOutIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsignmentOutOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    return_out_api_v1_consignments_out__out_id__return_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                out_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsignOutReturnIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsignmentOutOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_external_sale_api_v1_consignments_out__out_id__sale_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                out_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalSaleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_ConsignmentOutOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_external_sale_api_v1_consignments_out__out_id__sale_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                out_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalSaleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_consignment_api_v1_consignments__consignment_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                consignment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsignmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    agreement_api_v1_consignments__consignment_id__agreement_get: {
+        parameters: {
+            query?: {
+                lang?: "ar" | "en";
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                consignment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    return_to_owner_api_v1_consignments__consignment_id__return_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                consignment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsignmentReturnIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsignmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_settlement_api_v1_consignments__consignment_id__settlements_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                consignment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsignorSettlementIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_ConsignmentOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_settlement_api_v1_consignments__consignment_id__settlements_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                consignment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsignorSettlementIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_terms_api_v1_consignments__consignment_id__terms_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                consignment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsignmentUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsignmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_requests_api_v1_customer_requests_get: {
+        parameters: {
+            query?: {
+                status?: ("NEW" | "CONTACTED" | "VEHICLE_FOUND" | "NEGOTIATING" | "DEPOSIT" | "WON" | "LOST" | "ON_HOLD") | null;
+                customer_id?: string | null;
+                open_only?: boolean;
+                q?: string | null;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerRequestOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_request_api_v1_customer_requests_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerRequestIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerRequestOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_request_api_v1_customer_requests__request_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerRequestOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_request_api_v1_customer_requests__request_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerRequestUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerRequestOut"];
                 };
             };
             /** @description Validation Error */
@@ -5508,6 +7442,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CustomerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    consignor_statement_api_v1_customers__customer_id__consignor_statement_get: {
+        parameters: {
+            query?: {
+                format?: "json" | "pdf";
+                lang?: "ar" | "en";
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                customer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsignorStatement"];
+                    "application/pdf": unknown;
                 };
             };
             /** @description Validation Error */
@@ -6106,6 +8077,325 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ExpenseCategoryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_showrooms_api_v1_external_showrooms_get: {
+        parameters: {
+            query?: {
+                include_archived?: boolean;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalShowroomOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_showroom_api_v1_external_showrooms_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalShowroomIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalShowroomOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_showroom_api_v1_external_showrooms__showroom_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                showroom_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalShowroomUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalShowroomOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_collection_api_v1_external_showrooms__showroom_id__collections_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                showroom_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalCollectionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_ExternalCollectionOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_collection_api_v1_external_showrooms__showroom_id__collections_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                showroom_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalCollectionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    showroom_statement_api_v1_external_showrooms__showroom_id__statement_get: {
+        parameters: {
+            query?: {
+                format?: "json" | "pdf";
+                lang?: "ar" | "en";
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                showroom_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalShowroomStatement"];
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_follow_ups_api_v1_follow_ups_get: {
+        parameters: {
+            query?: {
+                customer_id?: string | null;
+                limit?: number;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    log_follow_up_api_v1_follow_ups_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FollowUpIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    due_follow_ups_api_v1_follow_ups_due_get: {
+        parameters: {
+            query?: {
+                mine?: boolean;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpDue"][];
                 };
             };
             /** @description Validation Error */
@@ -7585,6 +9875,43 @@ export interface operations {
                     "application/json": components["schemas"]["CashBookOut"];
                     "application/pdf": unknown;
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_contacted_api_v1_request_matches__match_id__contacted_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContactedIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestMatch"];
                 };
             };
             /** @description Validation Error */
@@ -9181,6 +11508,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    vehicle_matches_api_v1_vehicles__vehicle_id__request_matches_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                vehicle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestMatch"][];
                 };
             };
             /** @description Validation Error */

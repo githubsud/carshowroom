@@ -4,8 +4,11 @@ vehicle expenses (rules 9, 30, 31, P-04), photos and documents.
 
 Cost is never stored: a car's cost is its balance on vehicle inventory (1300)
 plus anything charged to cost of sales (5000) for it, and its profit is
-vehicle sales (4100) minus cost of sales for it (D-26, D-34). Responses carry
-cost fields that the routers strip for users without vehicle.view_cost.
+vehicle sales (4100) minus cost of sales for it (D-26, D-34), less the
+commission an external showroom kept (6100, Q-34). A consigned-in car's
+profit is its commission (4200) less what the showroom bore (6280, P-05).
+Responses carry cost fields that the routers strip for users without
+vehicle.view_cost.
 """
 
 import contextlib
@@ -20,6 +23,7 @@ from sqlalchemy import Connection, text
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
 from app.core.errors import AppError, not_found
+from app.domain.consignment import owner_share
 from app.domain.finance import EntryRef, PostingResult, Preview, PreviewEffect
 from app.domain.ledger import ZERO, EntryDraft
 from app.domain.money import format_money, ltr, quantize
@@ -45,6 +49,8 @@ from app.domain.vehicles import (
     SellerPaymentOut,
     StatusChange,
     UploadTicket,
+    VehicleConsignedOut,
+    VehicleConsignment,
     VehicleCost,
     VehicleDetail,
     VehicleExpenseIn,
@@ -275,12 +281,18 @@ def _check_vin_free(conn: Connection, vin: str | None, own_id: UUID | None) -> N
 
 
 def create_vehicle(
-    conn: Connection, payload: VehicleIn, *, acquisition_source: str | None = None, reason: str | None = None
+    conn: Connection,
+    payload: VehicleIn,
+    *,
+    acquisition_source: str | None = None,
+    reason: str | None = None,
+    ownership_type: str = "OWNED",
 ) -> UUID:
     _check_vin_free(conn, payload.vin, None)
     location_id = _active_location(conn, payload.current_location_id) if payload.current_location_id else None
     values = payload.model_dump(exclude={"current_location_id", "acquisition_source"})
     values["acquisition_source"] = acquisition_source or payload.acquisition_source
+    values["ownership_type"] = ownership_type
     values["current_location_id"] = location_id or default_location(conn)
     columns = list(values)
     _set_reason(conn, reason)
@@ -321,6 +333,9 @@ def change_status(conn: Connection, vehicle_id: UUID, status: VehicleStatus, rea
             status_code=409,
             details={"from": current.status, "to": status},
         )
+    if status == "ARCHIVED" and current.ownership_type == "CONSIGNED_IN":
+        # A consigned car leaves by going back to its owner (consignment return).
+        raise AppError("CONSIGNMENT_ACTIVE", "Return the car to its owner instead", status_code=409)
     if status == "ARCHIVED" and inventory_cost(conn, vehicle_id) != 0:
         # Money must not disappear with an archived record (like D-53).
         raise AppError("VEHICLE_HAS_COST", "A vehicle with recorded cost cannot be archived", status_code=409)
@@ -351,11 +366,16 @@ _COST_TOTALS = text(
     select l.vehicle_id,
            coalesce(sum(l.debit - l.credit) filter (where a.system_key = 'VEHICLE_INVENTORY'), 0) as inventory,
            coalesce(sum(l.debit - l.credit) filter (where a.system_key = 'COST_OF_VEHICLES_SOLD'), 0) as cogs,
-           coalesce(sum(l.credit - l.debit) filter (where a.system_key = 'VEHICLE_SALES'), 0) as sales
+           coalesce(sum(l.credit - l.debit) filter (where a.system_key = 'VEHICLE_SALES'), 0) as sales,
+           coalesce(sum(l.debit - l.credit) filter (where a.system_key = 'EXTERNAL_COMMISSION_EXPENSE'), 0)
+             as external_commission,
+           coalesce(sum(l.credit - l.debit) filter (where a.system_key = 'CONSIGNMENT_COMMISSION'), 0) as commission,
+           coalesce(sum(l.debit - l.credit) filter (where a.system_key = 'EXP_CONSIGNMENT'), 0) as consignment_expense
       from public.journal_lines l
       join public.ledger_accounts a on a.id = l.ledger_account_id
      where l.vehicle_id = any(:ids)
-       and a.system_key in ('VEHICLE_INVENTORY', 'COST_OF_VEHICLES_SOLD', 'VEHICLE_SALES')
+       and a.system_key in ('VEHICLE_INVENTORY', 'COST_OF_VEHICLES_SOLD', 'VEHICLE_SALES',
+                            'EXTERNAL_COMMISSION_EXPENSE', 'CONSIGNMENT_COMMISSION', 'EXP_CONSIGNMENT')
      group by l.vehicle_id
     """
 )
@@ -366,17 +386,28 @@ class CostTotals:
     inventory: Decimal
     cogs: Decimal
     sales: Decimal
+    external_commission: Decimal = ZERO
+    commission: Decimal = ZERO
+    consignment_expense: Decimal = ZERO
 
     @property
     def total_cost(self) -> Decimal:
         # In stock: the inventory balance; once sold: what moved to cost of sales.
-        return self.inventory + self.cogs
+        # A consigned car has no inventory; its cost is what the showroom bore (P-05).
+        return self.inventory + self.cogs + self.consignment_expense
 
 
 def cost_totals(conn: Connection, vehicle_ids: list[UUID]) -> dict[UUID, CostTotals]:
     totals = {vid: CostTotals(ZERO, ZERO, ZERO) for vid in vehicle_ids}
     for row in conn.execute(_COST_TOTALS, {"ids": vehicle_ids}):
-        totals[row.vehicle_id] = CostTotals(Decimal(row.inventory), Decimal(row.cogs), Decimal(row.sales))
+        totals[row.vehicle_id] = CostTotals(
+            Decimal(row.inventory),
+            Decimal(row.cogs),
+            Decimal(row.sales),
+            Decimal(row.external_commission),
+            Decimal(row.commission),
+            Decimal(row.consignment_expense),
+        )
     return totals
 
 
@@ -394,7 +425,7 @@ def missing_categories(conn: Connection, vehicle_ids: list[UUID], language: str 
               cross join public.tenant_settings s
               join public.expense_categories ec
                 on ec.kind = 'VEHICLE' and ec.archived_at is null and ec.code = any(s.expected_cost_categories)
-             where v.id = any(:ids) and v.status not in ('DRAFT', 'ARCHIVED')
+             where v.id = any(:ids) and v.status not in ('DRAFT', 'ARCHIVED') and v.ownership_type = 'OWNED'
                and not exists (select 1 from public.vehicle_expenses e
                                 where e.vehicle_id = v.id and e.category_id = ec.id and e.status = 'POSTED')
              order by ec.sort_order
@@ -418,19 +449,31 @@ _COST_LINES = text(
       join public.ledger_accounts a on a.id = l.ledger_account_id
      where l.vehicle_id = :id
        and ((a.system_key = 'VEHICLE_INVENTORY' and e.source_type <> 'SALE_COST')
-            or (a.system_key = 'COST_OF_VEHICLES_SOLD' and e.source_type = 'VEHICLE_EXPENSE'))
+            or (a.system_key in ('COST_OF_VEHICLES_SOLD', 'EXP_CONSIGNMENT') and e.source_type = 'VEHICLE_EXPENSE'))
      order by e.entry_date, e.entry_no, l.line_no
     """
 )
 
 
 def _profit(totals: CostTotals, estimate: bool) -> VehicleProfit | None:
+    if totals.commission > 0:
+        # Consigned-in car (rule 16): the showroom earns its commission only.
+        gross = totals.commission - totals.consignment_expense
+        return VehicleProfit(
+            kind="CONSIGNMENT",
+            sale_price=totals.commission,
+            cost=totals.consignment_expense,
+            gross_profit=gross,
+            profit_pct=quantize(gross * 100 / totals.commission),
+            estimate=False,
+        )
     if totals.sales <= 0:
         return None
-    gross = totals.sales - totals.cogs
+    gross = totals.sales - totals.cogs - totals.external_commission
     return VehicleProfit(
         sale_price=totals.sales,
         cost=totals.cogs,
+        external_commission=totals.external_commission,
         gross_profit=gross,
         profit_pct=quantize(gross * 100 / totals.sales),
         estimate=estimate,
@@ -702,8 +745,11 @@ def get_detail(conn: Connection, vehicle_id: UUID, storage: Storage, *, can_view
         conn.execute(
             text(
                 """
-            select s.id, s.sale_no, s.sale_date, s.buyer_customer_id, c.name as buyer_name, s.sale_price, s.invoice_no
-              from public.sales s join public.customers c on c.id = s.buyer_customer_id
+            select s.id, s.sale_no, s.sale_date, s.buyer_customer_id, coalesce(c.name, x.name) as buyer_name,
+                   s.sale_price, s.invoice_no, s.channel
+              from public.sales s
+              left join public.customers c on c.id = s.buyer_customer_id
+              left join public.external_showrooms x on x.id = s.external_showroom_id
              where s.vehicle_id = :id and s.status = 'POSTED'
             """
             ),
@@ -713,6 +759,32 @@ def get_detail(conn: Connection, vehicle_id: UUID, storage: Storage, *, can_view
         .first()
     )
     sale = VehicleSaleInfo.model_validate(dict(sale_row)) if sale_row is not None else None
+    consignment_row = (
+        conn.execute(
+            text(
+                "select ci.id, ci.consignor_id, c.name as consignor_name, ci.status, ci.end_date "
+                "from public.consignments_in ci join public.customers c on c.id = ci.consignor_id "
+                "where ci.vehicle_id = :id"
+            ),
+            {"id": vehicle_id},
+        )
+        .mappings()
+        .first()
+    )
+    out_row = (
+        conn.execute(
+            text(
+                "select o.id, o.external_showroom_id, x.name as external_showroom_name, o.sent_date, "
+                "o.commission_type, "
+                "o.commission_value, o.expected_price from public.consignments_out o "
+                "join public.external_showrooms x on x.id = o.external_showroom_id "
+                "where o.vehicle_id = :id and o.status = 'OUT'"
+            ),
+            {"id": vehicle_id},
+        )
+        .mappings()
+        .first()
+    )
 
     thresholds = _thresholds(conn)
     days = _days(v["status"], v["stock_date"], sale.sale_date if sale else None, info.today)
@@ -755,6 +827,8 @@ def get_detail(conn: Connection, vehicle_id: UUID, storage: Storage, *, can_view
         documents=list_documents(conn, "VEHICLE", vehicle_id, can_view_cost=can_view_cost),
         reservation=reservation,
         sale=sale,
+        consignment=VehicleConsignment.model_validate(dict(consignment_row)) if consignment_row else None,
+        consigned_out=VehicleConsignedOut.model_validate(dict(out_row)) if out_row else None,
         min_price=v["min_price"],
     )
     if can_view_cost:
@@ -1050,13 +1124,38 @@ class _ExpensePlan:
     cash: finance.ActiveCashAccount | None
     payer_ar: str | None
     payer_en: str | None
+    treatment: str
+    owner_part: Decimal = ZERO
+    consignor_name: str | None = None
+
+
+def _consignment_terms(conn: Connection, vehicle_id: UUID) -> Any:
+    row = conn.execute(
+        text(
+            """
+            select ci.id, ci.consignor_id, ci.expenses_borne_by, ci.shared_owner_pct, ci.status,
+                   c.name as consignor_name
+              from public.consignments_in ci join public.customers c on c.id = ci.consignor_id
+             where ci.vehicle_id = :id
+            """
+        ),
+        {"id": vehicle_id},
+    ).first()
+    if row is None:
+        raise AppError("CONSIGNMENT_MISSING", "This consigned car has no agreement", status_code=409)
+    return row
 
 
 def _plan_expense(
     conn: Connection, info: finance.TenantInfo, vehicle: VehicleRef, payload: VehicleExpenseIn
 ) -> _ExpensePlan:
     finance.check_entry_date(info, payload.expense_date)
-    _owned_vehicle(vehicle)
+    terms = None
+    if vehicle.ownership_type == "CONSIGNED_IN":
+        terms = _consignment_terms(conn, vehicle.id)
+        if terms.status != "ACTIVE":
+            # After the sale the owner's account is settled; after a return the car is gone (D-93).
+            raise AppError("CONSIGNMENT_CLOSED", "The consignment is closed", status_code=409)
     if vehicle.status in ("ARCHIVED", "RETURNED_TO_OWNER"):
         raise AppError("VEHICLE_ARCHIVED", "The vehicle is no longer with the showroom", status_code=409)
     category = conn.execute(
@@ -1089,6 +1188,34 @@ def _plan_expense(
     else:  # guarded by the model validator
         raise AppError("VALIDATION_ERROR", "Choose how the expense was paid", status_code=422)
 
+    description = payload.description or f"{category.name_ar} — {vehicle.label} ({vehicle.stock_no})"
+    if terms is not None:
+        owner_part = owner_share(payload.amount, terms.expenses_borne_by, terms.shared_owner_pct)
+        draft = rules.consigned_vehicle_expense(
+            entry_date=payload.expense_date,
+            vehicle_id=vehicle.id,
+            consignor_id=terms.consignor_id,
+            amount=payload.amount,
+            owner_part=owner_part,
+            category_label=category.name_ar,
+            funding=funding,
+            description=description,
+            source_id=None,
+        )
+        treatment = {"OWNER": "RECOVERABLE", "SHOWROOM": "SHOWROOM", "SHARED": "SHARED"}[terms.expenses_borne_by]
+        return _ExpensePlan(
+            draft=draft,
+            vehicle=vehicle,
+            category_ar=category.name_ar,
+            category_en=category.name_en,
+            sold=False,
+            cash=cash,
+            payer_ar=payer_ar,
+            payer_en=payer_en,
+            treatment=treatment,
+            owner_part=owner_part,
+            consignor_name=terms.consignor_name,
+        )
     draft = rules.vehicle_expense(
         entry_date=payload.expense_date,
         vehicle_id=vehicle.id,
@@ -1096,7 +1223,7 @@ def _plan_expense(
         category_label=category.name_ar,
         sold=sold,
         funding=funding,
-        description=payload.description or f"{category.name_ar} — {vehicle.label} ({vehicle.stock_no})",
+        description=description,
         source_id=None,
     )
     return _ExpensePlan(
@@ -1108,6 +1235,7 @@ def _plan_expense(
         cash=cash,
         payer_ar=payer_ar,
         payer_en=payer_en,
+        treatment="COGS" if sold else "CAPITALIZE",
     )
 
 
@@ -1128,7 +1256,20 @@ def preview_expense(conn: Connection, vehicle_id: UUID, payload: VehicleExpenseI
     else:
         how_ar = f"دفعها الشريك {plan.payer_ar} من ماله الخاص وتُضاف لحسابه الجاري"
         how_en = f"paid personally by partner {plan.payer_en}, credited to their current account"
-    if plan.sold:
+    if plan.treatment in ("RECOVERABLE", "SHOWROOM", "SHARED"):
+        owner = plan.consignor_name or ""
+        owner_ar = format_money(plan.owner_part, info.currency, "ar")
+        owner_en = format_money(plan.owner_part, info.currency, "en")
+        if plan.treatment == "RECOVERABLE":
+            effect_ar = f"السيارة أمانة، فالمصروف مستحق على صاحبها {owner} ويُخصم من مستحقاته عند البيع"
+            effect_en = f"the car is consigned, so the owner {owner} repays it, deducted from their money at the sale"
+        elif plan.treatment == "SHOWROOM":
+            effect_ar = "السيارة أمانة والمعرض يتحمل مصاريفها حسب الاتفاق، فتُسجَّل مصروفاً على المعرض"
+            effect_en = "the car is consigned and the showroom bears its expenses, so it is a showroom expense"
+        else:
+            effect_ar = f"السيارة أمانة والمصاريف مشتركة: {owner_ar} على صاحبها {owner} والباقي على المعرض"
+            effect_en = f"the car is consigned with shared expenses: {owner_en} for the owner {owner}, the rest ours"
+    elif plan.sold:
         effect_ar = "السيارة مباعة، فتُحمَّل على تكلفة المبيعات وتُخفض ربحها"
         effect_en = "the car is already sold, so it is charged to cost of sales and lowers its profit"
     else:
@@ -1177,7 +1318,7 @@ def record_expense(conn: Connection, vehicle_id: UUID, payload: VehicleExpenseIn
             **payload.model_dump(),
             "id": document_id,
             "vehicle_id": vehicle_id,
-            "treatment": "COGS" if plan.sold else "CAPITALIZE",
+            "treatment": plan.treatment,
             "entry": posted.id,
         },
     )

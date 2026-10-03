@@ -112,9 +112,16 @@ class SalePaymentOut(BaseModel):
 
 
 class SaleProfit(BaseModel):
+    # CONSIGNMENT (rule 16): the showroom's income is its commission; cost is what it bore (P-05).
+    kind: Literal["SALE", "CONSIGNMENT"] = "SALE"
     cost: Money
     gross_profit: Money
     profit_pct: Decimal
+    # Kept by the external showroom (rule 18); profit is after it (Q-34).
+    external_commission: Money = Decimal(0)
+    commission: Money | None = None
+    recovered_expenses: Money | None = None
+    due_to_owner: Money | None = None
 
 
 class SaleOut(BaseModel):
@@ -124,9 +131,15 @@ class SaleOut(BaseModel):
     vehicle_id: UUID
     stock_no: str
     vehicle_label: str
-    buyer_customer_id: UUID
-    buyer_name: str
+    ownership_type: Literal["OWNED", "CONSIGNED_IN"]
+    channel: Literal["DIRECT", "EXTERNAL_SHOWROOM"]
+    # An external-showroom sale may not know the buyer (D-35).
+    buyer_customer_id: UUID | None
+    buyer_name: str | None
     buyer_phone: str | None
+    external_showroom_id: UUID | None
+    external_showroom_name: str | None
+    consignor_name: str | None
     sale_date: date
     list_price: Money
     discount: Money
@@ -164,7 +177,8 @@ class SaleListRow(BaseModel):
     vehicle_id: UUID
     stock_no: str
     vehicle_label: str
-    buyer_name: str
+    buyer_name: str | None
+    channel: Literal["DIRECT", "EXTERNAL_SHOWROOM"]
     sale_date: date
     sale_price: Money
     invoice_no: str | None

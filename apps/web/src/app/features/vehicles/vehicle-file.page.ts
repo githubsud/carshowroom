@@ -21,7 +21,7 @@ import {
   Vehicle,
   VehicleStatus,
 } from '../../core/api/api.models';
-import { AppDatePipe, MoneyPipe, PercentPipe } from '../../core/format/format.service';
+import { AppDatePipe, FormatService, MoneyPipe, PercentPipe } from '../../core/format/format.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { CanDirective } from '../../core/permissions/can.directive';
 import { TenantContextService } from '../../core/tenant/tenant-context.service';
@@ -29,7 +29,11 @@ import { StateComponent } from '../../shared/components/state.component';
 import { ErrorMessageService } from '../../shared/error-message.service';
 import { compressImage } from '../../shared/image-compress';
 import { FinanceService } from '../finance/finance.service';
+import { ConsignOutDialogComponent } from '../consignment/consign-out-dialog.component';
+import { ConsignmentService } from '../consignment/consignment.service';
+import { ExternalSaleDialogComponent } from '../consignment/external-sale-dialog.component';
 import { PartnersService } from '../partners/partners.service';
+import { VehicleMatchesComponent } from '../requests/vehicle-matches.component';
 import { ReservationDialogComponent } from '../sales/reservation-dialog.component';
 import { SettleDialogComponent } from '../sales/settle-dialog.component';
 import { SuppliersService } from '../suppliers/suppliers.service';
@@ -77,6 +81,9 @@ const DOC_TYPES: DocumentType[] = ['LICENSE', 'INSPECTION_REPORT', 'PURCHASE_CON
     PaymentDialogComponent,
     ReservationDialogComponent,
     SettleDialogComponent,
+    ConsignOutDialogComponent,
+    ExternalSaleDialogComponent,
+    VehicleMatchesComponent,
   ],
   templateUrl: './vehicle-file.page.html',
   styleUrl: './vehicle-file.page.scss',
@@ -86,6 +93,8 @@ export class VehicleFilePage implements OnInit {
   private readonly finance = inject(FinanceService);
   private readonly partnersApi = inject(PartnersService);
   private readonly suppliersApi = inject(SuppliersService);
+  private readonly consignmentApi = inject(ConsignmentService);
+  private readonly format = inject(FormatService);
   private readonly router = inject(Router);
   private readonly toast = inject(MessageService);
   private readonly transloco = inject(TranslocoService);
@@ -111,6 +120,8 @@ export class VehicleFilePage implements OnInit {
   protected readonly reserveOpen = signal(false);
   protected readonly settleOpen = signal(false);
   protected readonly moveOpen = signal(false);
+  protected readonly sendOutOpen = signal(false);
+  protected readonly externalSaleOpen = signal(false);
   protected moveTo = '';
   protected moveReason = '';
   protected docType: DocumentType = 'LICENSE';
@@ -121,7 +132,12 @@ export class VehicleFilePage implements OnInit {
     const v = this.vehicle();
     return v ? [v.make, v.model, v.trim, v.year].filter(Boolean).join(' ') : '';
   });
-  protected readonly nextStatuses = computed(() => NEXT[this.vehicle()?.status ?? 'ARCHIVED'] ?? []);
+  protected readonly nextStatuses = computed(() => {
+    const v = this.vehicle();
+    const next = NEXT[v?.status ?? 'ARCHIVED'] ?? [];
+    // A consigned car leaves by going back to its owner, never by archiving.
+    return v?.ownership_type === 'CONSIGNED_IN' ? next.filter((s) => s !== 'ARCHIVED') : next;
+  });
   protected readonly canSell = computed(() => ['AVAILABLE', 'RESERVED'].includes(this.vehicle()?.status ?? ''));
   protected readonly locationOptions = computed(() =>
     this.locations().map((l) => ({ value: l.id, label: this.language.language() === 'ar' ? l.name_ar : (l.name_en ?? l.name_ar) })),
@@ -204,6 +220,18 @@ export class VehicleFilePage implements OnInit {
       });
     }
     await this.load();
+  }
+
+  protected async sentOut(): Promise<void> {
+    this.toast.add({ severity: 'success', summary: this.transloco.translate('consignment.sentOutToast') });
+    await this.load();
+  }
+
+  protected async cameBack(outId: string): Promise<void> {
+    await this.act(async () => {
+      await this.consignmentApi.returnOut(outId, this.format.todayIso(), null);
+      await this.load();
+    });
   }
 
   protected async onPaid(): Promise<void> {

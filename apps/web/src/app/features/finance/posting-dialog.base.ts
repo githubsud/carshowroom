@@ -20,7 +20,9 @@ export type PostingKind =
   | 'refund'
   | 'cancelSale'
   | 'receipt'
-  | 'paperAction';
+  | 'paperAction'
+  | 'consignment'
+  | 'externalSale';
 
 export interface Option {
   value: string;

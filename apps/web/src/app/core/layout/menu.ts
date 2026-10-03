@@ -17,6 +17,7 @@ export const MENU: readonly MenuItem[] = [
   { key: 'dashboard', icon: 'pi pi-home', path: 'dashboard', anyOf: ['dashboard.view', 'partner.view_own'], primary: true },
   { key: 'vehicles', icon: 'pi pi-car', path: 'vehicles', anyOf: ['vehicle.view'], primary: true },
   { key: 'customers', icon: 'pi pi-users', path: 'customers', anyOf: ['customer.view'] },
+  { key: 'requests', icon: 'pi pi-phone', path: 'requests', anyOf: ['customer.view'] },
   { key: 'sales', icon: 'pi pi-shopping-cart', path: 'sales', anyOf: ['sale.view'] },
   {
     key: 'installments',
@@ -29,7 +30,7 @@ export const MENU: readonly MenuItem[] = [
   {
     key: 'consignments',
     icon: 'pi pi-arrow-right-arrow-left',
-    path: 'soon/consignments',
+    path: 'consignments',
     anyOf: ['consignment.manage'],
     flag: 'consignment',
   },

@@ -76,6 +76,18 @@
 | BR-I4 | A cancelled sale's installments take no payments; MIRROR cannot undo collections (D-88) | `installments.plan_receipt`; `sales._plan_cancel` | `test_cancelling_an_installment_sale_owes_back_what_was_collected` ✅ |
 | BR-I5 | Each reminder reaches each user once (dedupe key) and each tenant's run happens once a day | `notifications` unique key; `reminder_jobs` unique key | `test_overdue_lists_and_daily_reminders`, notification test ✅ |
 
+## Consignment and customer requests (Phase 6)
+
+| ID | Rule | Enforced in | Proven by |
+|---|---|---|---|
+| BR-C1 | An expense on a consigned car is never capitalised: the owner's part is recoverable (1430), the showroom's part is an expense (6280), whatever paid it (rule 10, C-11, P-05, D-93) | `rules.consigned_vehicle_expense`; `vehicles._plan_expense` | unit `test_rule_10_*`, `test_p05_*`, `test_c11_*`; `test_shared_expenses_return_and_recovery` ✅ |
+| BR-C2 | Selling a consigned car owes the full price to the owner, less the commission and the recovered expenses (rule 16); a net-price sale must exceed the net; no installments (D-91, D-94) | `rules.sale(consignor_id=)`, `rules.consignment_commission`; `sales._consignment_sale` | `test_consignment_in_cycle_matches_hand_calculation`, `test_net_price_terms_block_*`; E2E ✅ |
+| BR-C3 | The owner is never paid more than is owed for the car, nor asked for more expenses than they owe; a showroom is never collected from beyond its balance (D-95, D-96) | `consignment._plan_settlement`, `_plan_collection` | cycle tests ✅ |
+| BR-C4 | Consignor and showroom statements reconcile with the ledger (running balance from 2200/1430 and 1420 lines) | `consignment.consignor_statement`, `showroom_statement` | cycle tests ✅ |
+| BR-C5 | A consigned car is not re-consigned (Q-33), not archived, and its sale is cancelled only by mirror before the owner is paid (D-94) | `consignment.consign_out`; `vehicles.change_status`; `sales._plan_cancel` | `test_consign_out_and_back_and_no_re_consignment`; cycle test ✅ |
+| BR-C6 | A car that becomes AVAILABLE is matched against open requests, and members who manage requests are told (D-97) | trigger `vehicles_available_match` | pgTAP 10; `test_a_car_becoming_available_matches_open_requests`; E2E ✅ |
+| BR-C7 | A logged call is never changed or deleted | trigger on `follow_ups` (SR003) | pgTAP 10; `test_follow_ups_cannot_be_changed` ✅ |
+
 ## Access (Phases 1–4)
 
 | ID | Rule | Enforced in | Proven by |

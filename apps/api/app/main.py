@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routers import (
+    consignment,
+    crm,
     customers,
     finance,
     health,
@@ -96,4 +98,6 @@ def create_app(
     app.include_router(vehicles.router, prefix=API_PREFIX)
     app.include_router(sales.router, prefix=API_PREFIX)
     app.include_router(installments.router, prefix=API_PREFIX)
+    app.include_router(consignment.router, prefix=API_PREFIX)
+    app.include_router(crm.router, prefix=API_PREFIX)
     return app

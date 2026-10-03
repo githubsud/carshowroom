@@ -126,6 +126,26 @@ export const routes: Routes = [
         loadComponent: () => import('./features/installments/papers.page').then((m) => m.PapersPage),
       },
       {
+        path: 'consignments',
+        canActivate: [permissionGuard('consignment.manage')],
+        loadComponent: () => import('./features/consignment/consignments.page').then((m) => m.ConsignmentsPage),
+      },
+      {
+        path: 'consignments/showrooms/:showroomId',
+        canActivate: [permissionGuard('consignment.settle')],
+        loadComponent: () => import('./features/consignment/showroom.page').then((m) => m.ShowroomPage),
+      },
+      {
+        path: 'consignments/:consignmentId',
+        canActivate: [permissionGuard('consignment.manage')],
+        loadComponent: () => import('./features/consignment/consignment.page').then((m) => m.ConsignmentPage),
+      },
+      {
+        path: 'requests',
+        canActivate: [permissionGuard('customer.view')],
+        loadComponent: () => import('./features/requests/requests.page').then((m) => m.RequestsPage),
+      },
+      {
         path: 'soon/:feature',
         loadComponent: () => import('./features/misc/coming-soon.page').then((m) => m.ComingSoonPage),
       },

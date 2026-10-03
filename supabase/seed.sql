@@ -513,3 +513,55 @@ begin
   perform set_config('app.tenant_id', '', true);
 end
 $$;
+
+-- =============================================================================
+-- Phase 6: consignment and customer requests (معرض النور). No money moves.
+--   Lancer 2017 consigned by سمير عادل on 2026-09-20, commission 5%,
+--   expenses on the owner                                           AVAILABLE
+--   External showroom معرض الأمل للسيارات (its yard is a location)
+--   سارة إبراهيم asks for a Toyota Corolla 2018-2021 up to 650,000 -> matches
+--   the Corolla in stock; a call-back is due since 2026-10-01
+-- =============================================================================
+do $$
+declare
+  v_nour    constant uuid := '11111111-1111-1111-1111-111111111111';
+  v_owner   constant uuid := 'a0000000-0000-0000-0000-000000000001';
+  v_sara    constant uuid := 'd0000000-0000-0000-0000-000000000003';
+  v_samir   constant uuid := 'd0000000-0000-0000-0000-000000000005';
+  v_lancer  constant uuid := 'e1000000-0000-0000-0000-000000000006';
+  v_amal    constant uuid := 'd6000000-0000-0000-0000-000000000001';
+  v_request constant uuid := 'd7000000-0000-0000-0000-000000000001';
+begin
+  perform set_config('app.tenant_id', v_nour::text, true);
+  insert into public.customers (id, tenant_id, name, phone_primary, is_consignor)
+  values (v_samir, v_nour, 'سمير عادل', '+201006667788', true);
+
+  insert into public.vehicles (id, tenant_id, make, model, year, color_ext, transmission, fuel, mileage_km, plate_no,
+                               asking_price, ownership_type, acquisition_source, stock_date, current_location_id)
+  values (v_lancer, v_nour, 'Mitsubishi', 'Lancer', 2017, 'أزرق', 'AUTOMATIC', 'PETROL', 110000, 'ر ي ح 2468',
+          310000.00, 'CONSIGNED_IN', 'CONSIGNMENT_IN', '2026-09-20',
+          (select id from public.locations where tenant_id = v_nour and is_default));
+  update public.vehicles set status = 'IN_PREPARATION' where id = v_lancer;
+  update public.vehicles set status = 'AVAILABLE' where id = v_lancer;
+  insert into public.consignments_in (id, tenant_id, vehicle_id, consignor_id, agreement_date, end_date, terms_type,
+                                      commission_value, expenses_borne_by)
+  values ('d8000000-0000-0000-0000-000000000001', v_nour, v_lancer, v_samir, '2026-09-20', '2026-12-20',
+          'COMMISSION_PCT', 5, 'OWNER');
+
+  insert into public.external_showrooms (id, tenant_id, name, contact_name, phone)
+  values (v_amal, v_nour, 'معرض الأمل للسيارات', 'أ. مجدي', '+201007778899');
+  insert into public.locations (tenant_id, type, name_ar, name_en, external_showroom_id)
+  values (v_nour, 'EXTERNAL_SHOWROOM', 'معرض الأمل للسيارات', 'معرض الأمل للسيارات', v_amal);
+
+  insert into public.customer_requests (id, tenant_id, customer_id, make, model, year_from, year_to, budget_max,
+                                        assigned_to, source, created_by)
+  values (v_request, v_nour, v_sara, 'Toyota', 'Corolla', 2018, 2021, 650000.00, v_owner, 'زيارة المعرض', v_owner);
+  perform private.match_request(v_request);
+  insert into public.follow_ups (tenant_id, customer_id, request_id, kind, occurred_at, result, notes,
+                                 next_follow_up_date, assigned_to, priority, created_by)
+  values (v_nour, v_sara, v_request, 'CALL', '2026-09-28 11:00+02', 'CALL_BACK', 'تريد معاينة الكورولا',
+          '2026-10-01', v_owner, 'HIGH', v_owner);
+
+  perform set_config('app.tenant_id', '', true);
+end
+$$;

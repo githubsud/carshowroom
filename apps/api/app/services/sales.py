@@ -7,6 +7,10 @@
   (sold once) is checked here and enforced by a partial unique index.
 * Cancellation (owner/accountant, reason required), by the tenant's method
   (D-41): REFUND_LIABILITY (default, P-03) or MIRROR (literal rule 33).
+* A consigned-in car is sold through the same draft: rule 16 entry A (the price
+  is owed to the owner) and entry B (commission and recovered expenses) take
+  the place of revenue and cost of sale. Its cancellation is always a mirror,
+  and only before the owner has been paid (D-94).
 """
 
 from dataclasses import dataclass, replace
@@ -18,6 +22,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import Connection, text
 
 from app.core.errors import AppError, not_found
+from app.domain.consignment import CommissionError, commission_for
 from app.domain.finance import EntryRef, PostingResult, PostingWarning, Preview, PreviewEffect
 from app.domain.installments import InstallmentPlanIn
 from app.domain.ledger import ZERO, EntryDraft
@@ -38,7 +43,7 @@ from app.domain.sales import (
 from app.domain.schedule import ScheduleRow
 from app.domain.vehicles import VehicleIn
 from app.integrations.einvoice import adapter_for
-from app.services import customers, finance, installments, papers, vehicles
+from app.services import consignment, customers, finance, installments, papers, vehicles
 from app.services.posting import engine, rules
 
 _COUNTER = text(
@@ -316,11 +321,16 @@ def settle_reservation(
 # =====================================================================================================
 
 _SALES = """
-    select s.*, v.stock_no, concat_ws(' ', v.make, v.model, v.year) as vehicle_label,
-           c.name as buyer_name, c.phone_primary as buyer_phone, je.entry_no, cje.entry_no as cost_entry_no
+    select s.*, v.stock_no, concat_ws(' ', v.make, v.model, v.year) as vehicle_label, v.ownership_type,
+           c.name as buyer_name, c.phone_primary as buyer_phone, je.entry_no, cje.entry_no as cost_entry_no,
+           x.name as external_showroom_name, owner.name as consignor_name, ci.id as consignment_id,
+           ci.consignor_id
       from public.sales s
       join public.vehicles v on v.id = s.vehicle_id
-      join public.customers c on c.id = s.buyer_customer_id
+      left join public.customers c on c.id = s.buyer_customer_id
+      left join public.external_showrooms x on x.id = s.external_showroom_id
+      left join public.consignments_in ci on ci.vehicle_id = s.vehicle_id
+      left join public.customers owner on owner.id = ci.consignor_id
       left join public.journal_entries je on je.id = s.journal_entry_id
       left join public.journal_entries cje on cje.id = s.cost_journal_entry_id
 """
@@ -379,9 +389,14 @@ def get_sale(conn: Connection, sale_id: UUID, *, viewer_id: UUID, see_all_drafts
         vehicle_id=row["vehicle_id"],
         stock_no=row["stock_no"],
         vehicle_label=row["vehicle_label"],
+        ownership_type=row["ownership_type"],
+        channel=row["channel"],
         buyer_customer_id=row["buyer_customer_id"],
         buyer_name=row["buyer_name"],
         buyer_phone=row["buyer_phone"],
+        external_showroom_id=row["external_showroom_id"],
+        external_showroom_name=row["external_showroom_name"],
+        consignor_name=row["consignor_name"],
         sale_date=row["sale_date"],
         list_price=row["list_price"],
         discount=row["discount"],
@@ -409,14 +424,34 @@ def get_sale(conn: Connection, sale_id: UUID, *, viewer_id: UUID, see_all_drafts
         notes=row["notes"],
     )
     if with_profit and row["status"] == "POSTED":
-        totals = vehicles.cost_totals(conn, [row["vehicle_id"]])[row["vehicle_id"]]
-        gross = Decimal(row["sale_price"]) - totals.cogs
-        sale.profit = SaleProfit(
-            cost=totals.cogs,
-            gross_profit=gross,
-            profit_pct=quantize(gross * 100 / Decimal(row["sale_price"])),
-        )
+        sale.profit = _sale_profit(conn, row)
     return sale
+
+
+def _sale_profit(conn: Connection, row: Any) -> SaleProfit:
+    totals = vehicles.cost_totals(conn, [row["vehicle_id"]])[row["vehicle_id"]]
+    sale_price = Decimal(row["sale_price"])
+    if row["ownership_type"] == "CONSIGNED_IN":
+        entry_b = engine.entry_lines(conn, row["cost_journal_entry_id"])
+        retained = sum((line.debit for line in entry_b), ZERO)
+        commission = totals.commission
+        gross = commission - totals.consignment_expense
+        return SaleProfit(
+            kind="CONSIGNMENT",
+            cost=totals.consignment_expense,
+            gross_profit=gross,
+            profit_pct=quantize(gross * 100 / sale_price),
+            commission=commission,
+            recovered_expenses=retained - commission,
+            due_to_owner=sale_price - retained,
+        )
+    gross = sale_price - totals.cogs - totals.external_commission
+    return SaleProfit(
+        cost=totals.cogs,
+        gross_profit=gross,
+        profit_pct=quantize(gross * 100 / sale_price),
+        external_commission=totals.external_commission,
+    )
 
 
 def list_sales(
@@ -437,7 +472,7 @@ def list_sales(
        and (cast(:date_to as date) is null or s.sale_date <= :date_to)
        and (s.status <> 'DRAFT' or :all_drafts or s.created_by = :viewer)
        and (cast(:q as text) is null or s.sale_no ilike '%' || :q || '%' or s.invoice_no ilike '%' || :q || '%'
-            or v.stock_no ilike '%' || :q || '%' or c.name ilike '%' || :q || '%'
+            or v.stock_no ilike '%' || :q || '%' or c.name ilike '%' || :q || '%' or x.name ilike '%' || :q || '%'
             or concat_ws(' ', v.make, v.model) ilike '%' || :q || '%')
     """
     params = {
@@ -450,7 +485,8 @@ def list_sales(
     }
     joins = (
         " from public.sales s join public.vehicles v on v.id = s.vehicle_id"
-        " join public.customers c on c.id = s.buyer_customer_id"
+        " left join public.customers c on c.id = s.buyer_customer_id"
+        " left join public.external_showrooms x on x.id = s.external_showroom_id"
     )
     total = conn.execute(text("select count(*)" + joins + where), params).scalar_one()
     rows = conn.execute(
@@ -465,7 +501,8 @@ def list_sales(
             vehicle_id=row["vehicle_id"],
             stock_no=row["stock_no"],
             vehicle_label=row["vehicle_label"],
-            buyer_name=row["buyer_name"],
+            buyer_name=row["buyer_name"] or row["external_showroom_name"],
+            channel=row["channel"],
             sale_date=row["sale_date"],
             sale_price=row["sale_price"],
             invoice_no=row["invoice_no"],
@@ -600,6 +637,53 @@ class _SalePlan:
     financed: Decimal
     plan: InstallmentPlanIn | None
     schedule: list[ScheduleRow]
+    consignment: "_ConsignmentSale | None" = None
+
+
+@dataclass(frozen=True)
+class _ConsignmentSale:
+    consignment_id: UUID
+    consignor_id: UUID
+    consignor_name: str
+    commission: Decimal
+    recovered: Decimal
+
+    def due_to_owner(self, sale_price: Decimal) -> Decimal:
+        return sale_price - self.commission - self.recovered
+
+
+def _consignment_sale(conn: Connection, vehicle_id: UUID, sale_price: Decimal) -> _ConsignmentSale:
+    """Rule 16: the commission by the agreement's terms and the owner's recoverable
+    expenses, recovered from the proceeds up to what is left after the commission."""
+    terms = conn.execute(
+        text(
+            """
+            select ci.id, ci.consignor_id, c.name, ci.terms_type, ci.net_price_to_owner, ci.commission_value, ci.status
+              from public.consignments_in ci join public.customers c on c.id = ci.consignor_id
+             where ci.vehicle_id = :id
+            """
+        ),
+        {"id": vehicle_id},
+    ).first()
+    if terms is None or terms.status != "ACTIVE":
+        raise AppError("CONSIGNMENT_CLOSED", "This car has no active consignment agreement", status_code=409)
+    try:
+        commission = commission_for(
+            terms.terms_type,
+            sale_price,
+            net_price=terms.net_price_to_owner,
+            value=terms.commission_value,
+        )
+    except CommissionError as exc:
+        raise AppError(exc.code, str(exc), status_code=422) from exc
+    recoverable = consignment.recoverable_balance(conn, terms.consignor_id, vehicle_id)
+    return _ConsignmentSale(
+        consignment_id=terms.id,
+        consignor_id=terms.consignor_id,
+        consignor_name=terms.name,
+        commission=commission,
+        recovered=max(ZERO, min(recoverable, sale_price - commission)),
+    )
 
 
 def _plan_post(
@@ -610,8 +694,9 @@ def _plan_post(
         raise AppError("SALE_NOT_DRAFT", "This sale is already posted or cancelled", status_code=409)
     finance.check_entry_date(info, sale["sale_date"])
     vehicle = vehicles.vehicle_ref(conn, sale["vehicle_id"], lock=lock)
-    if vehicle.ownership_type != "OWNED":
-        raise AppError("VEHICLE_NOT_OWNED", "Consigned cars are sold through consignment (Phase 6)", status_code=422)
+    consigned = vehicle.ownership_type == "CONSIGNED_IN"
+    if sale["channel"] != "DIRECT":
+        raise AppError("SALE_NOT_DRAFT", "External showroom sales are recorded from the consignment", status_code=409)
     if vehicle.status in ("SOLD", "DELIVERED"):
         raise AppError("VEHICLE_ALREADY_SOLD", "This vehicle has already been sold", status_code=409)
 
@@ -648,7 +733,7 @@ def _plan_post(
         )
 
     cost = vehicles.inventory_cost(conn, vehicle.id)
-    if cost <= 0:
+    if cost <= 0 and not consigned:
         # Profit uses recorded costs only (business rule 5): record the purchase first.
         raise AppError("VEHICLE_COST_MISSING", "Record the purchase of this car before selling it", status_code=422)
 
@@ -661,6 +746,9 @@ def _plan_post(
     plan = InstallmentPlanIn.model_validate(sale["installment_plan"]) if sale["installment_plan"] else None
     financed = sale_price - paid - deposit - trade_value if plan else ZERO
     schedule: list[ScheduleRow] = []
+    if plan is not None and consigned:
+        # P-14 has no candidate: when the owner would be paid is undecided (Q-15 default).
+        raise AppError("CONSIGNMENT_NO_INSTALLMENTS", "A consigned car is sold for cash or bank only", status_code=422)
     if plan is not None:
         enabled = conn.execute(
             text("select private.feature_enabled(private.current_tenant_id(), 'installments')")
@@ -684,6 +772,7 @@ def _plan_post(
             },
         )
     description = f"بيع {vehicle.label} ({vehicle.stock_no}) إلى {sale['buyer_name']} — {sale['sale_no']}"
+    consignment_sale = _consignment_sale(conn, vehicle.id, sale_price) if consigned else None
     sale_draft = rules.sale(
         entry_date=sale["sale_date"],
         vehicle_id=vehicle.id,
@@ -695,14 +784,26 @@ def _plan_post(
         description=description,
         source_id=sale_id,
         financed=financed,
+        consignor_id=consignment_sale.consignor_id if consignment_sale else None,
     )
-    cost_draft = rules.cost_of_sale(
-        entry_date=sale["sale_date"],
-        vehicle_id=vehicle.id,
-        cost=cost,
-        description=f"تكلفة {vehicle.label} ({vehicle.stock_no}) — {sale['sale_no']}",
-        source_id=sale_id,
-    )
+    if consignment_sale is not None:
+        cost_draft = rules.consignment_commission(
+            entry_date=sale["sale_date"],
+            vehicle_id=vehicle.id,
+            consignor_id=consignment_sale.consignor_id,
+            commission=consignment_sale.commission,
+            recovered=consignment_sale.recovered,
+            description=f"عمولة بيع أمانة {vehicle.label} ({vehicle.stock_no}) — {sale['sale_no']}",
+            source_id=sale_id,
+        )
+    else:
+        cost_draft = rules.cost_of_sale(
+            entry_date=sale["sale_date"],
+            vehicle_id=vehicle.id,
+            cost=cost,
+            description=f"تكلفة {vehicle.label} ({vehicle.stock_no}) — {sale['sale_no']}",
+            source_id=sale_id,
+        )
     return _SalePlan(
         sale=sale,
         vehicle=vehicle,
@@ -716,6 +817,7 @@ def _plan_post(
         financed=financed,
         plan=plan,
         schedule=schedule,
+        consignment=consignment_sale,
     )
 
 
@@ -759,7 +861,22 @@ def preview_post(conn: Connection, sale_id: UUID, *, with_lines: bool, with_prof
         f"{_money(sale_price, info, 'en')}{discount_en} on {plan.sale['sale_date'].isoformat()}. "
         f"Paid by: {'; '.join(parts_en)}. The car becomes sold."
     )
-    if with_profit:
+    if plan.consignment is not None:
+        owner = plan.consignment
+        due = owner.due_to_owner(sale_price)
+        recovered_ar = f" ومصاريف مستردة {_money(owner.recovered, info, 'ar')}" if owner.recovered > 0 else ""
+        recovered_en = (
+            f" and recovered expenses of {_money(owner.recovered, info, 'en')}" if owner.recovered > 0 else ""
+        )
+        summary_ar += (
+            f" السيارة أمانة لـ {owner.consignor_name}: عمولة المعرض {_money(owner.commission, info, 'ar')}"
+            f"{recovered_ar}، ويُستحق لصاحبها {_money(due, info, 'ar')}."
+        )
+        summary_en += (
+            f" The car is consigned by {owner.consignor_name}: the showroom keeps a commission of "
+            f"{_money(owner.commission, info, 'en')}{recovered_en}; {_money(due, info, 'en')} is owed to the owner."
+        )
+    elif with_profit:
         profit = sale_price - plan.cost
         summary_ar += f" التكلفة {_money(plan.cost, info, 'ar')} والربح {_money(profit, info, 'ar')}."
         summary_en += f" Cost {_money(plan.cost, info, 'en')}, profit {_money(profit, info, 'en')}."
@@ -773,7 +890,7 @@ def preview_post(conn: Connection, sale_id: UUID, *, with_lines: bool, with_prof
             PreviewEffect(direction="IN", label_ar=account.name_ar, label_en=account.name_en, amount=amount)
             for account, amount in plan.legs
         ],
-        warnings=_profit_warnings(sale_price, plan.cost, with_profit),
+        warnings=_profit_warnings(sale_price, plan.cost, with_profit and plan.consignment is None),
         lines=lines,
     )
 
@@ -811,7 +928,7 @@ def post_sale(conn: Connection, sale_id: UUID, *, user_id: UUID, with_profit: bo
     trade_in_vehicle_id = uuid4()
     plan = _plan_post(conn, info, sale_id, lock=True, trade_in_vehicle_id=trade_in_vehicle_id)
     warnings = finance.check_cash(conn, info, plan.sale_draft.cash_effects(), lock=True)
-    warnings += _profit_warnings(Decimal(plan.sale["sale_price"]), plan.cost, with_profit)
+    warnings += _profit_warnings(Decimal(plan.sale["sale_price"]), plan.cost, with_profit and plan.consignment is None)
 
     created_trade_in: UUID | None = None
     sale_draft = plan.sale_draft
@@ -874,6 +991,11 @@ def post_sale(conn: Connection, sale_id: UUID, *, user_id: UUID, with_profit: bo
             schedule=plan.schedule,
         )
     vehicles.set_status(conn, plan.vehicle.id, "SOLD", f"بيع {plan.sale['sale_no']}")
+    if plan.consignment is not None:
+        conn.execute(
+            text("update public.consignments_in set status = 'SOLD' where id = :id"),
+            {"id": plan.consignment.consignment_id},
+        )
     if plan.reservation_id is not None:
         conn.execute(
             text("update public.reservations set status = 'APPLIED', sale_id = :sale where id = :id"),
@@ -934,6 +1056,9 @@ def _plan_cancel(
     if cancel_date < sale["sale_date"]:
         raise AppError("DATE_RANGE_INVALID", "The cancellation cannot be dated before the sale", status_code=422)
     vehicle = vehicles.vehicle_ref(conn, sale["vehicle_id"], lock=lock)
+    if sale["channel"] == "EXTERNAL_SHOWROOM":
+        # The other showroom has delivered the car to its buyer (D-95, Q-30 default).
+        raise AppError("SALE_DELIVERED", "An external showroom sale cannot be cancelled", status_code=409)
     if vehicle.status != "SOLD":
         # Q-30 default: a delivered car's sale is not cancelled.
         raise AppError("SALE_DELIVERED", "The car has been delivered; the sale cannot be cancelled", status_code=409)
@@ -941,6 +1066,16 @@ def _plan_cancel(
         _check_trade_in_returnable(conn, sale["trade_in_vehicle_id"])
 
     method = conn.execute(text("select sale_cancellation_method from public.tenant_settings")).scalar_one()
+    if vehicle.ownership_type == "CONSIGNED_IN":
+        # D-94: no candidate exists for owing the buyer a consigned car's price, so it is
+        # always the literal mirror, and only while the owner has not been paid.
+        method = "MIRROR"
+        if consignment.payouts_total(conn, sale["consignment_id"]) > 0:
+            raise AppError(
+                "CONSIGNOR_ALREADY_PAID",
+                "The owner has already been paid for this car; reverse that payment first",
+                status_code=409,
+            )
     payments = list(conn.execute(_PAYMENTS, {"id": sale_id}).mappings())
     plan_id = installments.plan_id_for_sale(conn, sale_id)
     collected = installments.collected(conn, plan_id) if plan_id else ZERO
@@ -1102,6 +1237,10 @@ def cancel_sale(
         },
     )
     vehicles.set_status(conn, sale["vehicle_id"], "AVAILABLE", f"إلغاء البيع {sale['sale_no']}: {reason}")
+    if sale["consignment_id"] is not None:
+        conn.execute(
+            text("update public.consignments_in set status = 'ACTIVE' where id = :id"), {"id": sale["consignment_id"]}
+        )
     plan_id = installments.plan_id_for_sale(conn, sale_id)
     if plan_id is not None:
         installments.cancel_plan(conn, plan_id)
@@ -1135,6 +1274,8 @@ def document_context(conn: Connection, sale_id: UUID) -> dict[str, Any]:
     sale = _sale_row(conn, sale_id)
     if sale["status"] != "POSTED":
         raise AppError("SALE_NOT_POSTED", "Documents are printed for posted sales", status_code=409)
+    if sale["channel"] != "DIRECT":
+        raise AppError("SALE_NO_DOCUMENTS", "The external showroom issues the buyer's documents", status_code=409)
     tenant = (
         conn.execute(
             text(

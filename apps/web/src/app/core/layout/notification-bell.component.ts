@@ -186,7 +186,9 @@ export class NotificationBellComponent implements OnInit {
     }
     const tenant = this.context.activeTenantId();
     const planId = item.params['plan_id'];
-    if (item.entity_type === 'DEFERRED_PAPER') {
+    if (item.entity_type === 'VEHICLE' && item.entity_id) {
+      await this.router.navigate(['/t', tenant, 'vehicles', item.entity_id]);
+    } else if (item.entity_type === 'DEFERRED_PAPER') {
       await this.router.navigate(['/t', tenant, 'installments', 'papers']);
     } else if (typeof planId === 'string') {
       await this.router.navigate(['/t', tenant, 'installments', 'plans', planId]);

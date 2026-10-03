@@ -33,3 +33,19 @@ test('records a vehicle expense on a phone in under 15 seconds', async ({ page }
   await expect(page.getByText(/تم التسجيل — قيد رقم \d+/)).toBeVisible();
   expect(Date.now() - started).toBeLessThan(15_000);
 });
+
+/** BACKLOG 6.4: a call is logged in at most three taps on a phone. */
+test('logs a call in three taps or fewer', async ({ page }) => {
+  await page.goto(`/t/${NOUR}/customers/d0000000-0000-0000-0000-000000000003`);
+  const crm = page.getByTestId('customer-crm');
+  await expect(crm).toBeVisible();
+
+  let taps = 0;
+  await crm.getByTestId('log-call-customer').locator('button').click();
+  taps += 1;
+  await crm.getByTestId('call-ANSWERED').locator('button').click();
+  taps += 1;
+  await expect(page.getByText('تم تسجيل المكالمة')).toBeVisible();
+  await expect(page.getByTestId('customer-follow-ups')).toContainText('رد');
+  expect(taps).toBeLessThanOrEqual(3);
+});

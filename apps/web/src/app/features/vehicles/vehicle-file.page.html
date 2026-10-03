@@ -29,6 +29,10 @@
         <p-button *appCan="'reservation.manage'" icon="pi pi-bookmark" severity="secondary" data-testid="reserve"
                   [label]="'vehicles.reserve' | transloco" (onClick)="reserveOpen.set(true)" />
       }
+      @if (v.ownership_type === 'OWNED' && (v.status === 'AVAILABLE' || v.status === 'IN_PREPARATION')) {
+        <p-button *appCan="'consignment.manage'" icon="pi pi-arrow-right-arrow-left" severity="secondary"
+                  data-testid="send-out" [label]="'consignment.sendOut' | transloco" (onClick)="sendOutOpen.set(true)" />
+      }
       @if (v.reservation) {
         <p-button *appCan="'reservation.manage'" icon="pi pi-undo" severity="secondary" data-testid="settle-deposit"
                   [label]="'sales.settleTitle' | transloco" (onClick)="settleOpen.set(true)" />
@@ -57,6 +61,31 @@
     </div>
   }
 
+  @if (v.consignment; as c) {
+    <div class="notice" data-testid="consignment-notice">
+      <i class="pi pi-user" aria-hidden="true"></i>
+      {{ 'consignment.consignedBy' | transloco: { name: c.consignor_name } }}
+      @if (c.end_date) { · {{ 'consignment.endDate' | transloco }} {{ c.end_date | appDate }} }
+      <a *appCan="'consignment.manage'" [routerLink]="['/t', context.activeTenantId(), 'consignments', c.id]">
+        {{ 'consignment.openAgreement' | transloco }}</a>
+    </div>
+  }
+  @if (v.consigned_out; as o) {
+    <div class="notice" data-testid="consigned-out-notice">
+      <i class="pi pi-arrow-right-arrow-left" aria-hidden="true"></i>
+      {{ 'consignment.atShowroom' | transloco: { name: o.external_showroom_name } }} · {{ o.sent_date | appDate }}
+      <span class="notice-actions">
+        <p-button *appCan="'consignment.settle'" size="small" [label]="'consignment.soldThere' | transloco: { name: o.external_showroom_name }"
+                  (onClick)="externalSaleOpen.set(true)" data-testid="sold-there" />
+        <p-button *appCan="'consignment.manage'" size="small" severity="secondary" [outlined]="true"
+                  [label]="'consignment.cameBack' | transloco" (onClick)="cameBack(o.id)" data-testid="came-back" />
+      </span>
+    </div>
+    <app-external-sale-dialog [(visible)]="externalSaleOpen" [outId]="o.id" [showroomName]="o.external_showroom_name"
+                              [expectedPrice]="o.expected_price" (posted)="onPosted($event)" />
+  }
+  <app-vehicle-matches [vehicleId]="v.id" [status]="v.status" />
+
   <!-- Cost and profit: only users with vehicle.view_cost receive these fields at all. -->
   @if (v.cost; as cost) {
     <section class="card" data-testid="cost-section">
@@ -65,7 +94,12 @@
         <div class="figure"><span>{{ 'vehicles.totalCost' | transloco }}</span>
           <strong data-testid="total-cost">{{ cost.total_cost | money }}</strong></div>
         @if (v.profit; as p) {
-          <div class="figure"><span>{{ 'vehicles.salePrice' | transloco }}</span><strong>{{ p.sale_price | money }}</strong></div>
+          <div class="figure"><span>{{ (p.kind === 'CONSIGNMENT' ? 'consignment.commission' : 'vehicles.salePrice') | transloco }}</span>
+            <strong>{{ p.sale_price | money }}</strong></div>
+          @if (p.external_commission !== '0.00') {
+            <div class="figure"><span>{{ 'consignment.theirCommission' | transloco }}</span>
+              <strong>{{ p.external_commission | money }}</strong></div>
+          }
           <div class="figure" [class.negative]="p.gross_profit.startsWith('-')">
             <span>{{ 'vehicles.profit' | transloco }}
               @if (p.estimate) { <p-tag severity="warn" [value]="'vehicles.estimate' | transloco" /> }</span>
@@ -105,7 +139,7 @@
                       (onClick)="sellerPayOpen.set(true)" data-testid="pay-seller" />
           }
         </p>
-      } @else if (v.status !== 'ARCHIVED' && v.status !== 'SOLD' && v.status !== 'DELIVERED') {
+      } @else if (v.ownership_type === 'OWNED' && v.status !== 'ARCHIVED' && v.status !== 'SOLD' && v.status !== 'DELIVERED') {
         <p-button *appCan="'vehicle.purchase'" icon="pi pi-dollar" [outlined]="true" data-testid="record-purchase"
                   [label]="'vehicles.recordPurchase' | transloco" (onClick)="purchaseOpen.set(true)"
                   [disabled]="accounts().length === 0" />
@@ -231,6 +265,7 @@
     <app-payment-dialog [(visible)]="sellerPayOpen" mode="sellerPayment" [targetId]="v.id" [owed]="purchase.outstanding"
                         [accounts]="accounts()" (posted)="onPaid()" />
   }
+  <app-consign-out-dialog [(visible)]="sendOutOpen" [vehicleId]="v.id" (saved)="sentOut()" />
   <app-reservation-dialog [(visible)]="reserveOpen" [vehicleId]="v.id" [accounts]="accounts()" (posted)="onPosted($event)" />
   @if (v.reservation; as r) {
     <app-settle-dialog [(visible)]="settleOpen" [reservationId]="r.id" [amount]="r.deposit_amount"

@@ -245,7 +245,7 @@ export class SalePage implements OnInit {
     }
     this.form.patchValue({
       vehicle_id: sale.vehicle_id,
-      buyer_customer_id: sale.buyer_customer_id,
+      buyer_customer_id: sale.buyer_customer_id ?? '',
       sale_date: sale.sale_date,
       list_price: sale.list_price,
       discount: sale.discount === '0.00' ? '' : sale.discount,

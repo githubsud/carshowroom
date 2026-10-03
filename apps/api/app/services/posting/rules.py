@@ -6,8 +6,9 @@ expense), 11, 34, 35 (deposits), 12, 13, 26 (sale, installment sale mode a,
 trade-in, cost recognition), 15 and 27 (installment collected, cheque bounced),
 20, 21 (general expense, transfer), 24 (reversal; the database performs it,
 this mirror is used for previews and cash checks), 30-32 (partner-paid and
-supplier-credit expenses, supplier payment), and the approved candidates
-P-01, P-02, P-03, P-04, P-07. Further rules arrive with their phases (BACKLOG).
+supplier-credit expenses, supplier payment), 10 and 16-19 (consignment in
+and out), and the approved candidates P-01 to P-07. Further rules arrive
+with their phases (BACKLOG).
 """
 
 from collections.abc import Iterable, Sequence
@@ -500,13 +501,20 @@ def sale(
     description: str,
     source_id: UUID | None,
     financed: Decimal = ZERO,
+    consignor_id: UUID | None = None,
 ) -> EntryDraft:
     """Rule 12 (cash/bank sale, deposit applied), rule 13 (the rest financed by
     installments, mode a: Dr installment receivable for the buyer) and rule 26 (trade-in):
     Dr each cash/bank leg + Dr customer deposits (buyer + vehicle) + Dr vehicle
     inventory (trade-in car, at the agreed value) / Cr vehicle sales (sold car).
-    The sale price is the net price after any discount (P-12)."""
+    The sale price is the net price after any discount (P-12).
+
+    Rule 16 entry A, a consigned-in car (`consignor_id` given): the full price is
+    owed to the owner, so Cr payable to consignors (consignor + vehicle) instead
+    of vehicle sales. P-14 has no candidate, so such a car is never financed."""
     sale_price = _positive_amount(sale_price)
+    if consignor_id is not None and financed > 0:
+        raise LedgerRuleError("a consigned car cannot be sold on installments (P-14)")
     lines = list(_cash_lines(payments, money_in=True))
     if deposit_applied > 0:
         lines.append(_deposit_line(buyer_id, vehicle_id, debit=_positive_amount(deposit_applied)))
@@ -529,7 +537,17 @@ def sale(
         )
     if sum((line.debit for line in lines), ZERO) != sale_price:
         raise LedgerRuleError("payments, deposit, trade-in and financed amount must add up to the sale price")
-    lines.append(Line(account=Account.system("VEHICLE_SALES"), credit=sale_price, vehicle_id=vehicle_id))
+    if consignor_id is not None:
+        lines.append(
+            Line(
+                account=Account.system("CONSIGNOR_PAYABLE"),
+                credit=sale_price,
+                consignor_id=consignor_id,
+                vehicle_id=vehicle_id,
+            )
+        )
+    else:
+        lines.append(Line(account=Account.system("VEHICLE_SALES"), credit=sale_price, vehicle_id=vehicle_id))
     draft = EntryDraft(
         entry_date=entry_date, description=description, source_type="SALE", source_id=source_id, lines=tuple(lines)
     )
@@ -727,6 +745,271 @@ def bounce_charges(
         source_type="BANK_CHARGES",
         source_id=source_id,
         lines=(debit, Line(account=bank.account, credit=amount, cash_account_id=bank.cash_account_id)),
+    )
+    draft.validate()
+    return draft
+
+
+# --- Consignment in (rules 10, 16, 17; P-05, P-06) -----------------------------------------------
+
+
+def consigned_vehicle_expense(
+    *,
+    entry_date: date,
+    vehicle_id: UUID,
+    consignor_id: UUID,
+    amount: Decimal,
+    owner_part: Decimal,
+    category_label: str,
+    funding: ExpenseFunding,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """Rule 10: an expense on a consigned-in car is recoverable from the owner:
+    Dr recoverable from consignors (consignor + vehicle) / Cr the funding. With
+    partner or supplier funding this is C-11's default (never vehicle inventory).
+    P-05 (approved 2026-10-02): the part the showroom bears is Dr 6280
+    consigned-car expenses (vehicle); a shared expense is split between the two."""
+    amount = _positive_amount(amount)
+    if owner_part < 0 or owner_part > amount:
+        raise LedgerRuleError("the owner's part must be between zero and the expense")
+    showroom_part = amount - owner_part
+    lines = []
+    if owner_part > 0:
+        lines.append(
+            Line(
+                account=Account.system("CONSIGNOR_RECOVERABLE"),
+                debit=owner_part,
+                consignor_id=consignor_id,
+                vehicle_id=vehicle_id,
+                memo=category_label,
+            )
+        )
+    if showroom_part > 0:
+        lines.append(
+            Line(
+                account=Account.system("EXP_CONSIGNMENT"),
+                debit=showroom_part,
+                vehicle_id=vehicle_id,
+                memo=category_label,
+            )
+        )
+    lines.append(_funding_line(funding, amount))
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="VEHICLE_EXPENSE",
+        source_id=source_id,
+        lines=tuple(lines),
+    )
+    draft.validate()
+    return draft
+
+
+def consignment_commission(
+    *,
+    entry_date: date,
+    vehicle_id: UUID,
+    consignor_id: UUID,
+    commission: Decimal,
+    recovered: Decimal,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """Rule 16 entry B: on the sale of a consigned-in car, keep the commission and
+    recover the owner's expenses from what is owed to them: Dr payable to consignors
+    (commission + recovered) / Cr consignment commission (vehicle) + Cr recoverable
+    from consignors (consignor + vehicle)."""
+    commission = _positive_amount(commission)
+    if recovered < 0:
+        raise LedgerRuleError("recovered expenses cannot be negative")
+    lines = [
+        Line(
+            account=Account.system("CONSIGNOR_PAYABLE"),
+            debit=commission + recovered,
+            consignor_id=consignor_id,
+            vehicle_id=vehicle_id,
+        ),
+        Line(account=Account.system("CONSIGNMENT_COMMISSION"), credit=commission, vehicle_id=vehicle_id),
+    ]
+    if recovered > 0:
+        lines.append(
+            Line(
+                account=Account.system("CONSIGNOR_RECOVERABLE"),
+                credit=_positive_amount(recovered),
+                consignor_id=consignor_id,
+                vehicle_id=vehicle_id,
+            )
+        )
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="CONSIGNMENT_COMMISSION",
+        source_id=source_id,
+        lines=tuple(lines),
+    )
+    draft.validate()
+    return draft
+
+
+def consignor_payout(
+    *,
+    entry_date: date,
+    vehicle_id: UUID,
+    consignor_id: UUID,
+    amount: Decimal,
+    paid_from: CashAccountRef,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """Rule 17: pay the consignor: Dr payable to consignors (consignor + vehicle) / Cr cash or bank."""
+    amount = _positive_amount(amount)
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="CONSIGNOR_PAYOUT",
+        source_id=source_id,
+        lines=(
+            Line(
+                account=Account.system("CONSIGNOR_PAYABLE"),
+                debit=amount,
+                consignor_id=consignor_id,
+                vehicle_id=vehicle_id,
+            ),
+            Line(account=paid_from.account, credit=amount, cash_account_id=paid_from.cash_account_id),
+        ),
+    )
+    draft.validate()
+    return draft
+
+
+def consignor_recovery(
+    *,
+    entry_date: date,
+    vehicle_id: UUID,
+    consignor_id: UUID,
+    amount: Decimal,
+    received_in: CashAccountRef,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """P-06 (approved 2026-10-02): the owner repays recoverable expenses, for
+    example when the car goes back unsold: Dr cash or bank / Cr recoverable from
+    consignors (consignor + vehicle)."""
+    amount = _positive_amount(amount)
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="CONSIGNOR_RECOVERY",
+        source_id=source_id,
+        lines=(
+            Line(account=received_in.account, debit=amount, cash_account_id=received_in.cash_account_id),
+            Line(
+                account=Account.system("CONSIGNOR_RECOVERABLE"),
+                credit=amount,
+                consignor_id=consignor_id,
+                vehicle_id=vehicle_id,
+            ),
+        ),
+    )
+    draft.validate()
+    return draft
+
+
+# --- Consignment out (rules 18, 19) ----------------------------------------------------------------
+
+
+def _receivable_line(
+    external_showroom_id: UUID, vehicle_id: UUID | None, *, debit: Decimal = ZERO, credit: Decimal = ZERO
+) -> Line:
+    return Line(
+        account=Account.system("EXTERNAL_SHOWROOM_RECEIVABLE"),
+        debit=debit,
+        credit=credit,
+        external_showroom_id=external_showroom_id,
+        vehicle_id=vehicle_id,
+    )
+
+
+def external_sale(
+    *,
+    entry_date: date,
+    vehicle_id: UUID,
+    external_showroom_id: UUID,
+    sale_price: Decimal,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """Rule 18, first entry: our car sold by an external showroom: Dr receivable
+    from external showrooms (showroom + vehicle) / Cr vehicle sales (vehicle)."""
+    sale_price = _positive_amount(sale_price)
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="SALE",
+        source_id=source_id,
+        lines=(
+            _receivable_line(external_showroom_id, vehicle_id, debit=sale_price),
+            Line(account=Account.system("VEHICLE_SALES"), credit=sale_price, vehicle_id=vehicle_id),
+        ),
+    )
+    draft.validate()
+    return draft
+
+
+def external_commission(
+    *,
+    entry_date: date,
+    vehicle_id: UUID,
+    external_showroom_id: UUID,
+    commission: Decimal,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """Rule 18, second entry: the showroom keeps its commission: Dr commission to
+    external showrooms (showroom + vehicle) / Cr receivable from external showrooms.
+    The third entry is the cost of sale (`cost_of_sale`)."""
+    commission = _positive_amount(commission)
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="EXTERNAL_COMMISSION",
+        source_id=source_id,
+        lines=(
+            Line(
+                account=Account.system("EXTERNAL_COMMISSION_EXPENSE"),
+                debit=commission,
+                external_showroom_id=external_showroom_id,
+                vehicle_id=vehicle_id,
+            ),
+            _receivable_line(external_showroom_id, vehicle_id, credit=commission),
+        ),
+    )
+    draft.validate()
+    return draft
+
+
+def external_collection(
+    *,
+    entry_date: date,
+    external_showroom_id: UUID,
+    amount: Decimal,
+    received_in: CashAccountRef,
+    description: str,
+    source_id: UUID | None,
+) -> EntryDraft:
+    """Rule 19: collect from the external showroom: Dr cash or bank / Cr receivable
+    from external showrooms (showroom)."""
+    amount = _positive_amount(amount)
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="EXTERNAL_COLLECTION",
+        source_id=source_id,
+        lines=(
+            Line(account=received_in.account, debit=amount, cash_account_id=received_in.cash_account_id),
+            _receivable_line(external_showroom_id, None, credit=amount),
+        ),
     )
     draft.validate()
     return draft

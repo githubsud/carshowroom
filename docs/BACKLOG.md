@@ -197,6 +197,19 @@
 | 6.5 | Customer requests | Wanted list with statuses, budget/year ranges |
 | 6.6 | Matching | Becoming AVAILABLE triggers matching; alert "N customers asked for this car" with phones; contacted flag |
 
+### Phase 6 status: delivered (2026-10-03); continuing per the standing instruction
+
+| ID | Status | Notes |
+|---|---|---|
+| 6.1 | ✅ | Receive a consigned car (owner + car + terms in one form): net price, fixed or % commission, who bears expenses (owner / showroom / shared %), end date with "expired" flag; printable Arabic/English agreement PDF (D-91, D-99) |
+| 6.2 | ✅ | Rule 10 and C-11 (tests first); rule 16 both entries through the sale screen; rule 17 payouts and P-06 recoveries with previews; consignor statement (JSON/PDF) reconciles with 2200/1430. Showroom-borne and shared expenses now built (P-05, account 6280, D-93). Below/at-net sales stay blocked and installment sales refused (Q-15, P-14) |
+| 6.3 | ✅ | Send out / came back moves (D-92); rule 18 three entries, rule 19 collections; external showroom statement (JSON/PDF); "where are my cars and for how long" list with days out (D-95) |
+| 6.4 | ✅ | Call log in **2 taps** (E2E on a phone viewport), next follow-up date, assigned salesperson, priority; due list on the requests page (D-98) |
+| 6.5 | ✅ | Customer requests with make/model, year and budget ranges, statuses, financing/trade-in flags; on the customer page with the follow-up history |
+| 6.6 | ✅ | Database trigger on AVAILABLE (D-97); notification "N customers asked for a car like this"; matches card with phones on the vehicle file; contacted flag (E2E) |
+| Seed | ✅ | A consigned Lancer (owner سمير عادل, 5%), an external showroom, Sara's request matching the Corolla and a call-back due |
+| Tests | ✅ | pgTAP 157 · API 242 (+1 PDF test in Docker/CI) · web unit 44 · E2E 39 |
+
 **Phase 6 accepted when (DECISION; the spec gives no criteria, G-15):**
 
 - Rules 10, 16, 17, 18 and 19 pass their unit tests, and the consignor and external showroom statements reconcile with the ledger.

@@ -8,15 +8,18 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 
-import { CashAccount, CustomerDetail, InstallmentStatement } from '../../core/api/api.models';
-import { MoneyPipe } from '../../core/format/format.service';
+import { CashAccount, ConsignorStatement, CustomerDetail, InstallmentStatement } from '../../core/api/api.models';
+import { AppDatePipe, MoneyPipe } from '../../core/format/format.service';
 import { CanDirective } from '../../core/permissions/can.directive';
 import { TenantContextService } from '../../core/tenant/tenant-context.service';
 import { StateComponent } from '../../shared/components/state.component';
+import { saveBlob } from '../../shared/download';
 import { ErrorMessageService } from '../../shared/error-message.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { FinanceService } from '../finance/finance.service';
+import { ConsignmentService } from '../consignment/consignment.service';
 import { InstallmentsService } from '../installments/installments.service';
+import { CustomerCrmComponent } from '../requests/customer-crm.component';
 import { PaymentDialogComponent } from '../vehicles/payment-dialog.component';
 import { CustomersService } from './customers.service';
 
@@ -32,9 +35,11 @@ import { CustomersService } from './customers.service';
     InputTextModule,
     TagModule,
     MoneyPipe,
+    AppDatePipe,
     CanDirective,
     StateComponent,
     PaymentDialogComponent,
+    CustomerCrmComponent,
   ],
   template: `
     <a class="back" [routerLink]="['/t', context.activeTenantId(), 'customers']">← {{ 'customers.title' | transloco }}</a>
@@ -49,6 +54,7 @@ import { CustomersService } from './customers.service';
             @for (phone of d.customer.phones; track phone) { <span dir="ltr">{{ phone }}</span> }
             @if (d.customer.is_buyer) { <p-tag severity="info" [value]="'customers.buyer' | transloco" /> }
             @if (d.customer.is_seller) { <p-tag severity="secondary" [value]="'customers.seller' | transloco" /> }
+            @if (d.customer.is_consignor) { <p-tag severity="secondary" [value]="'customers.consignor' | transloco" /> }
           </div>
         </div>
         <p-button *appCan="'customer.manage'" icon="pi pi-pencil" [text]="true" [label]="'vehicles.edit' | transloco"
@@ -116,6 +122,34 @@ import { CustomersService } from './customers.service';
         }
       }
 
+      @if (consignor(); as cs) {
+        <section class="card" data-testid="consignor-statement">
+          <h2>{{ 'consignment.ownerStatement' | transloco }}</h2>
+          <div class="figures">
+            <div class="figure"><span>{{ 'consignment.dueToOwner' | transloco }}</span><strong>{{ cs.payable | money }}</strong></div>
+            <div class="figure negative"><span>{{ 'consignment.ownerOwes' | transloco }}</span><strong>{{ cs.recoverable | money }}</strong></div>
+            <div class="figure"><span>{{ 'consignment.netDue' | transloco }}</span>
+              <strong data-testid="net-due">{{ cs.net_due_to_owner | money }}</strong></div>
+          </div>
+          <ul>
+            @for (c of cs.consignments; track c.id) {
+              <li><a [routerLink]="['/t', context.activeTenantId(), 'consignments', c.id]">{{ c.vehicle_label }} ({{ c.stock_no }})</a>
+                — {{ 'consignment.status_' + c.status | transloco }}</li>
+            }
+          </ul>
+          @if (cs.lines.length) {
+            <ul class="sub">
+              @for (line of cs.lines; track $index) {
+                <li>{{ line.entry_date | appDate }} — {{ line.description }} — {{ line.balance | money }}</li>
+              }
+            </ul>
+          }
+          <p-button icon="pi pi-file-pdf" [outlined]="true" label="PDF" (onClick)="consignorPdf()" />
+        </section>
+      }
+
+      <app-customer-crm [customerId]="d.customer.id" [phone]="d.customer.phone_primary" />
+
       <p-dialog [(visible)]="editOpen" [modal]="true" [header]="'vehicles.edit' | transloco" [style]="{ width: 'min(440px, 96vw)' }">
         <div class="dialog-fields">
           <div class="field"><label for="e-name">{{ 'customers.name' | transloco }}</label>
@@ -139,6 +173,7 @@ export class CustomerPage implements OnInit {
   private readonly api = inject(CustomersService);
   private readonly finance = inject(FinanceService);
   private readonly installments = inject(InstallmentsService);
+  private readonly consignments = inject(ConsignmentService);
   private readonly language = inject(LanguageService);
   private readonly toast = inject(MessageService);
   private readonly transloco = inject(TranslocoService);
@@ -152,6 +187,7 @@ export class CustomerPage implements OnInit {
   protected readonly accounts = signal<CashAccount[]>([]);
   protected readonly nationalId = signal<string | null>(null);
   protected readonly statement = signal<InstallmentStatement | null>(null);
+  protected readonly consignor = signal<ConsignorStatement | null>(null);
   protected readonly refundOpen = signal(false);
   protected readonly editOpen = signal(false);
   protected edit = { name: '', phone: '', address: '', notes: '' };
@@ -168,7 +204,11 @@ export class CustomerPage implements OnInit {
 
   protected async load(): Promise<void> {
     try {
-      this.detail.set(await this.api.get(this.customerId()));
+      const detail = await this.api.get(this.customerId());
+      this.detail.set(detail);
+      if (detail.customer.is_consignor && this.context.can('consignment.settle')) {
+        this.consignor.set(await this.consignments.consignorStatement(this.customerId()));
+      }
       this.loadError.set(null);
     } catch (error) {
       this.loadError.set(this.errors.message(error));
@@ -213,6 +253,14 @@ export class CustomerPage implements OnInit {
       link.download = `installments-${this.customerId()}.pdf`;
       link.click();
       URL.revokeObjectURL(url);
+    } catch (error) {
+      this.toast.add({ severity: 'error', summary: this.errors.message(error) });
+    }
+  }
+
+  protected async consignorPdf(): Promise<void> {
+    try {
+      saveBlob(await this.consignments.consignorStatementPdf(this.customerId(), this.language.language()), 'consignor-statement.pdf');
     } catch (error) {
       this.toast.add({ severity: 'error', summary: this.errors.message(error) });
     }

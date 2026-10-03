@@ -151,6 +151,9 @@ _DOCUMENT_TABLES = {
     "VEHICLE_EXPENSE": "vehicle_expenses",
     "SUPPLIER_PAYMENT": "supplier_payments",
     "CUSTOMER_REFUND": "customer_refunds",
+    "CONSIGNOR_PAYOUT": "consignor_settlements",
+    "CONSIGNOR_RECOVERY": "consignor_settlements",
+    "EXTERNAL_COLLECTION": "external_collections",
 }
 
 # Entries tied to a document's state are undone through that document (D-75):
@@ -158,6 +161,8 @@ _DOCUMENT_TABLES = {
 _DOCUMENT_ACTIONS = {
     "SALE": "cancel the sale",
     "SALE_COST": "cancel the sale",
+    "CONSIGNMENT_COMMISSION": "cancel the sale",
+    "EXTERNAL_COMMISSION": "the external sale is final",
     "SALE_CANCELLATION": "the cancellation is final",
     "DEPOSIT": "refund or forfeit the deposit",
     "DEPOSIT_REFUND": "the deposit is settled",
@@ -194,6 +199,9 @@ def _guard_document(conn: Connection, original: JournalEntryOut) -> None:
         return
     # A sold car's cost has moved to cost of sales; reversing a capitalized cost now would leave stock negative.
     if row.status in ("SOLD", "DELIVERED") and row.treatment == "CAPITALIZE":
+        raise AppError("VEHICLE_ALREADY_SOLD", "The car is sold; cancel the sale first", status_code=409)
+    # The owner's share was already recovered from the sale proceeds (rule 16 entry B).
+    if row.status in ("SOLD", "DELIVERED") and row.treatment in ("RECOVERABLE", "SHARED"):
         raise AppError("VEHICLE_ALREADY_SOLD", "The car is sold; cancel the sale first", status_code=409)
     if original.source_type == "VEHICLE_PURCHASE" and row.paid_later:
         raise AppError("PURCHASE_HAS_PAYMENTS", "Reverse the later payments to the seller first", status_code=409)

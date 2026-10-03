@@ -85,7 +85,10 @@ Endpoint status codes: `200` read, `201` created/posted, `204` no content, `400`
 | `PAPER_INVALID_TRANSITION` / `PAPER_NUMBER_EXISTS` | 409 | |
 | `PAPER_NOT_LINKED` / `PAPER_INSTALLMENT_MISMATCH` / `BANK_CHARGES_NOT_COLLECTED` | 422 | |
 | `ENCRYPTION_UNAVAILABLE` | 503 | `NATIONAL_ID_KEY` not configured |
-| `CONSIGNMENT_TERMS_INVALID` | 422 | |
+| `CONSIGNMENT_TERMS_INVALID` / `SALE_BELOW_NET_PRICE` / `COMMISSION_EXCEEDS_PRICE` / `CONSIGNMENT_NO_INSTALLMENTS` | 422 | Phase 6 (D-91, D-94) |
+| `CONSIGNOR_OVERPAYMENT` / `RECOVERY_EXCEEDS_EXPENSES` / `EXTERNAL_OVERPAYMENT` | 422 | `details.outstanding` |
+| `CONSIGNMENT_CLOSED` / `CONSIGNMENT_NOT_SOLD` / `CONSIGNMENT_ACTIVE` / `CONSIGNOR_ALREADY_PAID` / `SHOWROOM_IN_USE` / `SALE_NO_DOCUMENTS` | 409 | |
+| `SHOWROOM_INVALID` / `USER_INVALID` / `REQUEST_MISMATCH` | 422 | |
 | `DISTRIBUTION_PERIOD_OVERLAP` | 409 | Period already distributed |
 | `IMPORT_NOT_VALIDATED` / `IMPORT_HAS_ERRORS` | 409 / 422 | |
 | `REASON_REQUIRED` | 422 | Reversal, cancellation, unlock |
@@ -184,7 +187,12 @@ As built in Phase 4. Every vehicle response passes through cost masking (ARCHITE
 | GET / POST / PATCH | `/suppliers`, `/suppliers/{id}` | `supplier.manage` | With `balance` (owed to the supplier) |
 | GET | `/suppliers/{id}/statement?date_from=&date_to=` | `supplier.manage` | Opening, lines, running balance |
 | POST 💰👁 | `/suppliers/{id}/payments` (+ `/preview`) | `supplier.pay` | Rule 32; at most what is owed |
-| GET | `/customers/{id}/summary`, `/vehicles/{id}/matches`, `/request-matches/{id}/contacted` | `request.manage` | ⏳ Phase 6 |
+| GET | `/customer-requests?status=&customer_id=&open_only=&q=`, `/customer-requests/{id}` | `customer.view` | With `match_count`; the single request carries its `matches` |
+| POST / PATCH | `/customer-requests`, `/customer-requests/{id}` | `request.manage` | `{customer_id, make?, model?, year_from?, year_to?, budget_min?, budget_max?, color_pref?, notes?, assigned_to?, source?, financing_needed, trade_in_offered}` (+ `status` on PATCH); matched at once against available cars (D-97) |
+| GET | `/vehicles/{id}/request-matches` | `customer.view` | “N customers asked for this car”: open requests with customer name and phone |
+| PUT | `/request-matches/{id}/contacted` | `request.manage` | `{contacted}`; moves a new/contacted request to VEHICLE_FOUND |
+| GET | `/follow-ups?customer_id=&limit=`, `/follow-ups/due?mine=` | `customer.view` | History, newest first; due = latest follow-up's next date ≤ today (D-98) |
+| POST | `/follow-ups` | `followup.manage` | `{customer_id, request_id?, kind, result?, notes?, next_action?, next_follow_up_date?, assigned_to?, priority}`; append-only |
 
 ### 3.6 Reservations and sales
 
@@ -222,14 +230,27 @@ As built in Phase 5. Installment plans are created when an installment sale is p
 
 | Method | Path | Perm | Request → Response |
 |---|---|---|---|
-| POST | `/consignments-in` | `consignment.manage` | `{vehicle: {...VehicleCreate}, consignor_id, agreement_date, end_date, terms_type, net_price_to_owner?, commission_value?, expenses_borne_by, attachment_ids}` → consignment + vehicle (CONSIGNED_IN) |
-| GET | `/consignments-in/{id}/statement?format=` | `consignment.manage` | Consignor statement |
-| GET | `/consignments-in/{id}/agreement?format=pdf` | `consignment.manage` | Printable Arabic agreement |
-| POST 💰👁 | `/consignments-in/{id}/settle` | `consignment.settle` | `{date, amount, cash_account_id}` → rule 17 |
-| POST 💰 | `/consignments-in/{id}/return` | `consignment.settle` | `{date, recoverable_settlement?: {amount, cash_account_id}}` → RETURNED_TO_OWNER (+ P-06 once approved) |
-| GET/CRUD | `/external-showrooms` | `consignment.manage` | |
-| POST 💰👁 | `/external-showrooms/{id}/collections` | `consignment.settle` | `{date, amount, cash_account_id}` → rule 19 |
-| GET | `/external-showrooms/{id}/statement?format=` | `consignment.manage` | |
+**As built (Phase 6).** Money fields with owners and showrooms (`payable`, `recoverable`, `commission`, `settlements`, `receivable`) are present only with `consignment.settle`.
+
+| Method | Path | Perm | Request → Response |
+|---|---|---|---|
+| GET | `/consignments?status=&consignor_id=&q=` | `consignment.manage` | Agreements with car, owner, terms, days with us, `expired` |
+| POST | `/consignments` | `consignment.manage` | `{consignor_id, vehicle: {...VehicleIn}, agreement_date, end_date?, terms_type, net_price_to_owner?, commission_value?, expenses_borne_by, shared_owner_pct?, notes?}` → consignment; the car is created CONSIGNED_IN, IN_PREPARATION (D-91) |
+| GET | `/consignments/{id}` | `consignment.manage` | |
+| PUT | `/consignments/{id}/terms` | `consignment.manage` | New terms while ACTIVE |
+| POST | `/consignments/{id}/return` | `consignment.manage` | `{return_date, reason}` → RETURNED_TO_OWNER; refused while reserved; expenses owed stay recoverable |
+| GET | `/consignments/{id}/agreement?lang=` | `consignment.manage` | Agreement PDF (D-99) |
+| POST 💰👁 | `/consignments/{id}/settlements` (+ `/preview`) | `consignment.settle` | `{kind: PAYOUT\|RECOVERY, settle_date, amount, cash_account_id, notes?}` → rule 17 / P-06 (D-96) |
+| GET | `/customers/{id}/consignor-statement?format=json\|pdf&lang=` | `consignment.settle` | Every 2200/1430 line with running balance; payable, recoverable, net due |
+| GET / POST / PATCH | `/external-showrooms`, `/external-showrooms/{id}` | `consignment.manage` | `{name, contact_name?, phone?, address?, notes?, archived?}`; creates its yard location (D-92) |
+| GET | `/external-showrooms/{id}/statement?format=json\|pdf&lang=` | `consignment.settle` | 1420 lines with running balance, cars, collections |
+| POST 💰👁 | `/external-showrooms/{id}/collections` (+ `/preview`) | `consignment.settle` | `{collect_date, amount, cash_account_id, notes?}` → rule 19; at most what is owed |
+| GET | `/consignments-out?status=&external_showroom_id=` | `consignment.manage` | “Where are my cars and for how long” |
+| POST | `/consignments-out` | `consignment.manage` | `{vehicle_id, external_showroom_id, sent_date, commission_type: FIXED\|PCT, commission_value, expected_price?}` → AT_OTHER_SHOWROOM |
+| POST | `/consignments-out/{id}/return` | `consignment.manage` | `{return_date, reason?}` → AVAILABLE at the default yard |
+| POST 💰👁 | `/consignments-out/{id}/sale` (+ `/preview`) | `consignment.settle` | `{sale_date, sale_price, buyer_name?, notes?}` → rule 18 (three entries), car DELIVERED (D-95) |
+
+A consigned car's sale goes through `/sales` (rule 16, D-94); `SaleOut` carries `ownership_type`, `channel`, `consignor_name`, `external_showroom_name`, and its `profit` (with `vehicle.view_cost`) has `kind`, `commission`, `recovered_expenses`, `due_to_owner` or `external_commission`.
 
 ### 3.9 Profit distribution
 
