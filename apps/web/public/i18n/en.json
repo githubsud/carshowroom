@@ -12,7 +12,8 @@
     "openMenu": "Open menu",
     "navigation": "Main navigation",
     "more": "More",
-    "readOnly": "The subscription is suspended: you can view data but not record anything new."
+    "readOnly": "The subscription is suspended: you can view data but not record anything new.",
+    "offline": "You are offline — viewing only until you reconnect"
   },
   "menu": {
     "dashboard": "Dashboard",
@@ -34,7 +35,9 @@
     "distribution": "Profit distribution",
     "policies": "Policies",
     "import": "Import from Excel",
-    "onboarding": "Getting started"
+    "onboarding": "Getting started",
+    "subscription": "Subscription & support",
+    "account": "My account & security"
   },
   "auth": {
     "loginSubtitle": "Sign in to follow your cars, money and partners.",
@@ -51,7 +54,11 @@
     "passwordRules": "At least 10 characters with an uppercase letter, a lowercase letter and a digit.",
     "newPassword": "New password",
     "savePassword": "Save password",
-    "linkInvalid": "This link is invalid or has expired. Request a new one."
+    "linkInvalid": "This link is invalid or has expired. Request a new one.",
+    "mfaPrompt": "Enter the code from your authenticator app",
+    "mfaCode": "Verification code",
+    "verify": "Verify",
+    "createAccount": "Create an account"
   },
   "tenants": {
     "title": "Choose a showroom",
@@ -90,7 +97,26 @@
     "TRIAL": "Trial",
     "ACTIVE": "Active",
     "PAST_DUE": "Past due",
-    "SUSPENDED": "Suspended"
+    "SUSPENDED": "Suspended",
+    "pageTitle": "Subscription & support",
+    "plan": "Plan",
+    "limit_users": "Users",
+    "limit_branches": "Branches",
+    "limit_vehicles_in_stock": "Cars in stock",
+    "branches": "Branches",
+    "main": "Main",
+    "addBranch": "Add branch",
+    "support": "Let support look in",
+    "supportHint": "Support sees nothing unless you allow it, for a set time, read-only; every look is logged.",
+    "hours": "Duration",
+    "hoursN": "{{n}} hours",
+    "grant": "Allow",
+    "active": "Active",
+    "ended": "Ended",
+    "revoke": "Revoke",
+    "export": "A full copy of your data",
+    "exportHint": "A zip with all of the showroom's data (JSON); a copy is also made every night.",
+    "exportNow": "Download now"
   },
   "users": {
     "name": "Name",
@@ -237,7 +263,15 @@
     "IMPORT_NOT_VALIDATED": "Check the rows first",
     "IMPORT_COMMITTED": "This file has already been imported",
     "IMPORT_TOO_LARGE": "The file is too large (5,000 rows per sheet)",
-    "OPENING_EQUITY_EXCEEDED": "The amounts exceed the opening balance equity"
+    "OPENING_EQUITY_EXCEEDED": "The amounts exceed the opening balance equity",
+    "PLAN_LIMIT_REACHED": "Your plan's limit is reached; upgrade to add more",
+    "SUPPORT_NOT_GRANTED": "The showroom has not granted support access",
+    "MFA_REQUIRED": "Enter your authenticator code to finish signing in",
+    "OFFLINE": "You are offline; nothing can be recorded now",
+    "SIGNUP_LIMIT": "You already own three showrooms",
+    "INVOICE_NOT_OPEN": "This invoice is not open",
+    "RATE_LIMITED": "Too many requests; try again shortly",
+    "REQUEST_TOO_LARGE": "The request is too large"
   },
   "finance": {
     "cashTitle": "Cash & bank",
@@ -1048,5 +1082,54 @@
     "toDashboard": "Go to the dashboard",
     "next": "Next",
     "back": "Back"
+  },
+  "signup": {
+    "title": "Start your free trial",
+    "subtitle": "An account for you, then your showroom — 30 days free",
+    "name": "Your name",
+    "passwordHint": "At least 10 characters with upper and lower case letters and digits",
+    "create": "Create account",
+    "haveAccount": "Have an account? Sign in",
+    "showroomTitle": "Your new showroom",
+    "trial": "Starts on the 30-day trial plan",
+    "country": "Country",
+    "country_EG": "Egypt (EGP)",
+    "country_QA": "Qatar (QAR)",
+    "createShowroom": "Create a showroom"
+  },
+  "admin": {
+    "title": "Platform console",
+    "showroom": "Showroom",
+    "plan": "Plan",
+    "status": "Status",
+    "users": "Users",
+    "stock": "Cars in stock",
+    "lines": "Journal lines",
+    "lastActivity": "Last activity",
+    "manage": "Manage",
+    "supportOpen": "Support open",
+    "invoices": "Invoices",
+    "markPaid": "Mark paid",
+    "issue": "Issue invoice",
+    "support": "Support",
+    "supportView": "Support view (read-only)",
+    "grantedUntil": "Granted until"
+  },
+  "audit": {
+    "title": "Audit log",
+    "entity": "Table (e.g. vehicles)",
+    "action": "Action",
+    "none": "No events",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "account": {
+    "title": "My account & security",
+    "mfa": "Two-step sign-in",
+    "mfaHint": "Once on, signing in also asks for a code from an authenticator app. Recommended for owners and accountants.",
+    "mfaOn": "Two-step sign-in is on",
+    "mfaOff": "Turn off",
+    "mfaStart": "Turn on",
+    "scan": "Scan the code with your authenticator app, then enter the 6-digit code"
   }
 }

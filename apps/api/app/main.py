@@ -13,6 +13,7 @@ from app.api.routers import (
     imports,
     installments,
     partners,
+    platform,
     reports,
     sales,
     session,
@@ -22,6 +23,7 @@ from app.api.routers import (
 from app.core.config import API_PREFIX, PRODUCT_NAME, Settings, get_settings
 from app.core.crypto import FieldCipher
 from app.core.errors import register_error_handlers
+from app.core.http_guard import HttpGuardMiddleware
 from app.core.logging import configure_logging
 from app.core.request_context import REQUEST_ID_HEADER, RequestContextMiddleware
 from app.core.security import TokenVerifier, build_token_verifier
@@ -80,6 +82,7 @@ def create_app(
     app.state.storage = storage
     app.state.cipher = FieldCipher(settings.national_id_key.get_secret_value() if settings.national_id_key else None)
 
+    app.add_middleware(HttpGuardMiddleware, production=settings.is_production, rate_limits=settings.rate_limits)
     app.add_middleware(RequestContextMiddleware)
     app.add_middleware(
         CORSMiddleware,
@@ -106,4 +109,5 @@ def create_app(
     app.include_router(distribution.router, prefix=API_PREFIX)
     app.include_router(reports.router, prefix=API_PREFIX)
     app.include_router(imports.router, prefix=API_PREFIX)
+    app.include_router(platform.router, prefix=API_PREFIX)
     return app

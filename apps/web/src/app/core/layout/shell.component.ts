@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
@@ -31,6 +31,19 @@ import { visibleMenu } from './menu';
   styleUrl: './shell.component.scss',
 })
 export class ShellComponent {
+  /** Offline the app reads from the last answers and refuses writes (BACKLOG 9.6). */
+  protected readonly offline = signal(typeof navigator !== 'undefined' && !navigator.onLine);
+  private readonly connectivity = (() => {
+    const update = () => this.offline.set(!navigator.onLine);
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    inject(DestroyRef).onDestroy(() => {
+      window.removeEventListener('online', update);
+      window.removeEventListener('offline', update);
+    });
+    return true;
+  })();
+
   protected readonly context = inject(TenantContextService);
   protected readonly language = inject(LanguageService);
   private readonly auth = inject(AuthService);

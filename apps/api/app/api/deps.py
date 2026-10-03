@@ -14,6 +14,7 @@ from sqlalchemy import text
 
 from app.core.crypto import FieldCipher
 from app.core.errors import (
+    AppError,
     auth_invalid_token,
     permission_denied,
     tenant_access_denied,
@@ -108,8 +109,14 @@ def get_tenant_context(
 
     with db.transaction(user_id=user.id, tenant_id=tenant_id) as conn:
         row = conn.execute(_LOAD_MEMBERSHIP, {"tenant_id": tenant_id, "user_id": user.id}).mappings().first()
+        mfa_missing = user.claims.get("aal") != "aal2" and bool(
+            conn.execute(text("select private.user_has_mfa(:u)"), {"u": user.id}).scalar_one()
+        )
     if row is None:
         raise tenant_access_denied()
+    if mfa_missing:
+        # Once a user has turned on two-step sign-in, a password-only session is not enough (D-119).
+        raise AppError("MFA_REQUIRED", "Enter the code from your authenticator app", status_code=401)
 
     return TenantContext(
         user=user,

@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, model, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, model, output, signal, untracked } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
@@ -200,10 +200,23 @@ export class VehicleFormDialogComponent {
         license_expiry: v?.license_expiry ?? '',
         asking_price: v?.asking_price ?? '',
         min_price: v?.min_price ?? '',
-        current_location_id: this.locations().find((l) => l.is_default)?.id ?? '',
+        current_location_id: untracked(() => this.defaultLocation()),
         notes: v?.notes ?? '',
       });
     });
+    // Locations may arrive after the dialog opened: fill the default in without
+    // resetting what the user has typed meanwhile.
+    effect(() => {
+      const fallback = this.defaultLocation();
+      const control = this.form.controls.current_location_id;
+      if (fallback && !control.value) {
+        control.setValue(fallback);
+      }
+    });
+  }
+
+  private defaultLocation(): string {
+    return this.locations().find((l) => l.is_default)?.id ?? '';
   }
 
   protected async save(): Promise<void> {

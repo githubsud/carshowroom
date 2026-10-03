@@ -83,9 +83,17 @@ def load_tenant(conn: Connection, tenant_id: UUID) -> TenantOut:
     )
     if profile is None or settings is None:
         raise not_found("tenant")
+    terminology = conn.execute(
+        text(
+            "select cp.terminology from public.tenants t join public.country_packs cp on cp.code = t.country_code "
+            "where t.id = :id"
+        ),
+        {"id": tenant_id},
+    ).scalar_one_or_none()
     return TenantOut(
         profile=TenantProfileOut.model_validate(dict(profile)),
         settings=TenantSettingsOut.model_validate(dict(settings)),
+        terminology=dict(terminology or {}),
     )
 
 

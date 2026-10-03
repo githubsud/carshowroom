@@ -39,7 +39,8 @@ test('records a vehicle expense on a phone in under 15 seconds', async ({ page }
 
 /** BACKLOG 6.4: a call is logged in at most three taps on a phone. */
 test('logs a call in three taps or fewer', async ({ page }) => {
-  await page.goto(`/t/${NOUR}/customers/d0000000-0000-0000-0000-000000000003`);
+  // عمر خالد: not سارة, whose seeded follow-up is due for the dashboard demo (phase7.spec).
+  await page.goto(`/t/${NOUR}/customers/d0000000-0000-0000-0000-000000000004`);
   const crm = page.getByTestId('customer-crm');
   await expect(crm).toBeVisible();
 

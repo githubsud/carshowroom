@@ -34,9 +34,76 @@ export class AuthService {
     this._session.set(data.session);
   }
 
+  /** Self-serve signup (SPEC §4.16): the account first, then the showroom. */
+  async signUp(email: string, password: string, fullName: string): Promise<void> {
+    const { data, error } = await this.supabase.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
+    if (error) {
+      throw error;
+    }
+    this._session.set(data.session);
+  }
+
+  // --- Two-step sign-in (TOTP, D-119) ---------------------------------------------------
+
+  /** True when the account has an authenticator and this session has not used it yet. */
+  async needsSecondStep(): Promise<boolean> {
+    const { data } = await this.supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    return data?.nextLevel === 'aal2' && data.currentLevel !== 'aal2';
+  }
+
+  async verifySecondStep(code: string): Promise<void> {
+    const { data: factors, error: listError } = await this.supabase.auth.mfa.listFactors();
+    if (listError) {
+      throw listError;
+    }
+    const factor = factors.totp[0];
+    if (!factor) {
+      throw new Error('no authenticator');
+    }
+    const { error } = await this.supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code });
+    if (error) {
+      throw error;
+    }
+    await this.refresh();
+  }
+
+  async factors(): Promise<{ id: string; friendly_name?: string; status: string }[]> {
+    const { data, error } = await this.supabase.auth.mfa.listFactors();
+    if (error) {
+      throw error;
+    }
+    return data.all;
+  }
+
+  async enroll(): Promise<{ factorId: string; qr: string; secret: string }> {
+    const { data, error } = await this.supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Sayyara' });
+    if (error) {
+      throw error;
+    }
+    return { factorId: data.id, qr: data.totp.qr_code, secret: data.totp.secret };
+  }
+
+  async confirmEnroll(factorId: string, code: string): Promise<void> {
+    const { error } = await this.supabase.auth.mfa.challengeAndVerify({ factorId, code });
+    if (error) {
+      throw error;
+    }
+    await this.refresh();
+  }
+
+  async unenroll(factorId: string): Promise<void> {
+    const { error } = await this.supabase.auth.mfa.unenroll({ factorId });
+    if (error) {
+      throw error;
+    }
+    await this.refresh();
+  }
+
   /** Signs out this device only; other devices (e.g. the owner's phone) stay signed in. */
   async signOut(): Promise<void> {
     await this.supabase.auth.signOut({ scope: 'local' });
+    // Data read offline belongs to this user: forget it.
+    navigator.serviceWorker?.controller?.postMessage('clear-api-cache');
     this._session.set(null);
   }
 

@@ -665,6 +665,9 @@ Other tables:
 | `audit_log` | `id bigserial, tenant_id null, actor_user_id, actor_kind USER/PLATFORM/SYSTEM, action, entity_type, entity_id, before jsonb, after jsonb, ip inet, user_agent, request_id, occurred_at` | Append-only; partitioned by month (DECISION) |
 | `documents` | `entity_type, entity_id, doc_type, storage_path, file_name, mime, size, sensitivity NORMAL/COST` | `sensitivity = COST` is hidden from sales (G-09). Replaces `vehicle_documents` (DECISION) |
 | `idempotency_keys` | see ARCHITECTURE §10 | Added (G-06) |
+| `support_grants` | `tenant_id, granted_by, reason, starts_at, expires_at (≤ 72 h), revoked_at` | Phase 9 (D-117); the planned `support_access_grants` |
+| `invoices` | `tenant_id, period_start, period_end, amount, currency_code, status ISSUED/PAID/VOID, paid_at, reference, marked_by` | Phase 9 manual billing (D-116); the planned `subscription_invoices` |
+| `country_packs.terminology` | `jsonb` translation key → country wording | Phase 9 (D-121, Q-25) |
 
 ---
 

@@ -4,6 +4,92 @@
  */
 
 export interface paths {
+    "/api/v1/admin/tenants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Tenants */
+        get: operations["admin_tenants_api_v1_admin_tenants_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tenants/{tenant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Admin Update Tenant */
+        patch: operations["admin_update_tenant_api_v1_admin_tenants__tenant_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/tenants/{tenant_id}/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Invoices */
+        get: operations["admin_invoices_api_v1_admin_tenants__tenant_id__invoices_get"];
+        put?: never;
+        /** Admin Issue Invoice */
+        post: operations["admin_issue_invoice_api_v1_admin_tenants__tenant_id__invoices_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tenants/{tenant_id}/invoices/{invoice_id}/paid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Mark Paid */
+        post: operations["admin_mark_paid_api_v1_admin_tenants__tenant_id__invoices__invoice_id__paid_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tenants/{tenant_id}/support": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Support View */
+        get: operations["admin_support_view_api_v1_admin_tenants__tenant_id__support_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/attention": {
         parameters: {
             query?: never;
@@ -15,6 +101,41 @@ export interface paths {
         get: operations["needs_attention_api_v1_attention_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Audit Log */
+        get: operations["audit_log_api_v1_audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/branches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Branches */
+        get: operations["branches_api_v1_branches_get"];
+        put?: never;
+        /** Create Branch */
+        post: operations["create_branch_api_v1_branches_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1837,6 +1958,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Signup */
+        post: operations["signup_api_v1_signup_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/suppliers": {
         parameters: {
             query?: never;
@@ -1923,6 +2061,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support-grants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Support Grants */
+        get: operations["support_grants_api_v1_support_grants_get"];
+        put?: never;
+        /** Grant Support */
+        post: operations["grant_support_api_v1_support_grants_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support-grants/{grant_id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke Support */
+        post: operations["revoke_support_api_v1_support_grants__grant_id__revoke_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tenant": {
         parameters: {
             query?: never;
@@ -1932,6 +2105,23 @@ export interface paths {
         };
         /** Get Tenant */
         get: operations["get_tenant_api_v1_tenant_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tenant/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export */
+        get: operations["export_api_v1_tenant_export_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2003,6 +2193,23 @@ export interface paths {
         put?: never;
         /** Preview Transfer */
         post: operations["preview_transfer_api_v1_transfers_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Usage */
+        get: operations["usage_api_v1_usage_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2404,6 +2611,78 @@ export interface components {
              * @enum {string}
              */
             severity: "danger" | "warn" | "info";
+        };
+        /** AuditPage */
+        AuditPage: {
+            /** Items */
+            items: components["schemas"]["AuditRow"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** AuditRow */
+        AuditRow: {
+            /** Action */
+            action: string;
+            /** Actor Kind */
+            actor_kind: string;
+            /** Actor Name */
+            actor_name: string | null;
+            /** Actor User Id */
+            actor_user_id: string | null;
+            /** After */
+            after: {
+                [key: string]: unknown;
+            } | null;
+            /** Before */
+            before: {
+                [key: string]: unknown;
+            } | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            } | null;
+            /** Entity Id */
+            entity_id: string | null;
+            /** Entity Type */
+            entity_type: string | null;
+            /** Id */
+            id: number;
+            /** Ip */
+            ip: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+        };
+        /** BranchIn */
+        BranchIn: {
+            /** Address */
+            address?: string | null;
+            /** Name Ar */
+            name_ar: string;
+            /** Name En */
+            name_en?: string | null;
+        };
+        /** BranchOut */
+        BranchOut: {
+            /** Address */
+            address: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Default */
+            is_default: boolean;
+            /** Name Ar */
+            name_ar: string;
+            /** Name En */
+            name_en: string | null;
         };
         /** CashAccountIn */
         CashAccountIn: {
@@ -4380,6 +4659,68 @@ export interface components {
              */
             role_code: "OWNER" | "MANAGER" | "ACCOUNTANT" | "SALES" | "PARTNER" | "VIEWER";
         };
+        /** InvoiceIn */
+        InvoiceIn: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Period End
+             * Format: date
+             */
+            period_end: string;
+            /**
+             * Period Start
+             * Format: date
+             */
+            period_start: string;
+        };
+        /** InvoiceOut */
+        InvoiceOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /** Currency Code */
+            currency_code: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Paid At */
+            paid_at: string | null;
+            /**
+             * Period End
+             * Format: date
+             */
+            period_end: string;
+            /**
+             * Period Start
+             * Format: date
+             */
+            period_start: string;
+            /** Reference */
+            reference: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ISSUED" | "PAID" | "VOID";
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+        };
+        /** InvoicePaidIn */
+        InvoicePaidIn: {
+            /** Reference */
+            reference?: string | null;
+        };
         /** JournalEntryOut */
         JournalEntryOut: {
             /** Description */
@@ -5242,6 +5583,61 @@ export interface components {
              * @enum {string}
              */
             status: "OPEN" | "LOCKED";
+        };
+        /** PlatformTenant */
+        PlatformTenant: {
+            /** Country Code */
+            country_code: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Current Period End */
+            current_period_end: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Journal Lines */
+            journal_lines: number;
+            /** Last Activity */
+            last_activity: string | null;
+            /** Name Ar */
+            name_ar: string;
+            /** Name En */
+            name_en: string | null;
+            /** Plan Code */
+            plan_code: string | null;
+            /** Subscription Status */
+            subscription_status: ("TRIAL" | "ACTIVE" | "PAST_DUE" | "SUSPENDED") | null;
+            /** Support Granted */
+            support_granted: boolean;
+            /**
+             * Tenant Status
+             * @enum {string}
+             */
+            tenant_status: "ACTIVE" | "ARCHIVED";
+            /** Trial Ends At */
+            trial_ends_at: string | null;
+            /** Users */
+            users: number;
+            /** Vehicles In Stock */
+            vehicles_in_stock: number;
+        };
+        /** PlatformTenantUpdate */
+        PlatformTenantUpdate: {
+            /** Current Period End */
+            current_period_end?: string | null;
+            /** Plan Code */
+            plan_code?: ("TRIAL" | "STANDARD") | null;
+            /** Reason */
+            reason: string;
+            /** Subscription Status */
+            subscription_status?: ("TRIAL" | "ACTIVE" | "PAST_DUE" | "SUSPENDED") | null;
+            /** Tenant Status */
+            tenant_status?: ("ACTIVE" | "ARCHIVED") | null;
         };
         /** PostingResult[ConsignmentOutOut] */
         PostingResult_ConsignmentOutOut_: {
@@ -6402,6 +6798,27 @@ export interface components {
             /** Url */
             url: string;
         };
+        /** SignupIn */
+        SignupIn: {
+            /**
+             * Country Code
+             * @default EG
+             * @enum {string}
+             */
+            country_code: "EG" | "QA";
+            /** Name Ar */
+            name_ar: string;
+            /** Name En */
+            name_en?: string | null;
+        };
+        /** SignupOut */
+        SignupOut: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+        };
         /** StatementRow */
         StatementRow: {
             /**
@@ -6589,10 +7006,82 @@ export interface components {
             /** Phone */
             phone?: string | null;
         };
+        /** SupportGrantIn */
+        SupportGrantIn: {
+            /** Hours */
+            hours: number;
+            /** Reason */
+            reason: string;
+        };
+        /** SupportGrantOut */
+        SupportGrantOut: {
+            /** Active */
+            active: boolean;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Granted By Name */
+            granted_by_name: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reason */
+            reason: string;
+            /** Revoked At */
+            revoked_at: string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+        };
+        /**
+         * SupportSummary
+         * @description What a support engineer sees inside a showroom that granted access: read-only, audited.
+         */
+        SupportSummary: {
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /**
+             * Granted Until
+             * Format: date-time
+             */
+            granted_until: string;
+            /** Name Ar */
+            name_ar: string;
+            /** Recent Events */
+            recent_events: {
+                [key: string]: unknown;
+            }[];
+            /** Subscription Status */
+            subscription_status: string | null;
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Vehicles By Status */
+            vehicles_by_status: {
+                [key: string]: number;
+            };
+        };
         /** TenantOut */
         TenantOut: {
             profile: components["schemas"]["TenantProfileOut"];
             settings: components["schemas"]["TenantSettingsOut"];
+            /**
+             * Terminology
+             * @default {}
+             */
+            terminology: {
+                [key: string]: string;
+            };
         };
         /** TenantProfileOut */
         TenantProfileOut: {
@@ -6858,6 +7347,19 @@ export interface components {
             storage_path: string;
             /** Upload Url */
             upload_url: string;
+        };
+        /** UsageOut */
+        UsageOut: {
+            /** Limits */
+            limits: {
+                [key: string]: number;
+            };
+            /** Plan Code */
+            plan_code: string | null;
+            /** Used */
+            used: {
+                [key: string]: number;
+            };
         };
         /** UserOut */
         UserOut: {
@@ -7479,6 +7981,194 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    admin_tenants_api_v1_admin_tenants_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformTenant"][];
+                };
+            };
+        };
+    };
+    admin_update_tenant_api_v1_admin_tenants__tenant_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlatformTenantUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformTenant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_invoices_api_v1_admin_tenants__tenant_id__invoices_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvoiceOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_issue_invoice_api_v1_admin_tenants__tenant_id__invoices_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InvoiceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvoiceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_mark_paid_api_v1_admin_tenants__tenant_id__invoices__invoice_id__paid_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+                invoice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InvoicePaidIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvoiceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_support_view_api_v1_admin_tenants__tenant_id__support_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     needs_attention_api_v1_attention_get: {
         parameters: {
             query?: never;
@@ -7497,6 +8187,111 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AttentionItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    audit_log_api_v1_audit_get: {
+        parameters: {
+            query?: {
+                entity_type?: string | null;
+                action?: string | null;
+                actor?: string | null;
+                date_from?: string | null;
+                date_to?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    branches_api_v1_branches_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_branch_api_v1_branches_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BranchIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchOut"];
                 };
             };
             /** @description Validation Error */
@@ -12046,6 +12841,39 @@ export interface operations {
             };
         };
     };
+    signup_api_v1_signup_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignupIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignupOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_suppliers_api_v1_suppliers_get: {
         parameters: {
             query?: {
@@ -12262,6 +13090,105 @@ export interface operations {
             };
         };
     };
+    support_grants_api_v1_support_grants_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportGrantOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    grant_support_api_v1_support_grants_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupportGrantIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportGrantOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_support_api_v1_support_grants__grant_id__revoke_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                grant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportGrantOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_tenant_api_v1_tenant_get: {
         parameters: {
             query?: never;
@@ -12280,6 +13207,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TenantOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_api_v1_tenant_export_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": unknown;
                 };
             };
             /** @description Validation Error */
@@ -12457,6 +13415,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    usage_api_v1_usage_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageOut"];
                 };
             };
             /** @description Validation Error */

@@ -29,6 +29,16 @@ import { ErrorMessageService } from '../../shared/error-message.service';
       </div>
       <p class="subtitle">{{ 'auth.loginSubtitle' | transloco }}</p>
 
+      @if (secondStep()) {
+        <form class="mfa" (ngSubmit)="verify()" data-testid="mfa-form">
+          <p>{{ 'auth.mfaPrompt' | transloco }}</p>
+          <input pInputText name="code" [value]="code()" (input)="code.set($any($event.target).value)" inputmode="numeric"
+                 autocomplete="one-time-code" maxlength="6" dir="ltr" data-testid="mfa-code"
+                 [attr.aria-label]="'auth.mfaCode' | transloco" />
+          @if (error()) { <p-message severity="error">{{ error() }}</p-message> }
+          <p-button type="submit" [label]="'auth.verify' | transloco" [loading]="busy()" data-testid="mfa-submit" />
+        </form>
+      } @else {
       <form [formGroup]="form" (ngSubmit)="submit()">
         <div class="field">
           <label for="email">{{ 'auth.email' | transloco }}</label>
@@ -61,7 +71,9 @@ import { ErrorMessageService } from '../../shared/error-message.service';
 
       <div class="links">
         <a routerLink="/forgot-password">{{ 'auth.forgotPassword' | transloco }}</a>
+        <a routerLink="/signup" data-testid="signup-link">{{ 'auth.createAccount' | transloco }}</a>
       </div>
+      }
     </div>
   `,
   styleUrl: './auth-layout.scss',
@@ -77,6 +89,8 @@ export class LoginPage {
 
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly secondStep = signal(false);
+  protected readonly code = signal('');
   protected readonly form = inject(NonNullableFormBuilder).group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
@@ -91,12 +105,33 @@ export class LoginPage {
     try {
       const { email, password } = this.form.getRawValue();
       await this.auth.signIn(email.trim(), password);
-      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-      await this.router.navigateByUrl(returnUrl?.startsWith('/') ? returnUrl : '/tenants');
+      if (await this.auth.needsSecondStep()) {
+        this.secondStep.set(true);
+        return;
+      }
+      await this.proceed();
     } catch (error) {
       this.error.set(this.errors.message(error));
     } finally {
       this.busy.set(false);
     }
+  }
+
+  protected async verify(): Promise<void> {
+    this.busy.set(true);
+    this.error.set(null);
+    try {
+      await this.auth.verifySecondStep(this.code().trim());
+      await this.proceed();
+    } catch (error) {
+      this.error.set(this.errors.message(error));
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  private async proceed(): Promise<void> {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    await this.router.navigateByUrl(returnUrl?.startsWith('/') ? returnUrl : '/tenants');
   }
 }

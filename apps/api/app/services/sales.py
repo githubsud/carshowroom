@@ -917,6 +917,7 @@ def _create_trade_in_vehicle(conn: Connection, trade_in: TradeInIn, sale_date: d
         ),
         acquisition_source="TRADE_IN",
         reason=f"استبدال من {buyer_name}",
+        count_against_plan=False,
     )
     # Its own cost file starts at the agreed value; days in stock start at the sale (Q-24).
     conn.execute(text("update public.vehicles set stock_date = :d where id = :id"), {"d": sale_date, "id": vehicle_id})

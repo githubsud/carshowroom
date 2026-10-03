@@ -36,8 +36,8 @@ Endpoint status codes: `200` read, `201` created/posted, `204` no content, `400`
 | `TENANT_HEADER_MISSING` | 400 | No `X-Tenant-Id` |
 | `TENANT_ACCESS_DENIED` | 403 | No active membership (identical whether or not the tenant exists) |
 | `PERMISSION_DENIED` | 403 | `details.permission` names the missing permission |
-| `TENANT_READ_ONLY` | 423 | Subscription suspended |
-| `PLAN_LIMIT_REACHED` | 422 | `details.limit`: users, branches or vehicles in stock |
+| `TENANT_READ_ONLY` | 423 | Suspended or archived showroom; also raised by the database (SR040, D-113) |
+| `PLAN_LIMIT_REACHED` | 403 | `details.limit` (users, branches, vehicles_in_stock), `details.max`, `details.used` (D-114) |
 | `FEATURE_DISABLED` | 403 | Feature flag off (installments, consignment, multi-branch, car-level investors) |
 | `IDEMPOTENCY_KEY_REQUIRED` / `IDEMPOTENCY_KEY_REUSED` / `IDEMPOTENCY_IN_PROGRESS` | 400 / 409 / 409 | |
 | `VALIDATION_ERROR` | 422 | `details.fields: {field: [codes]}` |
@@ -92,7 +92,12 @@ Endpoint status codes: `200` read, `201` created/posted, `204` no content, `400`
 | `DISTRIBUTION_PERIOD_OVERLAP` | 409 | Period already distributed |
 | `IMPORT_NOT_VALIDATED` / `IMPORT_HAS_ERRORS` | 409 / 422 | |
 | `REASON_REQUIRED` | 422 | Reversal, cancellation, unlock |
-| `RATE_LIMITED` | 429 | |
+| `RATE_LIMITED` | 429 | Per-IP limits (SECURITY.md); `Retry-After` header |
+| `REQUEST_TOO_LARGE` | 413 | Body over 10 MB |
+| `MFA_REQUIRED` | 401 | The user has two-step sign-in and the session is password-only (D-119) |
+| `SUPPORT_NOT_GRANTED` | 403 | No active support window (D-117) |
+| `SIGNUP_LIMIT` | 409 | Already owns three showrooms (D-118) |
+| `INVOICE_NOT_OPEN` | 409 | Only an ISSUED invoice can be marked paid |
 | `INTERNAL_ERROR` | 500 | Generic; includes `request_id`, never a stack trace |
 
 ---
@@ -306,6 +311,29 @@ A consigned car's sale goes through `/sales` (rule 16, D-94); `SaleOut` carries 
 | — | worker `python -m app.jobs` | system | Hourly; advisory lock; per tenant once a day (`reminder_jobs`): installment due within N days (default 2) and overdue (D-86). `license_expiry`, `aging_alerts`, `follow_up_due`, `tenant_nightly_export` arrive with Phases 6, 7 and 9 |
 
 ### 3.13 Platform (super admin), `/api/v1/admin/*`, no `X-Tenant-Id`
+
+**As built (Phase 9).** Platform endpoints need a row in `platform_admins` (checked in the database); otherwise `403`.
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/admin/tenants` | Every showroom: plan, subscription status, users, cars in stock, journal lines, last activity, `support_granted` |
+| PATCH | `/admin/tenants/{id}` | `{subscription_status?, plan_code?, trial_ends_at?, reason}`; audit-logged as PLATFORM |
+| GET/POST | `/admin/tenants/{id}/invoices` | List; issue `{period_start, period_end, amount}` (currency of the showroom) |
+| POST | `/admin/tenants/{id}/invoices/{invoice_id}/paid` | `{reference?}` through `PaymentGateway` (manual); subscription ACTIVE to the period end (D-116) |
+| GET | `/admin/tenants/{id}/support` | Read-only summary (counts, cars by status) inside an active grant, else `SUPPORT_NOT_GRANTED`; audit-logged (D-117) |
+
+Tenant-side SaaS endpoints (with `X-Tenant-Id` unless noted):
+
+| Method | Path | Perm | Notes |
+|---|---|---|---|
+| POST | `/signup` | signed in, no tenant | `{name_ar, name_en?, country_code EG/QA}` → `{tenant_id}`; 30-day trial, caller is owner (D-118) |
+| GET/POST | `/support-grants`, `/support-grants/{id}/revoke` | `support.grant` | `{hours 1–72, reason}` |
+| GET/POST | `/branches` | member / `tenant.settings.manage` | Creating needs the `multi_branch` feature and room in the plan |
+| GET | `/usage` | `tenant.settings.manage` | `{plan_code, limits, used}` |
+| GET | `/audit?entity_type=&action=&from=&to=&page=&page_size=` | `audit.view` | Newest first; `before`/`after` JSON for the diff viewer |
+| GET | `/tenant/export` | `tenant.settings.manage` | Zip with one JSON file per table; audit-logged |
+
+**Planned design (Phase 0), kept for reference:**
 
 | Method | Path | Perm | Notes |
 |---|---|---|---|

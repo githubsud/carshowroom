@@ -97,9 +97,11 @@ test.describe('partner in two showrooms', () => {
     await expect(page).toHaveURL(new RegExp(`/t/${DOHA}/dashboard$`));
     await expect(page.getByTestId('active-tenant')).toContainText('معرض الدوحة');
 
+    // Dashboard, partners and their own account security; nothing else.
     const items = page.getByTestId('sidebar').locator('a');
-    await expect(items).toHaveCount(2);
+    await expect(items).toHaveCount(3);
     await expect(page.getByTestId('nav-partners')).toBeVisible();
+    await expect(page.getByTestId('nav-account')).toBeVisible();
 
     // Switch back through the top bar.
     await page.getByTestId('active-tenant').click();

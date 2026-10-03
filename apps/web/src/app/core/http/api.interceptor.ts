@@ -44,6 +44,10 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
   }
   const auth = inject(AuthService);
   const tenant = inject(ActiveTenantStore);
+  // Offline the app is read-only (BACKLOG 9.6): a write could not be confirmed.
+  if (req.method !== 'GET' && typeof navigator !== 'undefined' && !navigator.onLine) {
+    return throwError(() => new ApiError('OFFLINE', 'You are offline', 0));
+  }
 
   return from(auth.accessToken()).pipe(
     switchMap((token) => next(withHeaders(req, token, tenant.tenantId()))),

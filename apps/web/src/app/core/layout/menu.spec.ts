@@ -36,8 +36,8 @@ describe('visibleMenu', () => {
     expect(visible).not.toContain('settings');
   });
 
-  it('shows a partner only the dashboard and partners', () => {
-    expect(keys(['partner.view_own'])).toEqual(['dashboard', 'partners']);
+  it('shows a partner only the dashboard, partners and their account', () => {
+    expect(keys(['partner.view_own'])).toEqual(['dashboard', 'partners', 'account']);
   });
 
   it('hides modules switched off by a feature flag', () => {

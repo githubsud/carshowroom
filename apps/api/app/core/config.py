@@ -36,10 +36,19 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ["http://localhost:4200", "http://127.0.0.1:4200"]
     invite_redirect_url: str = "http://localhost:4200/reset-password"
+    # Per-IP rate limits (D-119); off in tests unless set.
+    rate_limits_enabled: bool | None = None
+    # Nightly per-tenant exports (BACKLOG 9.9).
+    export_dir: str = "exports"
+    export_keep_days: int = 14
 
     @property
     def jwks_url(self) -> str:
         return self.supabase_jwks_url or f"{self.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
+
+    @property
+    def rate_limits(self) -> bool:
+        return self.rate_limits_enabled if self.rate_limits_enabled is not None else self.environment != "testing"
 
     @property
     def is_production(self) -> bool:

@@ -106,6 +106,16 @@
 | BR-O2 | Opening balances are one entry at go-live, balanced by 3900 | `rules.opening_balances` | unit `test_rule_25_*`; `test_a_clean_sheet_*` ✅ |
 | BR-O3 | Opening equity is cleared only by agreement and never beyond its balance (P-08) | `imports.clear_opening_equity` | `test_a_clean_sheet_*` ✅ |
 
+## SaaS layer (Phase 9)
+
+| ID | Rule | Enforced in | Proven by |
+|---|---|---|---|
+| BR-S1 | A suspended or archived showroom cannot change its business data, whatever path the write takes | trigger `require_tenant_writable` (SR040) + `require_writable` | pgTAP 13; `test_platform.py::test_a_suspended_showroom_*` ✅ |
+| BR-S2 | Plan limits refuse only the new user, branch or car; nothing existing changes | `plans.ensure_room` | `test_platform.py` (limits) ✅ |
+| BR-S3 | The platform sees a showroom's data only inside a window the showroom granted, read-only, and every look is logged | `private.support_granted`; `platform.support_summary` | pgTAP 13; `test_platform.py` (support); E2E phase 9 ✅ |
+| BR-S4 | Offline, nothing is recorded | `api.interceptor` (`OFFLINE`); the service worker never queues writes | E2E phase 9 ✅ |
+| BR-S5 | Once a user has an authenticator, a password-only session is refused | `deps.get_tenant_context` (`MFA_REQUIRED`) | `test_platform.py` (MFA) ✅ |
+
 ## Access (Phases 1–4)
 
 | ID | Rule | Enforced in | Proven by |

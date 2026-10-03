@@ -14,7 +14,7 @@ _INSERT_EVENT = text(
       (tenant_id, actor_user_id, actor_kind, action, entity_type, entity_id,
        details, ip, user_agent, request_id)
     values
-      (:tenant_id, :actor, 'USER', :action, :entity_type, :entity_id, cast(:details as jsonb),
+      (:tenant_id, :actor, :actor_kind, :action, :entity_type, :entity_id, cast(:details as jsonb),
        cast(:ip as inet), :user_agent, :request_id)
     """
 )
@@ -24,11 +24,12 @@ def record_event(
     conn: Connection,
     *,
     tenant_id: UUID | None,
-    actor: UUID,
+    actor: UUID | None,
     action: str,
     entity_type: str | None = None,
     entity_id: str | None = None,
     details: dict[str, Any] | None = None,
+    actor_kind: str = "USER",
 ) -> None:
     client = current_client()
     conn.execute(
@@ -36,6 +37,7 @@ def record_event(
         {
             "tenant_id": tenant_id,
             "actor": actor,
+            "actor_kind": actor_kind,
             "action": action,
             "entity_type": entity_type,
             "entity_id": entity_id,

@@ -88,6 +88,8 @@ class TenantSettingsOut(BaseModel):
 class TenantOut(BaseModel):
     profile: TenantProfileOut
     settings: TenantSettingsOut
+    # Country pack wording that replaces the default Arabic (Q-25, BACKLOG 9.10).
+    terminology: dict[str, str] = {}
 
 
 class TenantProfileUpdate(StrictModel):

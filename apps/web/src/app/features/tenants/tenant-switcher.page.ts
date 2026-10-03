@@ -47,6 +47,14 @@ import { ErrorMessageService } from '../../shared/error-message.service';
         </ul>
       }
 
+      <div class="extra">
+        <p-button type="button" [outlined]="true" icon="pi pi-plus" [label]="'signup.createShowroom' | transloco"
+                  (onClick)="go('/create-showroom')" data-testid="create-showroom" />
+        @if (context.me()?.is_platform_admin) {
+          <p-button type="button" severity="secondary" icon="pi pi-server" [label]="'admin.title' | transloco"
+                    (onClick)="go('/admin')" data-testid="admin-console" />
+        }
+      </div>
       <p-button type="button" [text]="true" icon="pi pi-sign-out" [label]="'shell.signOut' | transloco" (onClick)="signOut()" />
     </div>
   `,
@@ -80,6 +88,13 @@ import { ErrorMessageService } from '../../shared/error-message.service';
     .tenant:hover,
     .tenant:focus-visible {
       border-color: var(--color-primary);
+    }
+
+    .extra {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-block: var(--space-3);
     }
 
     .name {
@@ -134,6 +149,10 @@ export class TenantSwitcherPage implements OnInit {
 
   protected open(membership: Membership): void {
     void this.router.navigate(['/t', membership.tenant_id, 'dashboard']);
+  }
+
+  protected go(path: string): void {
+    void this.router.navigateByUrl(path);
   }
 
   protected async signOut(): Promise<void> {

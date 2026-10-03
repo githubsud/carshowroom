@@ -46,7 +46,14 @@ export const MENU: readonly MenuItem[] = [
   { key: 'users', icon: 'pi pi-user-plus', path: 'settings/users', anyOf: ['users.manage'] },
   { key: 'settings', icon: 'pi pi-cog', path: 'settings/finance', anyOf: ['tenant.settings.manage'] },
   { key: 'policies', icon: 'pi pi-sliders-h', path: 'settings/policies', anyOf: ['tenant.settings.manage'] },
-  { key: 'audit', icon: 'pi pi-history', path: 'soon/audit', anyOf: ['audit.view'] },
+  {
+    key: 'subscription',
+    icon: 'pi pi-id-card',
+    path: 'settings/subscription',
+    anyOf: ['tenant.settings.manage', 'support.grant'],
+  },
+  { key: 'audit', icon: 'pi pi-history', path: 'audit', anyOf: ['audit.view'] },
+  { key: 'account', icon: 'pi pi-shield', path: 'account', anyOf: ['dashboard.view', 'partner.view_own'] },
 ];
 
 export function visibleMenu(

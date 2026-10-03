@@ -61,6 +61,8 @@ test('MVP acceptance demo (SPEC §13)', async ({ page, browser }) => {
   // A car is bought, with transport, repair and licence expenses; the true cost shows.
   await page.goto(`/t/${NOUR}/vehicles`);
   await page.getByTestId('add-vehicle').locator('button').click();
+  // The dialog focuses its first field once open; type only after that.
+  await expect(page.getByTestId('vehicle-make')).toBeFocused();
   await page.getByTestId('vehicle-make').fill(make);
   await page.getByTestId('vehicle-model').fill('Sedan');
   await page.getByTestId('vehicle-year').fill('2021');

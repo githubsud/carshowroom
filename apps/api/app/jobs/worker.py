@@ -1,8 +1,9 @@
 """Background worker (D-03, BACKLOG 5.7): the same image as the API, run as
 ``python -m app.jobs``. Every hour it takes a Postgres advisory lock (so only
 one worker acts when several run) and, for each active tenant, runs the daily
-installment reminders in that tenant's own date. reminder_jobs makes each
-tenant's run happen once per day, however often the loop wakes up.
+installment reminders in that tenant's own date, and the nightly data export
+(BACKLOG 9.9). reminder_jobs makes each tenant's run happen once per day,
+however often the loop wakes up.
 """
 
 import argparse
@@ -17,7 +18,7 @@ from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.db.session import Database, create_db_engine
 from app.integrations.messaging import LogSmsProvider, MessageProvider
-from app.services import notifications
+from app.services import notifications, platform
 
 logger = logging.getLogger(__name__)
 LOCK_KEY = "sayyara.daily_reminders"
@@ -41,6 +42,9 @@ def run_once(db: Database, sms: MessageProvider) -> dict[str, dict[str, int] | N
                         ).scalar_one()
                         today = datetime.now(ZoneInfo(timezone)).date()
                         results[str(tenant_id)] = notifications.run_reminders(conn, today, sms)
+                    with db.transaction(user_id=None, tenant_id=tenant_id) as conn:
+                        settings = get_settings()
+                        platform.nightly_export(conn, tenant_id, today, settings.export_dir, settings.export_keep_days)
                 except Exception:
                     # One tenant's failure must not stop the others.
                     logger.exception("reminders failed", extra={"tenant_id": str(tenant_id)})

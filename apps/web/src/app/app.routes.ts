@@ -20,6 +20,21 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/reset-password.page').then((m) => m.ResetPasswordPage),
   },
   {
+    path: 'signup',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/auth/signup.page').then((m) => m.SignupPage),
+  },
+  {
+    path: 'create-showroom',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/tenants/create-showroom.page').then((m) => m.CreateShowroomPage),
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/admin/admin.page').then((m) => m.AdminPage),
+  },
+  {
     path: 'tenants',
     canActivate: [authGuard],
     loadComponent: () => import('./features/tenants/tenant-switcher.page').then((m) => m.TenantSwitcherPage),
@@ -169,6 +184,20 @@ export const routes: Routes = [
         path: 'onboarding',
         canActivate: [permissionGuard('import.run')],
         loadComponent: () => import('./features/imports/onboarding.page').then((m) => m.OnboardingPage),
+      },
+      {
+        path: 'audit',
+        canActivate: [permissionGuard('audit.view')],
+        loadComponent: () => import('./features/misc/audit.page').then((m) => m.AuditPage),
+      },
+      {
+        path: 'settings/subscription',
+        canActivate: [permissionGuard('tenant.settings.manage', 'support.grant')],
+        loadComponent: () => import('./features/settings/subscription.page').then((m) => m.SubscriptionPage),
+      },
+      {
+        path: 'account',
+        loadComponent: () => import('./features/account/account.page').then((m) => m.AccountPage),
       },
       {
         path: 'notifications',

@@ -35,6 +35,8 @@ test.describe('owner', () => {
     // 1. Add-car wizard: details, then the purchase (rules 6/7).
     await page.goto(`/t/${NOUR}/vehicles`);
     await page.getByTestId('add-vehicle').locator('button').click();
+    // The dialog focuses its first field once open; type only after that.
+    await expect(page.getByTestId('vehicle-make')).toBeFocused();
     await page.getByTestId('vehicle-make').fill('Mazda');
     await page.getByTestId('vehicle-model').fill('6');
     await page.getByTestId('vehicle-year').fill('2017');

@@ -8,6 +8,7 @@
 --   sales@nour.example        SALES of معرض النور
 --   partner@nour.example      PARTNER of معرض النور and PARTNER of Doha Motors (multi-tenant)
 --   owner@doha.example        OWNER of Doha Motors (QA) — the "other tenant" for isolation tests
+--   admin@sayyara.example     platform super admin (no showroom)
 -- =============================================================================
 
 alter role app_api with login password 'app_api_local_dev';
@@ -30,7 +31,8 @@ declare
     {"id": "a0000000-0000-0000-0000-000000000002", "email": "accountant@nour.example", "name": "منى المحاسبة"},
     {"id": "a0000000-0000-0000-0000-000000000003", "email": "sales@nour.example",      "name": "كريم المبيعات"},
     {"id": "a0000000-0000-0000-0000-000000000004", "email": "partner@nour.example",    "name": "يوسف الشريك"},
-    {"id": "b0000000-0000-0000-0000-000000000001", "email": "owner@doha.example",      "name": "Khalid Owner"}
+    {"id": "b0000000-0000-0000-0000-000000000001", "email": "owner@doha.example",      "name": "Khalid Owner"},
+    {"id": "e0000000-0000-0000-0000-000000000001", "email": "admin@sayyara.example",   "name": "Platform Admin"}
   ]';
   v_user jsonb;
 begin
@@ -62,6 +64,8 @@ begin
       now(), now(), now()
     );
   end loop;
+  -- The super admin of the platform (SPEC §4.16); no showroom membership.
+  insert into public.platform_admins (user_id) values ('e0000000-0000-0000-0000-000000000001');
 end
 $$;
 
@@ -561,6 +565,91 @@ begin
                                  next_follow_up_date, assigned_to, priority, created_by)
   values (v_nour, v_sara, v_request, 'CALL', '2026-09-28 11:00+02', 'CALL_BACK', 'تريد معاينة الكورولا',
           '2026-10-01', v_owner, 'HIGH', v_owner);
+
+  perform set_config('app.tenant_id', '', true);
+end
+$$;
+
+-- =============================================================================
+-- Phase 9: the demo seed completed to 15 cars in various states (BACKLOG 9.11).
+-- Eight more cars bought on credit from a dealer (rule 7, nothing paid yet, so
+-- cash and bank are unchanged), one more consigned car, one at معرض الأمل.
+--   Accent 2018 (stock since 06-15), Rio 2019 (07-10), Yaris 2020 (08-01) — aging
+--   Sentra 2021 AVAILABLE; Attrage 2022 and Swift 2021 IN_PREPARATION; MG 5 DRAFT
+--   Logan 2019 at معرض الأمل; BMW 320i 2015 consigned by هشام رضا
+-- =============================================================================
+do $$
+declare
+  v_nour   constant uuid := '11111111-1111-1111-1111-111111111111';
+  v_dealer constant uuid := 'd0000000-0000-0000-0000-000000000006';
+  v_hisham constant uuid := 'd0000000-0000-0000-0000-000000000007';
+  v_amal   constant uuid := 'd6000000-0000-0000-0000-000000000001';
+  v_inv    uuid;
+  v_pay    uuid;
+  v_home   uuid;
+  v_yard   uuid;
+  c        record;
+  v_entry  record;
+begin
+  perform set_config('app.tenant_id', v_nour::text, true);
+  select id into v_inv from public.ledger_accounts where tenant_id = v_nour and system_key = 'VEHICLE_INVENTORY';
+  select id into v_pay from public.ledger_accounts where tenant_id = v_nour and system_key = 'SELLER_PAYABLE';
+  select id into v_home from public.locations where tenant_id = v_nour and is_default;
+  select id into v_yard from public.locations where tenant_id = v_nour and external_showroom_id = v_amal;
+
+  insert into public.customers (id, tenant_id, name, phone_primary, is_seller, is_consignor) values
+    (v_dealer, v_nour, 'معرض الشروق للسيارات المستعملة', '+201008889900', true, false),
+    (v_hisham, v_nour, 'هشام رضا', '+201009990011', false, true);
+
+  for c in
+    select * from (values
+      ('e1000000-0000-0000-0000-000000000007'::uuid, 'Hyundai',    'Accent',  2018, 'فضي',    '2026-06-15'::date, 180000.00, 205000.00, 'AVAILABLE'),
+      ('e1000000-0000-0000-0000-000000000008'::uuid, 'Kia',        'Rio',     2019, 'أحمر',   '2026-07-10'::date, 210000.00, 240000.00, 'AVAILABLE'),
+      ('e1000000-0000-0000-0000-000000000009'::uuid, 'Toyota',     'Yaris',   2020, 'أبيض',   '2026-08-01'::date, 330000.00, 375000.00, 'AVAILABLE'),
+      ('e1000000-0000-0000-0000-000000000010'::uuid, 'Nissan',     'Sentra',  2021, 'رمادي',  '2026-09-20'::date, 520000.00, 585000.00, 'AVAILABLE'),
+      ('e1000000-0000-0000-0000-000000000011'::uuid, 'Mitsubishi', 'Attrage', 2022, 'أزرق',   '2026-09-25'::date, 410000.00, 460000.00, 'IN_PREPARATION'),
+      ('e1000000-0000-0000-0000-000000000012'::uuid, 'Suzuki',     'Swift',   2021, 'أصفر',   '2026-09-27'::date, 390000.00, 440000.00, 'IN_PREPARATION'),
+      ('e1000000-0000-0000-0000-000000000014'::uuid, 'Renault',    'Logan',   2019, 'بيج',    '2026-08-20'::date, 230000.00, 265000.00, 'AT_OTHER_SHOWROOM')
+    ) as v (id, make, model, year, color, stock_date, cost, asking, status)
+  loop
+    insert into public.vehicles (id, tenant_id, make, model, year, color_ext, transmission, fuel, asking_price,
+                                 min_price, stock_date, current_location_id)
+    values (c.id, v_nour, c.make, c.model, c.year, c.color, 'AUTOMATIC', 'PETROL', c.asking, c.asking - 15000,
+            c.stock_date, v_home);
+    select * into v_entry from private.post_journal_entry(jsonb_build_object(
+      'entry_date', c.stock_date::text, 'description', format('شراء %s %s %s على الحساب', c.make, c.model, c.year),
+      'source_type', 'VEHICLE_PURCHASE',
+      'lines', jsonb_build_array(
+        jsonb_build_object('ledger_account_id', v_inv, 'debit', c.cost::text, 'vehicle_id', c.id),
+        jsonb_build_object('ledger_account_id', v_pay, 'credit', c.cost::text, 'customer_id', v_dealer,
+                           'vehicle_id', c.id))));
+    insert into public.vehicle_purchases (tenant_id, vehicle_id, seller_customer_id, purchase_date, price,
+                                          deferred_amount, journal_entry_id)
+    values (v_nour, c.id, v_dealer, c.stock_date, c.cost, c.cost, v_entry.journal_entry_id);
+    update public.vehicles set status = 'IN_PREPARATION' where id = c.id;
+    if c.status in ('AVAILABLE', 'AT_OTHER_SHOWROOM') then
+      update public.vehicles set status = 'AVAILABLE' where id = c.id;
+    end if;
+    if c.status = 'AT_OTHER_SHOWROOM' then
+      insert into public.consignments_out (tenant_id, vehicle_id, external_showroom_id, sent_date, commission_type,
+                                           commission_value, expected_price)
+      values (v_nour, c.id, v_amal, '2026-09-10', 'FIXED', 5000, 260000);
+      update public.vehicles set status = 'AT_OTHER_SHOWROOM', current_location_id = v_yard where id = c.id;
+    end if;
+  end loop;
+
+  insert into public.vehicles (id, tenant_id, make, model, year, color_ext, asking_price, current_location_id)
+  values ('e1000000-0000-0000-0000-000000000013', v_nour, 'MG', '5', 2023, 'أسود', 650000.00, v_home);
+
+  insert into public.vehicles (id, tenant_id, make, model, year, color_ext, transmission, fuel, asking_price,
+                               ownership_type, acquisition_source, stock_date, current_location_id)
+  values ('e1000000-0000-0000-0000-000000000015', v_nour, 'BMW', '320i', 2015, 'أسود', 'AUTOMATIC', 'PETROL',
+          720000.00, 'CONSIGNED_IN', 'CONSIGNMENT_IN', '2026-09-22', v_home);
+  update public.vehicles set status = 'IN_PREPARATION' where id = 'e1000000-0000-0000-0000-000000000015';
+  update public.vehicles set status = 'AVAILABLE' where id = 'e1000000-0000-0000-0000-000000000015';
+  insert into public.consignments_in (tenant_id, vehicle_id, consignor_id, agreement_date, terms_type,
+                                      net_price_to_owner, expenses_borne_by)
+  values (v_nour, 'e1000000-0000-0000-0000-000000000015', v_hisham, '2026-09-22', 'NET_PRICE', 680000.00, 'OWNER');
 
   perform set_config('app.tenant_id', '', true);
 end

@@ -65,7 +65,7 @@ from app.domain.vehicles import (
     VehicleUpdate,
 )
 from app.integrations.storage import Storage
-from app.services import customers, finance, suppliers
+from app.services import customers, finance, plans, suppliers
 from app.services.posting import engine, rules
 
 MEDIA_BUCKET = "vehicle-media"
@@ -287,7 +287,11 @@ def create_vehicle(
     acquisition_source: str | None = None,
     reason: str | None = None,
     ownership_type: str = "OWNED",
+    count_against_plan: bool = True,
 ) -> UUID:
+    # A trade-in taken in a sale is not refused for the plan's stock limit (D-114).
+    if count_against_plan:
+        plans.ensure_room(conn, "vehicles_in_stock")
     _check_vin_free(conn, payload.vin, None)
     location_id = _active_location(conn, payload.current_location_id) if payload.current_location_id else None
     values = payload.model_dump(exclude={"current_location_id", "acquisition_source"})

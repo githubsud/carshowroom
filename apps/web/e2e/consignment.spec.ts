@@ -35,6 +35,8 @@ test('a car that becomes available is matched to a waiting customer', async ({ p
   // A matching car arrives and is put on sale.
   await page.goto(`/t/${NOUR}/vehicles`);
   await page.getByTestId('add-vehicle').locator('button').click();
+  // The dialog focuses its first field once open; type only after that.
+  await expect(page.getByTestId('vehicle-make')).toBeFocused();
   await page.getByTestId('vehicle-make').fill(make);
   await page.getByTestId('vehicle-model').fill('Jolion');
   await page.getByTestId('vehicle-year').fill('2023');

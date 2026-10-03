@@ -12,6 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from app.core.errors import AppError, not_found
 from app.domain.tenancy import InviteIn, MemberOut, MemberUpdate, RoleOut
 from app.integrations.supabase_auth_admin import AuthAdmin
+from app.services import plans
 from app.services.audit import record_event
 
 _MEMBERS = text("select * from private.tenant_members()")
@@ -93,6 +94,15 @@ def invite(
     """
     role_id = _role_id(conn, payload.role_code)
     user_id = find_existing_user(conn, str(payload.email))
+    if (
+        user_id is not None
+        and conn.execute(
+            text("select 1 from public.memberships where tenant_id = :t and user_id = :u"),
+            {"t": tenant_id, "u": user_id},
+        ).first()
+    ):
+        raise AppError("MEMBER_ALREADY_EXISTS", "This user is already a member of the showroom", status_code=409)
+    plans.ensure_room(conn, "users")
     is_new_account = user_id is None
     if user_id is None:
         user_id = auth_admin.invite_user(email=str(payload.email), full_name=payload.full_name, redirect_to=redirect_to)
@@ -147,6 +157,8 @@ def update_member(
     if changes.role_code is not None:
         values["role_id"] = _role_id(conn, changes.role_code)
     if changes.status is not None:
+        if changes.status == "ACTIVE" and current["status"] != "ACTIVE":
+            plans.ensure_room(conn, "users")
         values["status"] = changes.status
     if "partner_id" in changes.model_fields_set:
         if changes.partner_id is not None:

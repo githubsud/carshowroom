@@ -109,6 +109,10 @@ async def _http_error_handler(_: Request, exc: Exception) -> JSONResponse:
 
 
 async def _unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
+    # The database refuses writes to a suspended showroom on its own (SR040, D-113).
+    if getattr(getattr(exc, "orig", None), "sqlstate", None) == "SR040":
+        error = tenant_read_only()
+        return _envelope(error.code, error.message, error.status_code)
     request_id = getattr(request.state, "request_id", None) or current_request_id()
     logger.exception("unhandled error", exc_info=exc, extra={"event": "unhandled_error"})
     response = _envelope("INTERNAL_ERROR", "An unexpected error occurred", 500, {"request_id": request_id})

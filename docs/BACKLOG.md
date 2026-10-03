@@ -301,3 +301,22 @@
 - A restore drill has been documented.
 - Suspended-tenant and support-access tests pass.
 - The demo seed passes the balance check in CI.
+
+### Phase 9 status: delivered (2026-10-03); all phases delivered
+
+| ID | Status | Notes |
+|---|---|---|
+| 9.1 | ✅ | Limits from the plan (users, branches, cars in stock) → `PLAN_LIMIT_REACHED` (D-114); flags hide menus and block the API (since Phase 1) |
+| 9.2 | ✅ | TRIAL/ACTIVE/PAST_DUE/SUSPENDED; suspended or archived = read-only in the API **and** by a database trigger on every business table (SR040, D-113); nothing deleted |
+| 9.3 | ✅ | Self-serve signup → create showroom (30-day trial, ≤3 owned, D-118); platform console: showrooms with usage, status/plan with reason, manual invoices and mark-paid through `PaymentGateway` (D-116) |
+| 9.4 | ✅ | Owner grants 1–72 h with a reason, revocable; summary only; no grant → `SUPPORT_NOT_GRANTED`; every look in the showroom's audit log (D-117) |
+| 9.5 | ✅ | Audit viewer: filters by table, action and dates; field-by-field before/after |
+| 9.6 | ✅ | Manifest, icons, service worker (production), offline read-only cache per tenant, offline banner, writes refused offline (E2E with network emulation, D-120) |
+| 9.7 | ✅ | `scripts/perf_seed.py` (5,000 cars / 100,000 lines) and `scripts/perf_check.py`; every endpoint < 2 s p95, no summary table needed (D-115, PERFORMANCE.md) |
+| 9.8 | ✅ | SECURITY.md: threat model, dependency audit (runtime: 0), rate and size limits, security headers, TOTP two-step sign-in enforced once enrolled, password policy (D-119). Open deployment items S-01..S-07 |
+| 9.9 | ✅ | Nightly per-showroom JSON export + on-demand download; RUNBOOK.md with a rehearsed restore (D-122) |
+| 9.10 | ✅ | `country_packs.terminology` applied over Arabic for Qatar showrooms (D-121) |
+| 9.11 | ✅ | Demo seed complete: Nour has 15 cars in every state (incl. a consigned BMW and a car at Amal), sales, overdue installments, consignments; balance check passes |
+| Tests | ✅ | pgTAP 176 · API 322 (+1 PDF test in Docker/CI) · web unit 50 · E2E 48 (from a clean reset) |
+
+**Still with the product owner:** the PrimeUI licence key (`PRIMEUI_LICENSE`), enabling GitHub Actions, prices (D-116), Q-37 (mandatory 2FA), Q-21 (production hosting) and the deployment items in SECURITY.md §6.

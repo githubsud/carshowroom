@@ -199,3 +199,15 @@ export type ImportPosting = Schemas['PostingResult_ImportJobOut_'];
 export type OpeningEquity = Schemas['OpeningEquityOut'];
 export type EquityClearingInput = Schemas['EquityClearingIn'];
 export type TenantProfileUpdate = Schemas['TenantProfileUpdate'];
+
+// --- SaaS layer (Phase 9) ---------------------------------------------------------------
+
+export type PlatformTenant = Schemas['PlatformTenant'];
+export type PlatformTenantUpdate = Schemas['PlatformTenantUpdate'];
+export type Invoice = Schemas['InvoiceOut'];
+export type SupportSummary = Schemas['SupportSummary'];
+export type SupportGrant = Schemas['SupportGrantOut'];
+export type Branch = Schemas['BranchOut'];
+export type Usage = Schemas['UsageOut'];
+export type AuditRow = Schemas['AuditRow'];
+export type AuditPage = Schemas['AuditPage'];

@@ -5,6 +5,7 @@ Multi-tenant SaaS for car showrooms (Egypt and Qatar first): vehicles, money, cu
 - Specification: [docs/SPEC.md](docs/SPEC.md)
 - Design: [PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [ERD](docs/ERD.md) · [Accounting](docs/ACCOUNTING.md) · [API](docs/API.md) · [Frontend](docs/FRONTEND.md)
 - Plan and decisions: [Backlog](docs/BACKLOG.md) · [Decisions](docs/DECISIONS.md)
+- Operations: [Runbook](docs/RUNBOOK.md) · [Security](docs/SECURITY.md) · [Performance](docs/PERFORMANCE.md)
 
 ## Layout
 

@@ -1,3 +1,8 @@
+@if (offline()) {
+  <div class="offline-banner" role="status" data-testid="offline-banner">
+    <i class="pi pi-wifi" aria-hidden="true"></i> {{ 'shell.offline' | transloco }}
+  </div>
+}
 <header class="topbar">
   <p-button
     type="button"

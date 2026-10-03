@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
@@ -15,6 +16,9 @@ import { ActiveTenantStore } from './active-tenant.store';
 export class TenantContextService {
   private readonly http = inject(HttpClient);
   private readonly store = inject(ActiveTenantStore);
+  private readonly transloco = inject(TranslocoService);
+  /** Arabic wording replaced by the active country pack, to restore on a switch. */
+  private replaced: Record<string, string> = {};
 
   private readonly _me = signal<Me | null>(null);
   private readonly _tenant = signal<Tenant | null>(null);
@@ -64,9 +68,24 @@ export class TenantContextService {
     if (this.activeTenantId() !== tenantId || !this._tenant()) {
       this.store.set(tenantId);
       this._tenant.set(null);
-      this._tenant.set(await firstValueFrom(this.http.get<Tenant>(`${environment.apiBaseUrl}/tenant`)));
+      const tenant = await firstValueFrom(this.http.get<Tenant>(`${environment.apiBaseUrl}/tenant`));
+      this._tenant.set(tenant);
+      await this.applyTerminology(tenant.terminology ?? {});
     }
     return true;
+  }
+
+  /** Country pack wording (Q-25, BACKLOG 9.10): e.g. Qatar says السيارات where Egypt says العربيات. */
+  private async applyTerminology(terms: Record<string, string>): Promise<void> {
+    await firstValueFrom(this.transloco.load('ar'));
+    for (const [key, original] of Object.entries(this.replaced)) {
+      this.transloco.setTranslationKey(key, original, { lang: 'ar' });
+    }
+    this.replaced = {};
+    for (const [key, value] of Object.entries(terms)) {
+      this.replaced[key] = String(this.transloco.getTranslation('ar')[key] ?? '');
+      this.transloco.setTranslationKey(key, value, { lang: 'ar' });
+    }
   }
 
   /** Change the showroom profile (onboarding, Settings); the API checks tenant.settings.manage. */
