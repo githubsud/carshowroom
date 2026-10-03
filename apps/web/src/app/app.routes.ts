@@ -146,6 +146,25 @@ export const routes: Routes = [
         loadComponent: () => import('./features/requests/requests.page').then((m) => m.RequestsPage),
       },
       {
+        path: 'reports',
+        canActivate: [permissionGuard('report.financial', 'journal.view', 'vehicle.view_cost')],
+        loadComponent: () => import('./features/reports/reports.page').then((m) => m.ReportsPage),
+      },
+      {
+        path: 'distribution',
+        canActivate: [permissionGuard('profit.distribute', 'partner.view_all')],
+        loadComponent: () => import('./features/reports/distribution.page').then((m) => m.DistributionPage),
+      },
+      {
+        path: 'settings/policies',
+        canActivate: [permissionGuard('tenant.settings.manage')],
+        loadComponent: () => import('./features/settings/policies.page').then((m) => m.PoliciesPage),
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./features/misc/notifications.page').then((m) => m.NotificationsPage),
+      },
+      {
         path: 'soon/:feature',
         loadComponent: () => import('./features/misc/coming-soon.page').then((m) => m.ComingSoonPage),
       },

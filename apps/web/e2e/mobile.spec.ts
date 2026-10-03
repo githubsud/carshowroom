@@ -14,6 +14,9 @@ test('owner on a phone navigates with the bottom bar and the drawer', async ({ p
   const viewportWidth = page.viewportSize()?.width ?? 0;
   expect(scrollWidth).toBeLessThanOrEqual(viewportWidth);
 
+  // The dashboard's blocks load after the first paint; they must not widen the page either.
+  await page.getByTestId('kpi-tiles').waitFor();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewportWidth);
   await page.getByRole('button', { name: 'المزيد' }).click();
   await page.getByTestId('drawer-nav').getByRole('link', { name: 'المستخدمين' }).click();
   await expect(page).toHaveURL(new RegExp(`/t/${NOUR}/settings/users$`));

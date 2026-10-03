@@ -28,6 +28,7 @@ _DB_ERRORS: dict[str, tuple[str, int, str]] = {
     "SR006": ("SUBLEDGER_MISMATCH", 422, "The account and its subledger do not match"),
     "SR007": ("INVALID_ENTRY", 422, "The journal entry is invalid"),
     "SR008": ("ENTRY_IS_REVERSAL", 409, "A reversal entry cannot be reversed"),
+    "SR030": ("PERIOD_DISTRIBUTED", 422, "Profit for this date has already been distributed"),
     "23503": ("INVALID_REFERENCE", 422, "A referenced record does not exist in this showroom"),
 }
 
@@ -48,6 +49,8 @@ def map_db_error(error: DBAPIError) -> AppError | None:
     detail = getattr(diag, "message_detail", None)
     if sqlstate == "SR001" and detail:
         details["period"] = detail
+    elif sqlstate == "SR030" and detail:
+        details["distributed_until"] = detail
     elif sqlstate in ("SR005", "SR006") and detail:
         details["account_code"] = detail
     return AppError(code, message, status_code=status, details=details)

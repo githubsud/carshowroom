@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/api/v1/attention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Needs Attention */
+        get: operations["needs_attention_api_v1_attention_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/cash-accounts": {
         parameters: {
             query?: never;
@@ -385,6 +402,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Dashboard */
+        get: operations["get_dashboard_api_v1_dashboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/deferred-papers": {
         parameters: {
             query?: never;
@@ -448,6 +482,75 @@ export interface paths {
         put?: never;
         /** Preview Paper Action */
         post: operations["preview_paper_action_api_v1_deferred_papers__paper_id__actions_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/distributions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Distributions */
+        get: operations["list_distributions_api_v1_distributions_get"];
+        put?: never;
+        /** Post Distribution */
+        post: operations["post_distribution_api_v1_distributions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/distributions/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Distribution */
+        post: operations["preview_distribution_api_v1_distributions_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/distributions/{distribution_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Distribution */
+        get: operations["get_distribution_api_v1_distributions__distribution_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/distributions/{distribution_id}/reverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reverse Distribution */
+        post: operations["reverse_distribution_api_v1_distributions__distribution_id__reverse_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1284,6 +1387,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Available Reports
+         * @description The reports this user may open, in the order of the reports centre.
+         */
+        get: operations["available_reports_api_v1_reports_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reports/cash-book": {
         parameters: {
             query?: never;
@@ -1293,6 +1416,23 @@ export interface paths {
         };
         /** Cash Book Report Endpoint */
         get: operations["cash_book_report_endpoint_api_v1_reports_cash_book_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Run Report */
+        get: operations["run_report_api_v1_reports__name__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2083,6 +2223,33 @@ export interface components {
             amount: string;
             /** Seq */
             seq: number;
+        };
+        /**
+         * AttentionItem
+         * @description One deterministic alert. `params` fill the translated message; `link`
+         *     is the route of the record (e.g. ["vehicles", "<id>"]).
+         */
+        AttentionItem: {
+            /** Entity Id */
+            entity_id?: string | null;
+            /** Entity Type */
+            entity_type?: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "INSTALLMENT_OVERDUE" | "INSTALLMENT_DUE_SOON" | "CHEQUE_BOUNCED" | "VEHICLE_AGING" | "LICENSE_EXPIRY" | "COST_INCOMPLETE" | "LOW_PROFIT" | "REQUEST_MATCH" | "FOLLOW_UP_DUE" | "LEAD_IDLE" | "CONSIGNOR_SETTLEMENT" | "SUPPLIER_PAYABLE" | "CASH_NEGATIVE" | "PARTNER_OVERDRAWN";
+            /** Link */
+            link: string[];
+            /** Params */
+            params: {
+                [key: string]: string | number | null;
+            };
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "danger" | "warn" | "info";
         };
         /** CashAccountIn */
         CashAccountIn: {
@@ -2985,6 +3152,233 @@ export interface components {
             /** Phone */
             phone?: string | null;
         };
+        /**
+         * DashboardOut
+         * @description Blocks appear only for users who may see them (owner / partner / staff).
+         */
+        DashboardOut: {
+            /** As Of */
+            as_of: string;
+            /** Attention */
+            attention?: components["schemas"]["AttentionItem"][];
+            /** Equity */
+            equity?: components["schemas"]["EquityRow"][] | null;
+            installments?: components["schemas"]["InstallmentKpis"] | null;
+            kpis: components["schemas"]["KpiTiles"];
+        };
+        /** DistributionIn */
+        DistributionIn: {
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Period From
+             * Format: date
+             */
+            period_from: string;
+            /**
+             * Period To
+             * Format: date
+             */
+            period_to: string;
+        };
+        /** DistributionLineOut */
+        DistributionLineOut: {
+            /**
+             * Amount
+             * @example 25000.00
+             */
+            amount: string;
+            /**
+             * Partner Id
+             * Format: uuid
+             */
+            partner_id: string;
+            /** Partner Name Ar */
+            partner_name_ar: string;
+            /** Partner Name En */
+            partner_name_en: string | null;
+            /** Weight Pct */
+            weight_pct: string;
+        };
+        /** DistributionOut */
+        DistributionOut: {
+            /**
+             * Allocated In Advance
+             * @example 25000.00
+             */
+            allocated_in_advance: string;
+            /**
+             * Carried In
+             * @example 25000.00
+             */
+            carried_in: string;
+            /**
+             * Carried Out
+             * @example 25000.00
+             */
+            carried_out: string;
+            /** Closing Entry No */
+            closing_entry_no: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Distributed
+             * @example 25000.00
+             */
+            distributed: string;
+            /** Distribution Entry No */
+            distribution_entry_no: number | null;
+            /**
+             * Expenses
+             * @example 25000.00
+             */
+            expenses: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Lines */
+            lines: components["schemas"]["DistributionLineOut"][];
+            /**
+             * Loss Handling
+             * @enum {string}
+             */
+            loss_handling: "ALLOCATE_TO_PARTNERS" | "CARRY_FORWARD";
+            /**
+             * Net Profit
+             * @example 25000.00
+             */
+            net_profit: string;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Period From
+             * Format: date
+             */
+            period_from: string;
+            /**
+             * Period To
+             * Format: date
+             */
+            period_to: string;
+            /**
+             * Profit Policy
+             * @enum {string}
+             */
+            profit_policy: "PERIODIC" | "PER_CAR";
+            /**
+             * Prorata Method
+             * @enum {string}
+             */
+            prorata_method: "DAY_WEIGHTED" | "SUB_PERIOD_PROFIT";
+            /**
+             * Revenue
+             * @example 25000.00
+             */
+            revenue: string;
+            /** Reversal Reason */
+            reversal_reason: string | null;
+            /**
+             * Rounding Remainder
+             * @enum {string}
+             */
+            rounding_remainder: "LARGEST_REMAINDER" | "LARGEST_SHARE";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "POSTED" | "REVERSED";
+            /** Summary Ar */
+            summary_ar: string;
+            /** Summary En */
+            summary_en: string;
+        };
+        /**
+         * DistributionPlanOut
+         * @description What closing the period will do — the preview shows exactly what is posted.
+         */
+        DistributionPlanOut: {
+            /**
+             * Allocated In Advance
+             * @example 25000.00
+             */
+            allocated_in_advance: string;
+            /**
+             * Carried In
+             * @example 25000.00
+             */
+            carried_in: string;
+            /**
+             * Carried Out
+             * @example 25000.00
+             */
+            carried_out: string;
+            /**
+             * Distributed
+             * @example 25000.00
+             */
+            distributed: string;
+            /**
+             * Expenses
+             * @example 25000.00
+             */
+            expenses: string;
+            /** Lines */
+            lines: components["schemas"]["DistributionLineOut"][];
+            /**
+             * Loss Handling
+             * @enum {string}
+             */
+            loss_handling: "ALLOCATE_TO_PARTNERS" | "CARRY_FORWARD";
+            /**
+             * Net Profit
+             * @example 25000.00
+             */
+            net_profit: string;
+            /**
+             * Period From
+             * Format: date
+             */
+            period_from: string;
+            /**
+             * Period To
+             * Format: date
+             */
+            period_to: string;
+            /**
+             * Profit Policy
+             * @enum {string}
+             */
+            profit_policy: "PERIODIC" | "PER_CAR";
+            /**
+             * Prorata Method
+             * @enum {string}
+             */
+            prorata_method: "DAY_WEIGHTED" | "SUB_PERIOD_PROFIT";
+            /**
+             * Revenue
+             * @example 25000.00
+             */
+            revenue: string;
+            /**
+             * Rounding Remainder
+             * @enum {string}
+             */
+            rounding_remainder: "LARGEST_REMAINDER" | "LARGEST_SHARE";
+            /** Summary Ar */
+            summary_ar: string;
+            /** Summary En */
+            summary_en: string;
+        };
+        /** DistributionReverseIn */
+        DistributionReverseIn: {
+            /** Reason */
+            reason: string;
+        };
         /** DocumentOut */
         DocumentOut: {
             /** Content Type */
@@ -3089,6 +3483,40 @@ export interface components {
              * Format: uuid
              */
             id: string;
+        };
+        /** EquityRow */
+        EquityRow: {
+            /**
+             * Allocated Profit
+             * @example 25000.00
+             */
+            allocated_profit: string;
+            /**
+             * Capital
+             * @example 25000.00
+             */
+            capital: string;
+            /**
+             * Drawings
+             * @example 25000.00
+             */
+            drawings: string;
+            /** Name Ar */
+            name_ar: string;
+            /** Name En */
+            name_en: string | null;
+            /**
+             * Net
+             * @example 25000.00
+             */
+            net: string;
+            /**
+             * Partner Id
+             * Format: uuid
+             */
+            partner_id: string;
+            /** Percentage */
+            percentage: string;
         };
         /** ExpenseCategoryIn */
         ExpenseCategoryIn: {
@@ -3757,6 +4185,27 @@ export interface components {
             line_no: number;
             /** Memo */
             memo: string | null;
+        };
+        /** KpiTiles */
+        KpiTiles: {
+            /** Aged Count */
+            aged_count: number;
+            /** Aged Days */
+            aged_days: number;
+            /** Bank Total */
+            bank_total?: string | null;
+            /** Cash Total */
+            cash_total?: string | null;
+            /** Month Gross Profit */
+            month_gross_profit?: string | null;
+            /** Month Sales Count */
+            month_sales_count: number;
+            /** Month Sales Total */
+            month_sales_total?: string | null;
+            /** Stock Cost */
+            stock_cost?: string | null;
+            /** Stock Count */
+            stock_count: number;
         };
         /** LedgerAccountOut */
         LedgerAccountOut: {
@@ -4543,6 +4992,14 @@ export interface components {
             /** Warnings */
             warnings?: components["schemas"]["PostingWarning"][];
         };
+        /** PostingResult[DistributionOut] */
+        PostingResult_DistributionOut_: {
+            document: components["schemas"]["DistributionOut"];
+            /** Journal Entries */
+            journal_entries: components["schemas"]["EntryRef"][];
+            /** Warnings */
+            warnings?: components["schemas"]["PostingWarning"][];
+        };
         /** PostingResult[ExternalCollectionOut] */
         PostingResult_ExternalCollectionOut_: {
             document: components["schemas"]["ExternalCollectionOut"];
@@ -4894,6 +5351,61 @@ export interface components {
              * @enum {string}
              */
             status: "POSTED" | "REVERSED" | "BOUNCED";
+        };
+        /** ReportColumn */
+        ReportColumn: {
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @default text
+             * @enum {string}
+             */
+            kind: "text" | "money" | "date" | "number" | "percent";
+            /** Label Ar */
+            label_ar: string;
+            /** Label En */
+            label_en: string;
+        };
+        /** ReportRow */
+        ReportRow: {
+            /** Cells */
+            cells: {
+                [key: string]: string | number | null;
+            };
+            /** Link */
+            link?: string[] | null;
+            /** Style */
+            style?: ("section" | "total" | "muted") | null;
+        };
+        /** ReportTable */
+        ReportTable: {
+            /** Columns */
+            columns: components["schemas"]["ReportColumn"][];
+            /** Currency Code */
+            currency_code: string;
+            /** Figures */
+            figures?: [
+                string,
+                string,
+                string,
+                "text" | "money" | "date" | "number" | "percent"
+            ][];
+            /**
+             * Name
+             * @enum {string}
+             */
+            name: "profit-and-loss" | "trial-balance" | "general-ledger" | "balance-check" | "vehicle-profit" | "inventory-aging" | "expenses-by-category" | "installment-collections" | "deferred-papers" | "consignments-in" | "consignments-out";
+            /** Period Ar */
+            period_ar?: string | null;
+            /** Period En */
+            period_en?: string | null;
+            /** Rows */
+            rows: components["schemas"]["ReportRow"][];
+            /** Title Ar */
+            title_ar: string;
+            /** Title En */
+            title_en: string;
         };
         /** RequestMatch */
         RequestMatch: {
@@ -6599,6 +7111,37 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    needs_attention_api_v1_attention_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttentionItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_cash_accounts_api_v1_cash_accounts_get: {
         parameters: {
             query?: {
@@ -7637,6 +8180,37 @@ export interface operations {
             };
         };
     };
+    get_dashboard_api_v1_dashboard_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_papers_api_v1_deferred_papers_get: {
         parameters: {
             query?: {
@@ -7803,6 +8377,178 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_distributions_api_v1_distributions_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DistributionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_distribution_api_v1_distributions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DistributionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingResult_DistributionOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_distribution_api_v1_distributions_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DistributionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DistributionPlanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_distribution_api_v1_distributions__distribution_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                distribution_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DistributionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reverse_distribution_api_v1_distributions__distribution_id__reverse_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                distribution_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DistributionReverseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DistributionOut"];
                 };
             };
             /** @description Validation Error */
@@ -9849,6 +10595,37 @@ export interface operations {
             };
         };
     };
+    available_reports_api_v1_reports_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": ("profit-and-loss" | "trial-balance" | "general-ledger" | "balance-check" | "vehicle-profit" | "inventory-aging" | "expenses-by-category" | "installment-collections" | "deferred-papers" | "consignments-in" | "consignments-out")[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     cash_book_report_endpoint_api_v1_reports_cash_book_get: {
         parameters: {
             query: {
@@ -9873,6 +10650,48 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CashBookOut"];
+                    "application/pdf": unknown;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_report_api_v1_reports__name__get: {
+        parameters: {
+            query?: {
+                date_from?: string | null;
+                date_to?: string | null;
+                as_of?: string | null;
+                account_id?: string | null;
+                format?: "json" | "pdf" | "xlsx";
+                lang?: "ar" | "en";
+            };
+            header?: {
+                "X-Tenant-Id"?: string | null;
+            };
+            path: {
+                name: "profit-and-loss" | "trial-balance" | "general-ledger" | "balance-check" | "vehicle-profit" | "inventory-aging" | "expenses-by-category" | "installment-collections" | "deferred-papers" | "consignments-in" | "consignments-out";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportTable"];
                     "application/pdf": unknown;
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": unknown;
                 };

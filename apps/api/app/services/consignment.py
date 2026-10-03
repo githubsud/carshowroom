@@ -49,7 +49,7 @@ from app.domain.consignment import (
 from app.domain.finance import EntryRef, PostingResult, Preview, PreviewEffect
 from app.domain.ledger import ZERO, EntryDraft
 from app.domain.money import format_money, ltr
-from app.services import customers, finance, vehicles
+from app.services import customers, distribution, finance, vehicles
 from app.services.posting import engine, rules
 
 
@@ -904,6 +904,16 @@ def record_external_sale(
     if commission_entry is not None:
         entries.append(EntryRef(id=commission_entry.id, entry_no=commission_entry.entry_no))
     entries.append(EntryRef(id=cost_entry.id, entry_no=cost_entry.entry_no))
+    allocation = distribution.allocate_sale(
+        conn,
+        sale_id=sale_id,
+        vehicle_id=out.vehicle_id,
+        sale_date=payload.sale_date,
+        gross_profit=payload.sale_price - plan.commission - plan.cost,
+        label=f"{out.vehicle_label} ({out.stock_no})",
+    )
+    if allocation is not None:
+        entries.append(allocation)
     return PostingResult[ConsignmentOutOut](document=get_out(conn, out_id), journal_entries=entries)
 
 

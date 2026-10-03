@@ -254,6 +254,8 @@ A consigned car's sale goes through `/sales` (rule 16, D-94); `SaleOut` carries 
 
 ### 3.9 Profit distribution
 
+**As built (Phase 7):** `GET /distributions` (`profit.distribute` or `partner.view_all`); `POST /distributions/preview` and `POST 💰 /distributions` (`profit.distribute`, Idempotency-Key) with `{period_from, period_to, notes?}` → plan / posted distribution with per-partner lines; `GET /distributions/{id}`; `POST /distributions/{id}/reverse` `{reason}` (latest only, D-102). Errors: `DISTRIBUTION_PERIOD_OVERLAP` 409, `DISTRIBUTION_PERIOD_GAP` 422, `DISTRIBUTION_SHARES_MISSING` 422, `DISTRIBUTION_NOT_LATEST` 409, `PERIOD_DISTRIBUTED` 422 (posting into a distributed date).
+
 | Method | Path | Perm | Request → Response |
 |---|---|---|---|
 | POST | `/profit-distributions/preview` | `profit.distribute` | `{period_from, period_to}` → `{net_profit, breakdown: {revenue, cogs, expenses}, partners: [{partner_id, name, weighted_pct, amount}], rounding_adjustment, warnings}` |
@@ -261,6 +263,8 @@ A consigned car's sale goes through `/sales` (rule 16, D-94); `SaleOut` carries 
 | GET | `/profit-distributions` | `partner.view_all` | History |
 
 ### 3.10 Reports
+
+**As built (Phase 7):** `GET /reports` lists the reports the user may open; `GET /reports/{name}?date_from=&date_to=&as_of=&account_id=&format=json|pdf|xlsx&lang=` returns a `ReportTable` (columns, rows, headline figures) or the file (D-104). `GET /dashboard` (blocks by permission) and `GET /attention` (Needs Attention, D-105) need `dashboard.view`.
 
 `GET /reports/{report}?format=json|pdf|xlsx&lang=ar|en&from=&to=&...` (FACT). Every report applies masking.
 

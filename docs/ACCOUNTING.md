@@ -516,6 +516,10 @@ Partner net position (candidate formula, Q-17: capital + current account − loa
 
 ---
 
+**As built (Phase 7):** `tests/integration/test_full_scenario.py` runs steps 1–12 through the services in a fresh showroom and asserts every value above exactly.
+
+---
+
 ## 5. Open accounting questions (not implemented until answered)
 
 The spec has no rule for each event below. The **candidate treatment** is a proposal for the owner's accountant to approve or replace. It is not a rule.
@@ -530,8 +534,8 @@ The spec has no rule for each event below. The **candidate treatment** is a prop
 | P-06 | Consignor reimburses recoverable expenses when the car is returned unsold (§4.4 "settle any recoverable expenses") | Dr Cash / Cr 1430 (consignor) | G-10. **Approved (Q-26); implemented in Phase 6 (D-96)** |
 | P-07 | Bank charges on a bounced cheque, possibly recharged to the customer | Dr bank-charges expense (no account in the COA) / Cr Bank; optionally Dr 1410 (customer) | Q-20. **Approved (Q-26); implemented in Phase 5 with the new account 6270 (D-85)** |
 | P-08 | Clearing Opening Balance Equity 3900 | Allocate to partner capital or current accounts by agreement | Q-16 |
-| P-09 | Distribution of a **loss** | **Approved as tenant option (D-40)**: `ALLOCATE_TO_PARTNERS` (default) Dr 3200 per partner / Cr 3300 by %; or `CARRY_FORWARD` (stays in 3300) | G-07 |
-| P-10 | Per-car distribution (policy 2): rule 22 debits 3300 before the period is closed | **Approved as tenant option (D-40)**: on each sale, Dr 3310 Profit allocated in advance / Cr 3200 per partner; at close, 3310 is netted against 3300 | C-04, Q-10 |
+| P-09 | Distribution of a **loss** | **Approved as tenant option (D-40)**: `ALLOCATE_TO_PARTNERS` (default) Dr 3200 per partner / Cr 3300 by %; or `CARRY_FORWARD` (stays in 3300) | G-07. **Implemented in Phase 7** |
+| P-10 | Per-car distribution (policy 2): rule 22 debits 3300 before the period is closed | **Approved as tenant option (D-40)**: on each sale, Dr 3310 Profit allocated in advance / Cr 3200 per partner; at close, 3310 is netted against 3300 | C-04, Q-10. **Implemented in Phase 7 (D-103)** |
 | P-11 | VAT / tax on vehicle sales, consignment commission, invoices | **Decided (D-39): no tax rules.** Account 2500 is seeded but unused | G-08, Q-11, Q-06 |
 | P-12 | Sale discount | Default: post the net price (sale price after discount) to 4100 and store the discount on the document only | Q-22. **Approved (Q-26); implemented in Phase 4** |
 | P-13 | Late fees, early settlement discount (mode b), repossession, bad-debt write-off | Out of MVP scope until requested | G-12, G-13 |

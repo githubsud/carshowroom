@@ -88,6 +88,16 @@
 | BR-C6 | A car that becomes AVAILABLE is matched against open requests, and members who manage requests are told (D-97) | trigger `vehicles_available_match` | pgTAP 10; `test_a_car_becoming_available_matches_open_requests`; E2E ✅ |
 | BR-C7 | A logged call is never changed or deleted | trigger on `follow_ups` (SR003) | pgTAP 10; `test_follow_ups_cannot_be_changed` ✅ |
 
+## Distribution and reports (Phase 7)
+
+| ID | Rule | Enforced in | Proven by |
+|---|---|---|---|
+| BR-D1 | A period is distributed once; ranges never overlap or leave a gap | exclusion constraint `profit_distributions_no_overlap`; `distribution._check_range` | pgTAP 11; `test_a_period_is_closed_once_*`, `test_the_next_period_starts_*` ✅ |
+| BR-D2 | Nothing but closing entries may be dated inside a distributed period | trigger `journal_entries_check_distributed` (SR030) | pgTAP 11; `test_a_period_is_closed_once_*` ✅ |
+| BR-D3 | The distribution preview shows exactly what is posted; partner amounts add up to the cent | `distribution._plan` used by both; `round_shares` | unit `test_distribution.py`; full scenario ✅ |
+| BR-D4 | The full scenario of SPEC §7 matches the hand-calculated values exactly | the posting rules | `test_full_scenario_matches_the_hand_calculation` ✅ |
+| BR-D5 | Reports and alerts follow permissions: sales staff never receive profit, cost, cash or partner data | `REPORT_PERMISSIONS`; `attention.alerts(can)`; `dashboard.build(can)` | `test_reports.py` ✅ |
+
 ## Access (Phases 1–4)
 
 | ID | Rule | Enforced in | Proven by |

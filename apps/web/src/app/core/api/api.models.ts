@@ -172,3 +172,17 @@ export type FollowUp = Schemas['FollowUpOut'];
 export type FollowUpInput = Schemas['FollowUpIn'];
 export type FollowUpResult = NonNullable<FollowUpInput['result']>;
 export type FollowUpDue = Schemas['FollowUpDue'];
+
+// --- Distribution, reports, dashboard (Phase 7) -----------------------------------------
+
+export type DistributionInput = Schemas['DistributionIn'];
+export type DistributionPlan = Schemas['DistributionPlanOut'];
+export type Distribution = Schemas['DistributionOut'];
+export type DistributionPosting = Schemas['PostingResult_DistributionOut_'];
+export type ReportName = Schemas['ReportTable']['name'];
+export type ReportTable = Schemas['ReportTable'];
+export type ReportColumn = Schemas['ReportColumn'];
+export type ReportRow = Schemas['ReportRow'];
+export type Dashboard = Schemas['DashboardOut'];
+export type AttentionItem = Schemas['AttentionItem'];
+export type EquityRow = Schemas['EquityRow'];

@@ -81,6 +81,95 @@
         "title": "AllocationOut",
         "type": "object"
       },
+      "AttentionItem": {
+        "description": "One deterministic alert. `params` fill the translated message; `link`\nis the route of the record (e.g. [\"vehicles\", \"<id>\"]).",
+        "properties": {
+          "entity_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Id"
+          },
+          "entity_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Type"
+          },
+          "kind": {
+            "enum": [
+              "INSTALLMENT_OVERDUE",
+              "INSTALLMENT_DUE_SOON",
+              "CHEQUE_BOUNCED",
+              "VEHICLE_AGING",
+              "LICENSE_EXPIRY",
+              "COST_INCOMPLETE",
+              "LOW_PROFIT",
+              "REQUEST_MATCH",
+              "FOLLOW_UP_DUE",
+              "LEAD_IDLE",
+              "CONSIGNOR_SETTLEMENT",
+              "SUPPLIER_PAYABLE",
+              "CASH_NEGATIVE",
+              "PARTNER_OVERDRAWN"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "link": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Link",
+            "type": "array"
+          },
+          "params": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Params",
+            "type": "object"
+          },
+          "severity": {
+            "enum": [
+              "danger",
+              "warn",
+              "info"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "severity",
+          "params",
+          "link"
+        ],
+        "title": "AttentionItem",
+        "type": "object"
+      },
       "CashAccountIn": {
         "additionalProperties": false,
         "properties": {
@@ -2833,6 +2922,494 @@
         "title": "CustomerUpdate",
         "type": "object"
       },
+      "DashboardOut": {
+        "description": "Blocks appear only for users who may see them (owner / partner / staff).",
+        "properties": {
+          "as_of": {
+            "title": "As Of",
+            "type": "string"
+          },
+          "attention": {
+            "items": {
+              "$ref": "#/components/schemas/AttentionItem"
+            },
+            "title": "Attention",
+            "type": "array"
+          },
+          "equity": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/EquityRow"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equity"
+          },
+          "installments": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InstallmentKpis"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/KpiTiles"
+          }
+        },
+        "required": [
+          "as_of",
+          "kpis"
+        ],
+        "title": "DashboardOut",
+        "type": "object"
+      },
+      "DistributionIn": {
+        "additionalProperties": false,
+        "properties": {
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "period_from": {
+            "format": "date",
+            "title": "Period From",
+            "type": "string"
+          },
+          "period_to": {
+            "format": "date",
+            "title": "Period To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "period_from",
+          "period_to"
+        ],
+        "title": "DistributionIn",
+        "type": "object"
+      },
+      "DistributionLineOut": {
+        "properties": {
+          "amount": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "partner_id": {
+            "format": "uuid",
+            "title": "Partner Id",
+            "type": "string"
+          },
+          "partner_name_ar": {
+            "title": "Partner Name Ar",
+            "type": "string"
+          },
+          "partner_name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partner Name En"
+          },
+          "weight_pct": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Weight Pct",
+            "type": "string"
+          }
+        },
+        "required": [
+          "partner_id",
+          "partner_name_ar",
+          "partner_name_en",
+          "weight_pct",
+          "amount"
+        ],
+        "title": "DistributionLineOut",
+        "type": "object"
+      },
+      "DistributionOut": {
+        "properties": {
+          "allocated_in_advance": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Allocated In Advance",
+            "type": "string"
+          },
+          "carried_in": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Carried In",
+            "type": "string"
+          },
+          "carried_out": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Carried Out",
+            "type": "string"
+          },
+          "closing_entry_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closing Entry No"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "distributed": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Distributed",
+            "type": "string"
+          },
+          "distribution_entry_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distribution Entry No"
+          },
+          "expenses": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Expenses",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/DistributionLineOut"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "loss_handling": {
+            "enum": [
+              "ALLOCATE_TO_PARTNERS",
+              "CARRY_FORWARD"
+            ],
+            "title": "Loss Handling",
+            "type": "string"
+          },
+          "net_profit": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Net Profit",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "period_from": {
+            "format": "date",
+            "title": "Period From",
+            "type": "string"
+          },
+          "period_to": {
+            "format": "date",
+            "title": "Period To",
+            "type": "string"
+          },
+          "profit_policy": {
+            "enum": [
+              "PERIODIC",
+              "PER_CAR"
+            ],
+            "title": "Profit Policy",
+            "type": "string"
+          },
+          "prorata_method": {
+            "enum": [
+              "DAY_WEIGHTED",
+              "SUB_PERIOD_PROFIT"
+            ],
+            "title": "Prorata Method",
+            "type": "string"
+          },
+          "revenue": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Revenue",
+            "type": "string"
+          },
+          "reversal_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reversal Reason"
+          },
+          "rounding_remainder": {
+            "enum": [
+              "LARGEST_REMAINDER",
+              "LARGEST_SHARE"
+            ],
+            "title": "Rounding Remainder",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "POSTED",
+              "REVERSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary_ar": {
+            "title": "Summary Ar",
+            "type": "string"
+          },
+          "summary_en": {
+            "title": "Summary En",
+            "type": "string"
+          }
+        },
+        "required": [
+          "period_from",
+          "period_to",
+          "profit_policy",
+          "prorata_method",
+          "rounding_remainder",
+          "loss_handling",
+          "revenue",
+          "expenses",
+          "net_profit",
+          "allocated_in_advance",
+          "carried_in",
+          "distributed",
+          "carried_out",
+          "lines",
+          "summary_ar",
+          "summary_en",
+          "id",
+          "status",
+          "closing_entry_no",
+          "distribution_entry_no",
+          "created_at",
+          "reversal_reason",
+          "notes"
+        ],
+        "title": "DistributionOut",
+        "type": "object"
+      },
+      "DistributionPlanOut": {
+        "description": "What closing the period will do — the preview shows exactly what is posted.",
+        "properties": {
+          "allocated_in_advance": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Allocated In Advance",
+            "type": "string"
+          },
+          "carried_in": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Carried In",
+            "type": "string"
+          },
+          "carried_out": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Carried Out",
+            "type": "string"
+          },
+          "distributed": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Distributed",
+            "type": "string"
+          },
+          "expenses": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Expenses",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/DistributionLineOut"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "loss_handling": {
+            "enum": [
+              "ALLOCATE_TO_PARTNERS",
+              "CARRY_FORWARD"
+            ],
+            "title": "Loss Handling",
+            "type": "string"
+          },
+          "net_profit": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Net Profit",
+            "type": "string"
+          },
+          "period_from": {
+            "format": "date",
+            "title": "Period From",
+            "type": "string"
+          },
+          "period_to": {
+            "format": "date",
+            "title": "Period To",
+            "type": "string"
+          },
+          "profit_policy": {
+            "enum": [
+              "PERIODIC",
+              "PER_CAR"
+            ],
+            "title": "Profit Policy",
+            "type": "string"
+          },
+          "prorata_method": {
+            "enum": [
+              "DAY_WEIGHTED",
+              "SUB_PERIOD_PROFIT"
+            ],
+            "title": "Prorata Method",
+            "type": "string"
+          },
+          "revenue": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Revenue",
+            "type": "string"
+          },
+          "rounding_remainder": {
+            "enum": [
+              "LARGEST_REMAINDER",
+              "LARGEST_SHARE"
+            ],
+            "title": "Rounding Remainder",
+            "type": "string"
+          },
+          "summary_ar": {
+            "title": "Summary Ar",
+            "type": "string"
+          },
+          "summary_en": {
+            "title": "Summary En",
+            "type": "string"
+          }
+        },
+        "required": [
+          "period_from",
+          "period_to",
+          "profit_policy",
+          "prorata_method",
+          "rounding_remainder",
+          "loss_handling",
+          "revenue",
+          "expenses",
+          "net_profit",
+          "allocated_in_advance",
+          "carried_in",
+          "distributed",
+          "carried_out",
+          "lines",
+          "summary_ar",
+          "summary_en"
+        ],
+        "title": "DistributionPlanOut",
+        "type": "object"
+      },
+      "DistributionReverseIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "DistributionReverseIn",
+        "type": "object"
+      },
       "DocumentOut": {
         "properties": {
           "content_type": {
@@ -3061,6 +3638,79 @@
           "entry_no"
         ],
         "title": "EntryRef",
+        "type": "object"
+      },
+      "EquityRow": {
+        "properties": {
+          "allocated_profit": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Allocated Profit",
+            "type": "string"
+          },
+          "capital": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Capital",
+            "type": "string"
+          },
+          "drawings": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Drawings",
+            "type": "string"
+          },
+          "name_ar": {
+            "title": "Name Ar",
+            "type": "string"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          },
+          "net": {
+            "examples": [
+              "25000.00"
+            ],
+            "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+            "title": "Net",
+            "type": "string"
+          },
+          "partner_id": {
+            "format": "uuid",
+            "title": "Partner Id",
+            "type": "string"
+          },
+          "percentage": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Percentage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "partner_id",
+          "name_ar",
+          "name_en",
+          "percentage",
+          "capital",
+          "allocated_profit",
+          "drawings",
+          "net"
+        ],
+        "title": "EquityRow",
         "type": "object"
       },
       "ExpenseCategoryIn": {
@@ -4926,6 +5576,109 @@
           "memo"
         ],
         "title": "JournalLineOut",
+        "type": "object"
+      },
+      "KpiTiles": {
+        "properties": {
+          "aged_count": {
+            "title": "Aged Count",
+            "type": "integer"
+          },
+          "aged_days": {
+            "title": "Aged Days",
+            "type": "integer"
+          },
+          "bank_total": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bank Total"
+          },
+          "cash_total": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Total"
+          },
+          "month_gross_profit": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Month Gross Profit"
+          },
+          "month_sales_count": {
+            "title": "Month Sales Count",
+            "type": "integer"
+          },
+          "month_sales_total": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Month Sales Total"
+          },
+          "stock_cost": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stock Cost"
+          },
+          "stock_count": {
+            "title": "Stock Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "stock_count",
+          "aged_count",
+          "aged_days",
+          "month_sales_count"
+        ],
+        "title": "KpiTiles",
         "type": "object"
       },
       "LedgerAccountOut": {
@@ -7122,6 +7875,33 @@
         "title": "PostingResult[CustomerRefundOut]",
         "type": "object"
       },
+      "PostingResult_DistributionOut_": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/DistributionOut"
+          },
+          "journal_entries": {
+            "items": {
+              "$ref": "#/components/schemas/EntryRef"
+            },
+            "title": "Journal Entries",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PostingWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "journal_entries"
+        ],
+        "title": "PostingResult[DistributionOut]",
+        "type": "object"
+      },
       "PostingResult_ExternalCollectionOut_": {
         "properties": {
           "document": {
@@ -7999,6 +8779,206 @@
           "allocations"
         ],
         "title": "ReceiptOut",
+        "type": "object"
+      },
+      "ReportColumn": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "default": "text",
+            "enum": [
+              "text",
+              "money",
+              "date",
+              "number",
+              "percent"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label_ar": {
+            "title": "Label Ar",
+            "type": "string"
+          },
+          "label_en": {
+            "title": "Label En",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label_ar",
+          "label_en"
+        ],
+        "title": "ReportColumn",
+        "type": "object"
+      },
+      "ReportRow": {
+        "properties": {
+          "cells": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Cells",
+            "type": "object"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "enum": [
+                  "section",
+                  "total",
+                  "muted"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Style"
+          }
+        },
+        "required": [
+          "cells"
+        ],
+        "title": "ReportRow",
+        "type": "object"
+      },
+      "ReportTable": {
+        "properties": {
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/ReportColumn"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "currency_code": {
+            "title": "Currency Code",
+            "type": "string"
+          },
+          "figures": {
+            "items": {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "enum": [
+                    "text",
+                    "money",
+                    "date",
+                    "number",
+                    "percent"
+                  ],
+                  "type": "string"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Figures",
+            "type": "array"
+          },
+          "name": {
+            "enum": [
+              "profit-and-loss",
+              "trial-balance",
+              "general-ledger",
+              "balance-check",
+              "vehicle-profit",
+              "inventory-aging",
+              "expenses-by-category",
+              "installment-collections",
+              "deferred-papers",
+              "consignments-in",
+              "consignments-out"
+            ],
+            "title": "Name",
+            "type": "string"
+          },
+          "period_ar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Ar"
+          },
+          "period_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period En"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ReportRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "title_ar": {
+            "title": "Title Ar",
+            "type": "string"
+          },
+          "title_en": {
+            "title": "Title En",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "title_ar",
+          "title_en",
+          "currency_code",
+          "columns",
+          "rows"
+        ],
+        "title": "ReportTable",
         "type": "object"
       },
       "RequestMatch": {
@@ -13188,6 +14168,65 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/attention": {
+      "get": {
+        "operationId": "needs_attention_api_v1_attention_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AttentionItem"
+                  },
+                  "title": "Response Needs Attention Api V1 Attention Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Needs Attention",
+        "tags": [
+          "reports",
+          "dashboard"
+        ]
+      }
+    },
     "/api/v1/cash-accounts": {
       "get": {
         "operationId": "list_cash_accounts_api_v1_cash_accounts_get",
@@ -15473,6 +16512,61 @@
         ]
       }
     },
+    "/api/v1/dashboard": {
+      "get": {
+        "operationId": "get_dashboard_api_v1_dashboard_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Dashboard",
+        "tags": [
+          "reports",
+          "dashboard"
+        ]
+      }
+    },
     "/api/v1/deferred-papers": {
       "get": {
         "operationId": "list_papers_api_v1_deferred_papers_get",
@@ -15895,6 +16989,344 @@
         "tags": [
           "installments",
           "deferred papers"
+        ]
+      }
+    },
+    "/api/v1/distributions": {
+      "get": {
+        "operationId": "list_distributions_api_v1_distributions_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DistributionOut"
+                  },
+                  "title": "Response List Distributions Api V1 Distributions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Distributions",
+        "tags": [
+          "profit distribution"
+        ]
+      },
+      "post": {
+        "operationId": "post_distribution_api_v1_distributions_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DistributionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostingResult_DistributionOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Post Distribution",
+        "tags": [
+          "profit distribution"
+        ]
+      }
+    },
+    "/api/v1/distributions/preview": {
+      "post": {
+        "operationId": "preview_distribution_api_v1_distributions_preview_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DistributionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionPlanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Distribution",
+        "tags": [
+          "profit distribution"
+        ]
+      }
+    },
+    "/api/v1/distributions/{distribution_id}": {
+      "get": {
+        "operationId": "get_distribution_api_v1_distributions__distribution_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "distribution_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Distribution Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Distribution",
+        "tags": [
+          "profit distribution"
+        ]
+      }
+    },
+    "/api/v1/distributions/{distribution_id}/reverse": {
+      "post": {
+        "operationId": "reverse_distribution_api_v1_distributions__distribution_id__reverse_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "distribution_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Distribution Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DistributionReverseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reverse Distribution",
+        "tags": [
+          "profit distribution"
         ]
       }
     },
@@ -20296,6 +21728,78 @@
         ]
       }
     },
+    "/api/v1/reports": {
+      "get": {
+        "description": "The reports this user may open, in the order of the reports centre.",
+        "operationId": "available_reports_api_v1_reports_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "enum": [
+                      "profit-and-loss",
+                      "trial-balance",
+                      "general-ledger",
+                      "balance-check",
+                      "vehicle-profit",
+                      "inventory-aging",
+                      "expenses-by-category",
+                      "installment-collections",
+                      "deferred-papers",
+                      "consignments-in",
+                      "consignments-out"
+                    ],
+                    "type": "string"
+                  },
+                  "title": "Response Available Reports Api V1 Reports Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Available Reports",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
     "/api/v1/reports/cash-book": {
       "get": {
         "operationId": "cash_book_report_endpoint_api_v1_reports_cash_book_get",
@@ -20406,6 +21910,181 @@
           }
         ],
         "summary": "Cash Book Report Endpoint",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/api/v1/reports/{name}": {
+      "get": {
+        "operationId": "run_report_api_v1_reports__name__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "enum": [
+                "profit-and-loss",
+                "trial-balance",
+                "general-ledger",
+                "balance-check",
+                "vehicle-profit",
+                "inventory-aging",
+                "expenses-by-category",
+                "installment-collections",
+                "deferred-papers",
+                "consignments-in",
+                "consignments-out"
+              ],
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "as_of",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "As Of"
+            }
+          },
+          {
+            "in": "query",
+            "name": "account_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "json",
+              "enum": [
+                "json",
+                "pdf",
+                "xlsx"
+              ],
+              "title": "Format",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": "ar",
+              "enum": [
+                "ar",
+                "en"
+              ],
+              "title": "Lang",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTable"
+                }
+              },
+              "application/pdf": {},
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Run Report",
         "tags": [
           "reports"
         ]

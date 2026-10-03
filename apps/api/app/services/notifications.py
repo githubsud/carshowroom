@@ -143,6 +143,8 @@ def run_reminders(conn: Connection, today: date, sms: MessageProvider) -> dict[s
         )
         if not overdue and row.phone_primary:
             sms.send(row.phone_primary, "installment_due_soon", {k: str(v) for k, v in params.items()})
+    stats["attention"] = _attention_notifications(conn, today)
+    stats["notifications"] += stats["attention"]
     conn.execute(
         text(
             "update public.reminder_jobs set status = 'DONE', finished_at = now(), stats = cast(:stats as jsonb) "
@@ -151,3 +153,43 @@ def run_reminders(conn: Connection, today: date, sms: MessageProvider) -> dict[s
         {"stats": _json(stats), "id": started},
     )
     return stats
+
+
+# Needs Attention alerts that also go to the notification centre (SPEC §4.17), and
+# who receives them. Installment reminders and request matches have their own
+# notifications already; bounced cheques are notified when they bounce.
+ATTENTION_AUDIENCE = {
+    "VEHICLE_AGING": "vehicle.view",
+    "LICENSE_EXPIRY": "vehicle.manage",
+    "COST_INCOMPLETE": "vehicle.view_cost",
+    "LOW_PROFIT": "vehicle.view_cost",
+    "FOLLOW_UP_DUE": "followup.manage",
+    "LEAD_IDLE": "followup.manage",
+    "CONSIGNOR_SETTLEMENT": "consignment.settle",
+    "SUPPLIER_PAYABLE": "supplier.pay",
+    "CASH_NEGATIVE": "cash.view",
+    "PARTNER_OVERDRAWN": "partner.view_all",
+}
+
+
+def _attention_notifications(conn: Connection, today: date) -> int:
+    # Imported here: attention reads services that import this module.
+    from app.services import attention
+
+    created = 0
+    for item in attention.alerts(conn, lambda _permission: True):
+        permission = ATTENTION_AUDIENCE.get(item.kind)
+        if permission is None:
+            continue
+        # Once per alert and level; a due follow-up again on each new due day.
+        bucket = today.isoformat() if item.kind == "FOLLOW_UP_DUE" else item.severity
+        created += notify_permission(
+            conn,
+            permission=permission,
+            kind=item.kind,
+            params={**item.params, "link": "/".join(item.link)},
+            entity_type=item.entity_type,
+            entity_id=item.entity_id,
+            dedupe_key=f"attention:{item.kind}:{item.entity_id}:{bucket}",
+        )
+    return created

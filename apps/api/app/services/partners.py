@@ -520,7 +520,8 @@ def summary(conn: Connection, as_of: date | None) -> PartnerSummaryOut:
             text(
                 """
                 select l.partner_id,
-                       coalesce(sum(l.credit - l.debit) filter (where e.source_type = 'PROFIT_DISTRIBUTION'), 0)
+                       coalesce(sum(l.credit - l.debit)
+                                  filter (where e.source_type in ('PROFIT_DISTRIBUTION', 'PROFIT_ALLOCATION')), 0)
                          as allocated_profit,
                        coalesce(sum(l.debit - l.credit) filter (where e.source_type = 'PARTNER_DRAWING'), 0)
                          as drawings

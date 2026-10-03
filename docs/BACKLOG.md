@@ -232,6 +232,22 @@
 | 7.8 | Full scenario test | ACCOUNTING §4 expected values match **exactly** |
 | 7.9 | MVP acceptance demo E2E | The Playwright test from SPEC §13 passes |
 
+### Phase 7 status: delivered (2026-10-03); continuing per the standing instruction
+
+| ID | Status | Notes |
+|---|---|---|
+| 7.1 | ✅ | Rules 23 + 22 with preview = post; DAY_WEIGHTED / SUB_PERIOD_PROFIT, LARGEST_REMAINDER / LARGEST_SHARE, loss to partners or carried forward (D-40, P-09); no overlap, no gap, nothing posted into a distributed range, latest reversible (D-100–D-102) |
+| 7.2 | ✅ | PER_CAR: allocation through 3310 at each sale (incl. consigned and external sales), reversed on cancellation, netted at close (P-10, D-103) |
+| 7.3 | ✅ | P&L (closing entries excluded), trial balance, general ledger, balance check with 3900 flag (D-104) |
+| 7.4 | ✅ | Vehicle profit, inventory aging (0–30/31–60/61–90/90+), installment collections, papers register, consignments in/out, general expenses by category — each on screen, PDF and Excel |
+| 7.5 | ✅ | Needs Attention engine, every SPEC §4.17 rule, thresholds from settings, permission-filtered (D-105) |
+| 7.6 | ✅ | Dashboard: Needs Attention first, cash/bank, stock and capital tied up, aged cars, month's sales and gross profit, installments due, partner equity matrix with bars; partner view keeps its own position |
+| 7.7 | ✅ | Notification centre page (read/unread, deep links); worker sends attention alerts once per alert and level |
+| 7.8 | ✅ | `test_full_scenario.py`: every expected value of ACCOUNTING §4 matches exactly, in a fresh showroom inside a rolled-back transaction |
+| 7.9 | ✅ | `e2e/phase7.spec.ts` MVP acceptance demo (from the seeded showroom, D-106) |
+| Settings | ✅ | Settings → Policies: profit policy, frequency, losses, pro-rata, rounding, cancellation, overpayments, negative cash, aging thresholds |
+| Tests | ✅ | pgTAP 164 · API 268 (+1 PDF test in Docker/CI) · web unit 46 · E2E 42 |
+
 **Phase 7 accepted when (FACT):** the full end-to-end scenario test (SPEC §7) matches the expected values exactly.
 
 ---

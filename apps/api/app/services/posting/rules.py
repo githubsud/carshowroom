@@ -1013,3 +1013,113 @@ def external_collection(
     )
     draft.validate()
     return draft
+
+
+# --- Period close and distribution (rules 22, 23; P-09, P-10) ---------------------------------
+
+
+def _signed(account: Account, amount: Decimal, **ids: UUID | None) -> Line:
+    """A line that adds `amount` to a credit balance (negative amounts debit)."""
+    return Line(
+        account=account,
+        debit=-amount if amount < 0 else ZERO,
+        credit=amount if amount > 0 else ZERO,
+        **ids,  # type: ignore[arg-type]
+    )
+
+
+def period_close(*, entry_date: date, balances: Sequence[Line], description: str, source_id: UUID | None) -> EntryDraft:
+    """Rule 23 — close the period's income and expense balances (each given as a
+    line carrying its balance, with its subledger ids) into retained earnings:
+    the mirror of every balance, and Cr 3300 the net profit (Dr for a loss).
+    The entry is a closing entry, left out of the P&L (D-29)."""
+    lines = [replace(line, debit=line.credit, credit=line.debit) for line in balances if line.debit != line.credit]
+    if not lines:
+        raise LedgerRuleError("nothing to close")
+    net = sum((line.debit - line.credit for line in lines), ZERO)
+    if net != 0:
+        lines.append(_signed(Account.system("RETAINED_EARNINGS"), net))
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="PERIOD_CLOSE",
+        source_id=source_id,
+        lines=tuple(lines),
+        is_closing=True,
+    )
+    draft.validate()
+    return draft
+
+
+def _partner_lines(account_key: str, shares: Sequence[tuple[UUID, Decimal]]) -> list[Line]:
+    return [
+        _signed(Account.system(account_key), amount, partner_id=partner_id)
+        for partner_id, amount in shares
+        if amount != 0
+    ]
+
+
+def profit_distribution(
+    *, entry_date: date, shares: Sequence[tuple[UUID, Decimal]], description: str, source_id: UUID | None
+) -> EntryDraft:
+    """Rule 22 — distribute undistributed profit: Dr 3300 / Cr 3200 per partner.
+    P-09 (approved as option D-40): a loss is the opposite, Dr 3200 per partner / Cr 3300."""
+    partner_lines = _partner_lines("PARTNER_CURRENT", shares)
+    total = sum((line.credit - line.debit for line in partner_lines), ZERO)
+    if not partner_lines or total == 0:
+        raise LedgerRuleError("nothing to distribute")
+    retained = _signed(Account.system("RETAINED_EARNINGS"), -total)
+    lines = [retained, *partner_lines] if total > 0 else [*partner_lines, retained]
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="PROFIT_DISTRIBUTION",
+        source_id=source_id,
+        lines=tuple(lines),
+        is_closing=True,
+    )
+    draft.validate()
+    return draft
+
+
+def profit_allocation(
+    *, entry_date: date, shares: Sequence[tuple[UUID, Decimal]], description: str, source_id: UUID | None
+) -> EntryDraft:
+    """P-10 (per-car policy, D-40) — a sale's gross profit allocated at once:
+    Dr 3310 Profit allocated in advance / Cr 3200 per partner (the reverse for a loss)."""
+    partner_lines = _partner_lines("PARTNER_CURRENT", shares)
+    total = sum((line.credit - line.debit for line in partner_lines), ZERO)
+    if not partner_lines or total == 0:
+        raise LedgerRuleError("nothing to allocate")
+    advance = _signed(Account.system("PROFIT_ALLOCATED_IN_ADVANCE"), -total)
+    lines = [advance, *partner_lines] if total > 0 else [*partner_lines, advance]
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="PROFIT_ALLOCATION",
+        source_id=source_id,
+        lines=tuple(lines),
+    )
+    draft.validate()
+    return draft
+
+
+def advance_netting(*, entry_date: date, amount: Decimal, description: str, source_id: UUID | None) -> EntryDraft:
+    """P-10 at period close: the profit already allocated per car is netted
+    against the closed profit: Dr 3300 / Cr 3310 (the reverse when it was a loss)."""
+    if amount == 0:
+        raise LedgerRuleError("nothing to net")
+    lines = (
+        _signed(Account.system("RETAINED_EARNINGS"), -amount),
+        _signed(Account.system("PROFIT_ALLOCATED_IN_ADVANCE"), amount),
+    )
+    draft = EntryDraft(
+        entry_date=entry_date,
+        description=description,
+        source_type="PROFIT_NETTING",
+        source_id=source_id,
+        lines=lines if amount > 0 else (lines[1], lines[0]),
+        is_closing=True,
+    )
+    draft.validate()
+    return draft

@@ -43,7 +43,7 @@ from app.domain.sales import (
 from app.domain.schedule import ScheduleRow
 from app.domain.vehicles import VehicleIn
 from app.integrations.einvoice import adapter_for
-from app.services import consignment, customers, finance, installments, papers, vehicles
+from app.services import consignment, customers, distribution, finance, installments, papers, vehicles
 from app.services.posting import engine, rules
 
 _COUNTER = text(
@@ -996,6 +996,17 @@ def post_sale(conn: Connection, sale_id: UUID, *, user_id: UUID, with_profit: bo
             text("update public.consignments_in set status = 'SOLD' where id = :id"),
             {"id": plan.consignment.consignment_id},
         )
+    gross_profit = (
+        plan.consignment.commission if plan.consignment is not None else Decimal(plan.sale["sale_price"]) - plan.cost
+    )
+    allocation = distribution.allocate_sale(
+        conn,
+        sale_id=sale_id,
+        vehicle_id=plan.vehicle.id,
+        sale_date=plan.sale["sale_date"],
+        gross_profit=gross_profit,
+        label=f"{plan.vehicle.label} ({plan.vehicle.stock_no}) — {plan.sale['sale_no']}",
+    )
     if plan.reservation_id is not None:
         conn.execute(
             text("update public.reservations set status = 'APPLIED', sale_id = :sale where id = :id"),
@@ -1026,6 +1037,7 @@ def post_sale(conn: Connection, sale_id: UUID, *, user_id: UUID, with_profit: bo
         journal_entries=[
             EntryRef(id=sale_entry.id, entry_no=sale_entry.entry_no),
             EntryRef(id=cost_entry.id, entry_no=cost_entry.entry_no),
+            *([allocation] if allocation else []),
         ],
         warnings=warnings,
     )
@@ -1215,6 +1227,7 @@ def cancel_sale(
         warnings = finance.check_cash(conn, info, plan.mirror_cash, lock=True)
         cancel_entry = engine.reverse(conn, sale["journal_entry_id"], reason, plan.cancel_date)
     cost_entry = engine.reverse(conn, sale["cost_journal_entry_id"], reason, plan.cancel_date)
+    distribution.reverse_sale_allocation(conn, sale_id, reason, plan.cancel_date)
     conn.execute(
         text(
             """

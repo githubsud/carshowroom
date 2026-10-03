@@ -112,6 +112,8 @@ class EntryDraft:
     source_id: UUID | None
     lines: tuple[Line, ...]
     is_opening: bool = field(default=False)
+    # Rules 22/23 (D-29): closing entries are left out of the P&L.
+    is_closing: bool = field(default=False)
 
     def validate(self) -> None:
         if len(self.lines) < 2:
@@ -141,5 +143,6 @@ class EntryDraft:
             "source_type": self.source_type,
             "source_id": str(self.source_id) if self.source_id else None,
             "is_opening": self.is_opening,
+            "is_closing": self.is_closing,
             "lines": [line.to_payload(system_accounts) for line in self.lines],
         }

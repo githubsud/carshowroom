@@ -8,6 +8,7 @@ Set REQUIRE_DB=1 (CI does) to fail instead of skip when the stack is down.
 """
 
 import os
+import uuid
 from collections.abc import Iterator
 from functools import cache
 from pathlib import Path
@@ -17,8 +18,10 @@ import httpx
 import psycopg
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import Connection, text
 
 from app.core.config import Settings
+from app.db.session import create_db_engine
 from app.main import create_app
 
 _ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
@@ -99,3 +102,40 @@ def admin_db() -> Iterator[psycopg.Connection[Any]]:
     """Superuser-ish connection for arranging and inspecting state."""
     with psycopg.connect(ADMIN_DB_URL, autocommit=True) as conn:
         yield conn
+
+
+# The seed owner acts in fresh tenants (no membership is needed for app_api).
+FRESH_TENANT_ACTOR = uuid.UUID("a0000000-0000-0000-0000-000000000001")
+
+
+@pytest.fixture
+def fresh_tenant() -> Iterator[tuple[Connection, uuid.UUID]]:
+    """A new showroom (trial plan, Egypt) in a transaction that is always rolled back."""
+    engine = create_db_engine(ADMIN_DB_URL)
+    tenant = uuid.uuid4()
+    with engine.connect() as conn:
+        transaction = conn.begin()
+        try:
+            conn.execute(
+                text(
+                    "insert into public.tenants (id, name_ar, country_code, currency_code, timezone) "
+                    "values (:id, 'معرض السيناريو', 'EG', 'EGP', 'Africa/Cairo')"
+                ),
+                {"id": tenant},
+            )
+            conn.execute(
+                text(
+                    "insert into public.subscriptions (tenant_id, plan_id, status, trial_ends_at) "
+                    "select :id, p.id, 'TRIAL', now() + interval '30 days' from public.plans p where p.code = 'TRIAL'"
+                ),
+                {"id": tenant},
+            )
+            conn.execute(text("set local role app_api"))
+            conn.execute(
+                text("select set_config('app.user_id', :u, true), set_config('app.tenant_id', :t, true)"),
+                {"u": str(FRESH_TENANT_ACTOR), "t": str(tenant)},
+            )
+            yield conn, tenant
+        finally:
+            transaction.rollback()
+    engine.dispose()

@@ -39,9 +39,11 @@ export const MENU: readonly MenuItem[] = [
   { key: 'finance', icon: 'pi pi-wallet', path: 'finance/cash', anyOf: ['cash.view'] },
   { key: 'journal', icon: 'pi pi-book', path: 'finance/journal', anyOf: ['journal.view'] },
   { key: 'periods', icon: 'pi pi-calendar-times', path: 'finance/periods', anyOf: ['period.lock', 'journal.view'] },
-  { key: 'reports', icon: 'pi pi-chart-bar', path: 'soon/reports', anyOf: ['report.financial'] },
+  { key: 'distribution', icon: 'pi pi-percentage', path: 'distribution', anyOf: ['profit.distribute'] },
+  { key: 'reports', icon: 'pi pi-chart-bar', path: 'reports', anyOf: ['report.financial', 'journal.view'] },
   { key: 'users', icon: 'pi pi-user-plus', path: 'settings/users', anyOf: ['users.manage'] },
   { key: 'settings', icon: 'pi pi-cog', path: 'settings/finance', anyOf: ['tenant.settings.manage'] },
+  { key: 'policies', icon: 'pi pi-sliders-h', path: 'settings/policies', anyOf: ['tenant.settings.manage'] },
   { key: 'audit', icon: 'pi pi-history', path: 'soon/audit', anyOf: ['audit.view'] },
 ];
 

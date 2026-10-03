@@ -7,10 +7,12 @@ from app.api.routers import (
     consignment,
     crm,
     customers,
+    distribution,
     finance,
     health,
     installments,
     partners,
+    reports,
     sales,
     session,
     suppliers,
@@ -100,4 +102,6 @@ def create_app(
     app.include_router(installments.router, prefix=API_PREFIX)
     app.include_router(consignment.router, prefix=API_PREFIX)
     app.include_router(crm.router, prefix=API_PREFIX)
+    app.include_router(distribution.router, prefix=API_PREFIX)
+    app.include_router(reports.router, prefix=API_PREFIX)
     return app

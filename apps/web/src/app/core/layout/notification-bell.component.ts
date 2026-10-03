@@ -36,6 +36,8 @@ const REFRESH_MS = 60_000;
           } @empty {
             <p class="empty">{{ 'notifications.none' | transloco }}</p>
           }
+          <button type="button" class="link all" (click)="all()" data-testid="notifications-all">
+            {{ 'notifications.all' | transloco }}</button>
         </div>
       }
     </div>
@@ -121,6 +123,10 @@ const REFRESH_MS = 60_000;
       padding: 12px;
       margin: 0;
     }
+    .all {
+      display: block;
+      padding: 8px 12px;
+    }
   `,
 })
 export class NotificationBellComponent implements OnInit {
@@ -155,7 +161,7 @@ export class NotificationBellComponent implements OnInit {
   /** Amounts and dates in the message, formatted like everywhere else. */
   protected display(item: NotificationItem): Record<string, unknown> {
     const params: Record<string, unknown> = { ...item.params };
-    for (const key of ['amount', 'remaining']) {
+    for (const key of ['amount', 'remaining', 'profit']) {
       if (typeof params[key] === 'string') {
         params[key] = this.format.money(params[key] as string);
       }
@@ -186,7 +192,10 @@ export class NotificationBellComponent implements OnInit {
     }
     const tenant = this.context.activeTenantId();
     const planId = item.params['plan_id'];
-    if (item.entity_type === 'VEHICLE' && item.entity_id) {
+    const link = item.params['link'];
+    if (typeof link === 'string' && link) {
+      await this.router.navigate(['/t', tenant, ...link.split('/')]);
+    } else if (item.entity_type === 'VEHICLE' && item.entity_id) {
       await this.router.navigate(['/t', tenant, 'vehicles', item.entity_id]);
     } else if (item.entity_type === 'DEFERRED_PAPER') {
       await this.router.navigate(['/t', tenant, 'installments', 'papers']);
@@ -195,6 +204,11 @@ export class NotificationBellComponent implements OnInit {
     } else {
       await this.router.navigate(['/t', tenant, 'installments']);
     }
+  }
+
+  protected async all(): Promise<void> {
+    this.open.set(false);
+    await this.router.navigate(['/t', this.context.activeTenantId(), 'notifications']);
   }
 
   protected blur(event: FocusEvent): void {
