@@ -12,7 +12,10 @@ API_PREFIX = "/api/v1"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    # Values pasted into a hosting dashboard often carry a stray space or line break.
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", str_strip_whitespace=True
+    )
 
     environment: Literal["development", "testing", "production"] = "development"
 
