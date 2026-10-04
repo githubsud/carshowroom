@@ -144,7 +144,7 @@
   },
   "errors": {
     "UNKNOWN_ERROR": "Something unexpected happened. Please try again.",
-    "NETWORK_ERROR": "Cannot reach the server. If you are running the system locally, make sure the API is running (scripts/dev.ps1 api) and try again.",
+    "NETWORK_ERROR": "Cannot reach the server. If the system has not been used for a while it can take a minute to wake up; please try again shortly.",
     "INTERNAL_ERROR": "The server had a problem. Please try again shortly.",
     "AUTH_INVALID_TOKEN": "Your session has ended. Please sign in again.",
     "TENANT_HEADER_MISSING": "Choose a showroom first.",

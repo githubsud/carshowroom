@@ -121,6 +121,10 @@ async def _unhandled_error_handler(request: Request, exc: Exception) -> JSONResp
     return response
 
 
+# Public name for the request middleware, which renders unhandled errors inside CORS.
+unhandled_error_response = _unhandled_error_handler
+
+
 def register_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, _app_error_handler)
     app.add_exception_handler(RequestValidationError, _validation_error_handler)

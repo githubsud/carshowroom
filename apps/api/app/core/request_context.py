@@ -62,6 +62,12 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         token = _client.set(info)
         try:
             response = await call_next(request)
+        except Exception as exc:
+            # Render the 500 here, inside CORS, so the browser sees the real error
+            # instead of a blocked cross-origin reply ("cannot reach the server").
+            from app.core.errors import unhandled_error_response
+
+            response = await unhandled_error_response(request, exc)
         finally:
             _client.reset(token)
         response.headers[REQUEST_ID_HEADER] = info.request_id
