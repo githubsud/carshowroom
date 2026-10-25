@@ -6211,6 +6211,8 @@ export interface components {
              * Format: date-time
              */
             matched_at: string;
+            /** Over Budget */
+            over_budget?: string | null;
             /**
              * Request Id
              * Format: uuid
@@ -7332,6 +7334,8 @@ export interface components {
              * @enum {string}
              */
             prorata_method: "DAY_WEIGHTED" | "SUB_PERIOD_PROFIT";
+            /** Request Budget Tolerance Pct */
+            request_budget_tolerance_pct: string;
             /**
              * Rounding Remainder
              * @enum {string}
@@ -7371,6 +7375,8 @@ export interface components {
             profit_policy?: ("PERIODIC" | "PER_CAR") | null;
             /** Prorata Method */
             prorata_method?: ("DAY_WEIGHTED" | "SUB_PERIOD_PROFIT") | null;
+            /** Request Budget Tolerance Pct */
+            request_budget_tolerance_pct?: number | string | null;
             /** Rounding Remainder */
             rounding_remainder?: ("LARGEST_REMAINDER" | "LARGEST_SHARE") | null;
             /** Sale Cancellation Method */

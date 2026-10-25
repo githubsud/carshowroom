@@ -896,7 +896,10 @@
     "status_DEPOSIT": "Deposit",
     "status_WON": "Won",
     "status_LOST": "Lost",
-    "status_ON_HOLD": "On hold"
+    "status_ON_HOLD": "On hold",
+    "edit": "Edit request",
+    "updated": "Request updated — {{n}} matching cars now",
+    "overBudget": "Above budget by {{amount}}"
   },
   "followUps": {
     "title": "Follow-ups & requests",
@@ -981,7 +984,7 @@
     "aging": "Inventory aging thresholds (days)",
     "partner_sees_summary": "Partners see the all-partners summary",
     "profit_policy": "Profit distribution policy",
-    "profit_policy_hint": "Periodic: net profit at period close. Per car: each car's profit at its sale, the rest at close.",
+    "profit_policy_hint": "Per car: each partner's part of a car's profit is credited the moment it is sold. Periodic: profits add up and are split once at period close.",
     "profit_policy_PERIODIC": "Periodic",
     "profit_policy_PER_CAR": "Per car at sale",
     "distribution_frequency": "Distribution frequency",
@@ -1017,7 +1020,12 @@
     "installment_markup_mode": "Installment sale price",
     "installment_markup_mode_hint": "When on, each installment sale can have a price above the cash price, agreed in the contract. It never increases afterwards and there are no late fees.",
     "installment_markup_mode_A": "At the cash price (installments = the rest)",
-    "installment_markup_mode_B_ENABLED": "At an installment price set on each sale"
+    "installment_markup_mode_B_ENABLED": "At an installment price set on each sale",
+    "groupPartners": "Partners' profit and distribution",
+    "groupSales": "Sales, collection and cash",
+    "groupStock": "Customer requests and stock",
+    "request_budget_tolerance_pct": "Price tolerance above the customer's budget (%)",
+    "request_budget_tolerance_pct_hint": "A car is suggested for a request when its price is at most this much above the customer's maximum budget, since prices are negotiated. 0 = never above the budget."
   },
   "imports": {
     "title": "Import from Excel",
@@ -1147,5 +1155,17 @@
     "mfaOff": "Turn off",
     "mfaStart": "Turn on",
     "scan": "Scan the code with your authenticator app, then enter the 6-digit code"
+  },
+  "profitRules": {
+    "title": "How a partner's share of profit is worked out",
+    "kind": "Partnership: a partner in the whole showroom with {{share}} of the profit.",
+    "kindExample": "Each showroom partner has an ownership share (e.g. {{share}}) that sets their part of the profit.",
+    "PER_CAR": "Each car's profit is worked out when it is sold: sale price after discount − (purchase price + the car's own expenses). Example: a car makes {{profit}} → a partner with {{share}} gets {{part}}, credited to their current account at once.",
+    "PERIODIC": "Profits add up until the period is closed. At close: net profit = profit on cars sold + other income − general expenses, split by the shares. Example: a period nets {{profit}} → a partner with {{share}} gets {{part}}.",
+    "expenses_PER_CAR": "General expenses (rent, salaries, power…) and other income are settled at period close by the same shares.",
+    "expenses_PERIODIC": "Each car's own expenses are part of its cost; general expenses are deducted from the period's profit before it is split.",
+    "loss_ALLOCATE_TO_PARTNERS": "If a period makes a loss, it is charged to the partners by their shares ({{share}}) on their current accounts.",
+    "loss_CARRY_FORWARD": "If a period makes a loss, it is carried forward and deducted from later periods' profit before distribution.",
+    "sharia": "In Sharia, profit follows the agreed ratio and loss follows each partner's capital, so keep each partner's share here equal to their share of the capital."
   }
 }

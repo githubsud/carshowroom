@@ -10,7 +10,12 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
-import { CustomerRequest, FollowUpDue, RequestMatch, RequestStatus } from '../../core/api/api.models';
+import {
+  CustomerRequest,
+  FollowUpDue,
+  RequestMatch,
+  RequestStatus,
+} from '../../core/api/api.models';
 import { AppDatePipe, MoneyPipe } from '../../core/format/format.service';
 import { CanDirective } from '../../core/permissions/can.directive';
 import { TenantContextService } from '../../core/tenant/tenant-context.service';
@@ -55,33 +60,69 @@ export const REQUEST_STATUSES: RequestStatus[] = [
   template: `
     <div class="page-header">
       <h1 class="page-title">{{ 'requests.title' | transloco }}</h1>
-      <p-button *appCan="'request.manage'" icon="pi pi-plus" [label]="'requests.add' | transloco"
-                (onClick)="formOpen.set(true)" data-testid="add-request" />
+      <p-button
+        *appCan="'request.manage'"
+        icon="pi pi-plus"
+        [label]="'requests.add' | transloco"
+        (onClick)="formOpen.set(true)"
+        data-testid="add-request"
+      />
     </div>
 
     <section class="card" data-testid="due-follow-ups">
-      <h2>{{ 'followUps.due' | transloco }}
-        <span class="check"><p-checkbox [(ngModel)]="mine" (ngModelChange)="loadDue()" [binary]="true" inputId="due-mine" />
-          <label for="due-mine">{{ 'followUps.mine' | transloco }}</label></span>
+      <h2>
+        {{ 'followUps.due' | transloco }}
+        <span class="check"
+          ><p-checkbox
+            [(ngModel)]="mine"
+            (ngModelChange)="loadDue()"
+            [binary]="true"
+            inputId="due-mine"
+          />
+          <label for="due-mine">{{ 'followUps.mine' | transloco }}</label></span
+        >
       </h2>
       <ul class="due">
         @for (d of due(); track d.follow_up.id) {
           <li [attr.data-testid]="'due-' + d.follow_up.customer_id">
             <div>
-              <a [routerLink]="['/t', context.activeTenantId(), 'customers', d.follow_up.customer_id]">
-                <strong>{{ d.follow_up.customer_name }}</strong></a>
+              <a
+                [routerLink]="[
+                  '/t',
+                  context.activeTenantId(),
+                  'customers',
+                  d.follow_up.customer_id,
+                ]"
+              >
+                <strong>{{ d.follow_up.customer_name }}</strong></a
+              >
               <span dir="ltr" class="sub"> {{ d.follow_up.customer_phone }}</span>
-              @if (d.follow_up.priority === 'HIGH') { <p-tag severity="danger" [value]="'followUps.priority_HIGH' | transloco" /> }
+              @if (d.follow_up.priority === 'HIGH') {
+                <p-tag severity="danger" [value]="'followUps.priority_HIGH' | transloco" />
+              }
               <div class="sub">
                 {{ d.follow_up.next_follow_up_date | appDate }}
-                @if (d.overdue_days > 0) { <span class="negative">({{ 'installments.daysLate' | transloco: { n: d.overdue_days } }})</span> }
-                @if (d.follow_up.notes) { — {{ d.follow_up.notes }} }
-                @if (d.follow_up.assigned_name) { · {{ d.follow_up.assigned_name }} }
+                @if (d.overdue_days > 0) {
+                  <span class="negative"
+                    >({{ 'installments.daysLate' | transloco: { n: d.overdue_days } }})</span
+                  >
+                }
+                @if (d.follow_up.notes) {
+                  — {{ d.follow_up.notes }}
+                }
+                @if (d.follow_up.assigned_name) {
+                  · {{ d.follow_up.assigned_name }}
+                }
               </div>
             </div>
-            <app-log-call *appCan="'followup.manage'" [customerId]="d.follow_up.customer_id"
-                          [requestId]="d.follow_up.request_id" [phone]="d.follow_up.customer_phone"
-                          [testKey]="d.follow_up.customer_id" (logged)="logged()" />
+            <app-log-call
+              *appCan="'followup.manage'"
+              [customerId]="d.follow_up.customer_id"
+              [requestId]="d.follow_up.request_id"
+              [phone]="d.follow_up.customer_phone"
+              [testKey]="d.follow_up.customer_id"
+              (logged)="logged()"
+            />
           </li>
         } @empty {
           <li class="sub">{{ 'followUps.noneDue' | transloco }}</li>
@@ -90,10 +131,22 @@ export const REQUEST_STATUSES: RequestStatus[] = [
     </section>
 
     <div class="filters">
-      <input pInputText [(ngModel)]="q" (keyup.enter)="load()" [placeholder]="'customers.searchHint' | transloco"
-             [attr.aria-label]="'customers.searchHint' | transloco" />
-      <p-select [options]="statusOptions()" [(ngModel)]="status" (ngModelChange)="load()" optionLabel="label"
-                optionValue="value" [showClear]="true" [placeholder]="'requests.openOnly' | transloco" />
+      <input
+        pInputText
+        [(ngModel)]="q"
+        (keyup.enter)="load()"
+        [placeholder]="'customers.searchHint' | transloco"
+        [attr.aria-label]="'customers.searchHint' | transloco"
+      />
+      <p-select
+        [options]="statusOptions()"
+        [(ngModel)]="status"
+        (ngModelChange)="load()"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="'requests.openOnly' | transloco"
+      />
     </div>
     @if (loadError()) {
       <app-state kind="error" [message]="loadError()" (retry)="load()" />
@@ -110,26 +163,66 @@ export const REQUEST_STATUSES: RequestStatus[] = [
         </ng-template>
         <ng-template #body let-r>
           <tr [attr.data-testid]="'request-' + r.id">
-            <td><a [routerLink]="['/t', context.activeTenantId(), 'customers', r.customer_id]">{{ r.customer_name }}</a>
-              <div class="sub" dir="ltr">{{ r.customer_phone }}</div></td>
-            <td>{{ wants(r) }}
-              @if (r.budget_max) { <div class="sub">≤ {{ r.budget_max | money }}</div> }</td>
+            <td>
+              <a [routerLink]="['/t', context.activeTenantId(), 'customers', r.customer_id]">{{
+                r.customer_name
+              }}</a>
+              <div class="sub" dir="ltr">{{ r.customer_phone }}</div>
+            </td>
+            <td>
+              {{ wants(r) }}
+              @if (r.budget_max) {
+                <div class="sub">≤ {{ r.budget_max | money }}</div>
+              }
+            </td>
             <td>
               @if (context.can('request.manage')) {
-                <p-select [options]="statusOptions()" [ngModel]="r.status" (ngModelChange)="setStatus(r, $event)"
-                          optionLabel="label" optionValue="value" size="small" [attr.aria-label]="'vehicles.status' | transloco" />
+                <p-select
+                  [options]="statusOptions()"
+                  [ngModel]="r.status"
+                  (ngModelChange)="setStatus(r, $event)"
+                  optionLabel="label"
+                  optionValue="value"
+                  size="small"
+                  [attr.aria-label]="'vehicles.status' | transloco"
+                />
               } @else {
                 <p-tag [value]="'requests.status_' + r.status | transloco" />
               }
             </td>
             <td>
               @if (r.match_count > 0) {
-                <p-button [text]="true" size="small" [label]="'requests.matchCount' | transloco: { n: r.match_count }"
-                          (onClick)="toggle(r)" [attr.data-testid]="'matches-' + r.id" />
-              } @else { <span class="sub">—</span> }
+                <p-button
+                  [text]="true"
+                  size="small"
+                  [label]="'requests.matchCount' | transloco: { n: r.match_count }"
+                  (onClick)="toggle(r)"
+                  [attr.data-testid]="'matches-' + r.id"
+                />
+              } @else {
+                <span class="sub">—</span>
+              }
             </td>
-            <td><app-log-call *appCan="'followup.manage'" [customerId]="r.customer_id" [requestId]="r.id"
-                              [phone]="r.customer_phone" [compact]="true" [testKey]="r.id" (logged)="logged()" /></td>
+            <td class="row-actions">
+              <p-button
+                *appCan="'request.manage'"
+                icon="pi pi-pencil"
+                [text]="true"
+                size="small"
+                [ariaLabel]="'requests.edit' | transloco"
+                (onClick)="edit(r)"
+                [attr.data-testid]="'edit-' + r.id"
+              />
+              <app-log-call
+                *appCan="'followup.manage'"
+                [customerId]="r.customer_id"
+                [requestId]="r.id"
+                [phone]="r.customer_phone"
+                [compact]="true"
+                [testKey]="r.id"
+                (logged)="logged()"
+              />
+            </td>
           </tr>
           @if (expanded() === r.id) {
             <tr>
@@ -137,11 +230,27 @@ export const REQUEST_STATUSES: RequestStatus[] = [
                 <ul class="matches">
                   @for (m of matches(); track m.id) {
                     <li>
-                      <a [routerLink]="['/t', context.activeTenantId(), 'vehicles', m.vehicle_id]">{{ m.vehicle_label }}
-                        ({{ m.stock_no }})</a>
-                      @if (m.asking_price) { — {{ m.asking_price | money }} }
-                      <p-tag [value]="'vehicles.status_' + m.vehicle_status | transloco" severity="secondary" />
-                      @if (m.contacted) { <p-tag severity="success" [value]="'requests.contacted' | transloco" /> }
+                      <a [routerLink]="['/t', context.activeTenantId(), 'vehicles', m.vehicle_id]"
+                        >{{ m.vehicle_label }} ({{ m.stock_no }})</a
+                      >
+                      @if (m.asking_price) {
+                        — {{ m.asking_price | money }}
+                      }
+                      @if (m.over_budget) {
+                        <p-tag
+                          severity="warn"
+                          [value]="
+                            'requests.overBudget' | transloco: { amount: (m.over_budget | money) }
+                          "
+                        />
+                      }
+                      <p-tag
+                        [value]="'vehicles.status_' + m.vehicle_status | transloco"
+                        severity="secondary"
+                      />
+                      @if (m.contacted) {
+                        <p-tag severity="success" [value]="'requests.contacted' | transloco" />
+                      }
                     </li>
                   }
                 </ul>
@@ -150,11 +259,18 @@ export const REQUEST_STATUSES: RequestStatus[] = [
           }
         </ng-template>
         <ng-template #emptymessage>
-          <tr><td colspan="5"><app-state kind="empty" [message]="'requests.none' | transloco" /></td></tr>
+          <tr>
+            <td colspan="5"><app-state kind="empty" [message]="'requests.none' | transloco" /></td>
+          </tr>
         </ng-template>
       </p-table>
     }
     <app-request-form-dialog [(visible)]="formOpen" (saved)="created($event)" />
+    <app-request-form-dialog
+      [(visible)]="editOpen"
+      [request]="editing()"
+      (saved)="updated($event)"
+    />
   `,
   styles: `
     h2 {
@@ -169,6 +285,11 @@ export const REQUEST_STATUSES: RequestStatus[] = [
       align-items: center;
       font-size: 0.875rem;
       font-weight: 400;
+    }
+    .row-actions {
+      display: flex;
+      gap: var(--space-1);
+      align-items: center;
     }
     .due,
     .matches {
@@ -202,6 +323,8 @@ export class RequestsPage implements OnInit {
   protected readonly expanded = signal<string | null>(null);
   protected readonly loadError = signal<string | null>(null);
   protected readonly formOpen = signal(false);
+  protected readonly editOpen = signal(false);
+  protected readonly editing = signal<CustomerRequest | null>(null);
   protected status: RequestStatus | null = null;
   protected q = '';
   protected mine = false;
@@ -210,7 +333,10 @@ export class RequestsPage implements OnInit {
     if (!loaded(this.translations())) {
       return [];
     }
-    return REQUEST_STATUSES.map((value) => ({ value, label: this.transloco.translate(`requests.status_${value}`) }));
+    return REQUEST_STATUSES.map((value) => ({
+      value,
+      label: this.transloco.translate(`requests.status_${value}`),
+    }));
   });
 
   ngOnInit(): void {
@@ -220,7 +346,13 @@ export class RequestsPage implements OnInit {
 
   protected async load(): Promise<void> {
     try {
-      this.requests.set(await this.api.requests({ status: this.status, open_only: this.status === null, q: this.q }));
+      this.requests.set(
+        await this.api.requests({
+          status: this.status,
+          open_only: this.status === null,
+          q: this.q,
+        }),
+      );
       this.loadError.set(null);
     } catch (error) {
       this.loadError.set(this.errors.message(error));
@@ -263,6 +395,22 @@ export class RequestsPage implements OnInit {
       severity: 'success',
       summary: this.transloco.translate('requests.saved', { n: request.match_count }),
     });
+    await this.load();
+  }
+
+  protected edit(r: CustomerRequest): void {
+    this.editing.set(r);
+    this.editOpen.set(true);
+  }
+
+  protected async updated(request: CustomerRequest): Promise<void> {
+    this.toast.add({
+      severity: 'success',
+      summary: this.transloco.translate('requests.updated', { n: request.match_count }),
+    });
+    if (this.expanded() === request.id) {
+      this.matches.set(request.matches ?? []);
+    }
     await this.load();
   }
 

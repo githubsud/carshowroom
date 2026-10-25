@@ -16,17 +16,38 @@ import { RequestFormDialogComponent } from './request-form-dialog.component';
 /** On the customer page: what they asked for, every call, and a one-tap call log. */
 @Component({
   selector: 'app-customer-crm',
-  imports: [RouterLink, TranslocoPipe, ButtonModule, TagModule, AppDatePipe, MoneyPipe, CanDirective, LogCallComponent,
-            RequestFormDialogComponent],
+  imports: [
+    RouterLink,
+    TranslocoPipe,
+    ButtonModule,
+    TagModule,
+    AppDatePipe,
+    MoneyPipe,
+    CanDirective,
+    LogCallComponent,
+    RequestFormDialogComponent,
+  ],
   template: `
     <section class="card" data-testid="customer-crm">
       <div class="head">
         <h2>{{ 'followUps.title' | transloco }}</h2>
         <div class="actions">
-          <app-log-call *appCan="'followup.manage'" [customerId]="customerId()" [phone]="phone()" testKey="customer"
-                        (logged)="logged()" />
-          <p-button *appCan="'request.manage'" icon="pi pi-plus" size="small" [text]="true"
-                    [label]="'requests.add' | transloco" (onClick)="formOpen.set(true)" data-testid="customer-add-request" />
+          <app-log-call
+            *appCan="'followup.manage'"
+            [customerId]="customerId()"
+            [phone]="phone()"
+            testKey="customer"
+            (logged)="logged()"
+          />
+          <p-button
+            *appCan="'request.manage'"
+            icon="pi pi-plus"
+            size="small"
+            [text]="true"
+            [label]="'requests.add' | transloco"
+            (onClick)="formOpen.set(true)"
+            data-testid="customer-add-request"
+          />
         </div>
       </div>
       @if (requests().length) {
@@ -35,12 +56,26 @@ import { RequestFormDialogComponent } from './request-form-dialog.component';
             <li>
               <i class="pi pi-search" aria-hidden="true"></i>
               {{ [r.make, r.model].join(' ') }}
-              @if (r.year_from || r.year_to) { {{ r.year_from }}–{{ r.year_to }} }
-              @if (r.budget_max) { · ≤ {{ r.budget_max | money }} }
+              @if (r.year_from || r.year_to) {
+                {{ r.year_from }}–{{ r.year_to }}
+              }
+              @if (r.budget_max) {
+                · ≤ {{ r.budget_max | money }}
+              }
               <p-tag [value]="'requests.status_' + r.status | transloco" severity="secondary" />
+              <p-button
+                *appCan="'request.manage'"
+                icon="pi pi-pencil"
+                [text]="true"
+                size="small"
+                [ariaLabel]="'requests.edit' | transloco"
+                (onClick)="edit(r)"
+                [attr.data-testid]="'customer-edit-request-' + r.id"
+              />
               @if (r.match_count) {
                 <a [routerLink]="['/t', context.activeTenantId(), 'requests']" class="matches">
-                  {{ 'requests.matchCount' | transloco: { n: r.match_count } }}</a>
+                  {{ 'requests.matchCount' | transloco: { n: r.match_count } }}</a
+                >
               }
             </li>
           }
@@ -51,10 +86,20 @@ import { RequestFormDialogComponent } from './request-form-dialog.component';
           <li>
             <span class="sub">{{ f.occurred_at | appDate }}</span>
             {{ 'followUps.kind_' + f.kind | transloco }}
-            @if (f.result) { — <strong>{{ 'followUps.result_' + f.result | transloco }}</strong> }
-            @if (f.notes) { — {{ f.notes }} }
-            @if (f.next_follow_up_date) { <span class="sub">· {{ 'followUps.next' | transloco }} {{ f.next_follow_up_date | appDate }}</span> }
-            @if (f.created_by_name) { <span class="sub">· {{ f.created_by_name }}</span> }
+            @if (f.result) {
+              — <strong>{{ 'followUps.result_' + f.result | transloco }}</strong>
+            }
+            @if (f.notes) {
+              — {{ f.notes }}
+            }
+            @if (f.next_follow_up_date) {
+              <span class="sub"
+                >· {{ 'followUps.next' | transloco }} {{ f.next_follow_up_date | appDate }}</span
+              >
+            }
+            @if (f.created_by_name) {
+              <span class="sub">· {{ f.created_by_name }}</span>
+            }
           </li>
         } @empty {
           <li class="sub">{{ 'followUps.none' | transloco }}</li>
@@ -62,6 +107,7 @@ import { RequestFormDialogComponent } from './request-form-dialog.component';
       </ul>
     </section>
     <app-request-form-dialog [(visible)]="formOpen" [customerId]="customerId()" (saved)="load()" />
+    <app-request-form-dialog [(visible)]="editOpen" [request]="editing()" (saved)="load()" />
   `,
   styles: `
     .head {
@@ -108,6 +154,8 @@ export class CustomerCrmComponent {
   protected readonly requests = signal<CustomerRequest[]>([]);
   protected readonly followUps = signal<FollowUp[]>([]);
   protected readonly formOpen = signal(false);
+  protected readonly editOpen = signal(false);
+  protected readonly editing = signal<CustomerRequest | null>(null);
 
   constructor() {
     effect(() => {
@@ -123,6 +171,11 @@ export class CustomerCrmComponent {
     ]);
     this.requests.set(requests);
     this.followUps.set(followUps);
+  }
+
+  protected edit(r: CustomerRequest): void {
+    this.editing.set(r);
+    this.editOpen.set(true);
   }
 
   protected async logged(): Promise<void> {

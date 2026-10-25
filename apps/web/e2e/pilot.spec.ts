@@ -59,3 +59,34 @@ test('an installment sale carries the markup the owner sets', async ({ page }) =
   await page.getByTestId('confirm').locator('button').click();
   await expect(page.getByTestId('sale-status')).toContainText('مرحّل');
 });
+
+test('pilot feedback: pick a customer from the list, edit a request, read how profit is split', async ({
+  page,
+}) => {
+  const make = `E2E${Date.now() % 100000}`;
+  await page.goto(`/t/${NOUR}/requests`);
+  await page.getByTestId('add-request').locator('button').click();
+
+  // The customer list opens on click, before anything is typed (D-135).
+  await page.getByTestId('rq-customer').locator('input').click();
+  await expect(page.getByRole('option').nth(1)).toBeVisible();
+  await page.getByRole('option', { name: /كريم محمود/ }).click();
+  await page.getByTestId('rq-make').fill(make);
+  await page.getByTestId('rq-model').fill('Corolla');
+  await page.getByTestId('rq-save').locator('button').click();
+  const row = page.getByTestId('requests').locator('tr', { hasText: make });
+  await expect(row).toContainText('Corolla');
+
+  // The request can be corrected afterwards (D-134).
+  await row.getByRole('button', { name: 'تعديل الطلب' }).click();
+  await expect(page.getByTestId('rq-model')).toHaveValue('Corolla');
+  await page.getByTestId('rq-model').fill('Camry');
+  await page.getByTestId('rq-save').locator('button').click();
+  await expect(page.getByText('تم تعديل الطلب').first()).toBeVisible();
+  await expect(row).toContainText('Camry');
+
+  // Settings → Policies explains the profit rules in plain words, with an example.
+  await page.goto(`/t/${NOUR}/settings/policies`);
+  await expect(page.getByTestId('profit-rules')).toContainText('مثال');
+  await expect(page.getByTestId('pol-tolerance')).toHaveValue('10');
+});

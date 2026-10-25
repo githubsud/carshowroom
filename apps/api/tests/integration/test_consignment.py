@@ -22,6 +22,7 @@ from app.domain.consignment import (
     ConsignOutIn,
     ConsignOutReturnIn,
     CustomerRequestIn,
+    CustomerRequestUpdate,
     ExternalCollectionIn,
     ExternalSaleIn,
     ExternalShowroomIn,
@@ -532,6 +533,34 @@ def test_a_car_becoming_available_matches_open_requests(client: TestClient) -> N
                 ),
             )
             assert {m.vehicle_id for m in crm.get_request(conn, later.id).matches} == {fits, too_old}
+            raise _Rollback
+
+    with pytest.raises(_Rollback):
+        scenario()
+
+
+def test_an_edited_request_finds_a_car_slightly_above_its_budget(client: TestClient) -> None:
+    """Pilot case (D-134): a 650,000 car against a 600,000 ceiling is suggested, then dropped when edited away."""
+
+    def scenario() -> None:
+        with _owner_tx(client) as conn:
+            make = f"Make{uuid.uuid4().hex[:6]}"
+            request = crm.create_request(
+                conn,
+                CustomerRequestIn.model_validate(
+                    {"customer_id": _customer(conn, "عميل باترول"), "make": make, "budget_max": "400000"}
+                ),
+            )
+            car = vehicles.create_vehicle(conn, VehicleIn(make=make, model="Patrol", asking_price=Decimal(650000)))
+            vehicles.change_status(conn, car, "IN_PREPARATION", None)
+            vehicles.change_status(conn, car, "AVAILABLE", None)
+            assert crm.get_request(conn, request.id).match_count == 0
+
+            edited = crm.update_request(conn, request.id, CustomerRequestUpdate(budget_max=Decimal(600000)))
+            assert [(m.vehicle_id, m.over_budget) for m in edited.matches] == [(car, Decimal("50000.00"))]
+
+            edited = crm.update_request(conn, request.id, CustomerRequestUpdate(model="Land Cruiser"))
+            assert edited.matches == []
             raise _Rollback
 
     with pytest.raises(_Rollback):

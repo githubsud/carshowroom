@@ -1,6 +1,7 @@
 """Request and response models for session, tenant and user management."""
 
 from datetime import datetime
+from decimal import Decimal
 from typing import Annotated, Literal
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -83,6 +84,7 @@ class TenantSettingsOut(BaseModel):
     rounding_remainder: Literal["LARGEST_REMAINDER", "LARGEST_SHARE"]
     sale_cancellation_method: Literal["REFUND_LIABILITY", "MIRROR"]
     overpayment_policy: Literal["BLOCK", "ALLOW_AS_CREDIT"]
+    request_budget_tolerance_pct: Decimal
 
 
 class TenantOut(BaseModel):
@@ -129,6 +131,7 @@ class TenantSettingsUpdate(StrictModel):
     rounding_remainder: Literal["LARGEST_REMAINDER", "LARGEST_SHARE"] | None = None
     sale_cancellation_method: Literal["REFUND_LIABILITY", "MIRROR"] | None = None
     overpayment_policy: Literal["BLOCK", "ALLOW_AS_CREDIT"] | None = None
+    request_budget_tolerance_pct: Decimal | None = Field(default=None, ge=0, le=50, max_digits=5, decimal_places=2)
 
     @field_validator("aging_thresholds")
     @classmethod

@@ -42,6 +42,7 @@ _MATCHES = """
     select m.id, m.request_id, m.vehicle_id, v.stock_no, concat_ws(' ', v.make, v.model, v.year) as vehicle_label,
            v.status as vehicle_status, v.asking_price, r.customer_id, c.name as customer_name,
            c.phone_primary as customer_phone, r.make, r.model, r.year_from, r.year_to, r.budget_max,
+           nullif(greatest(v.asking_price - r.budget_max, 0), 0) as over_budget,
            m.matched_at, m.contacted, m.contacted_at
       from public.customer_request_matches m
       join public.customer_requests r on r.id = m.request_id

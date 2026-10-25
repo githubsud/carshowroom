@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 
 import { TenantSettings } from '../../core/api/api.models';
+import { ProfitRulesComponent } from '../partners/profit-rules.component';
 import { TenantContextService } from '../../core/tenant/tenant-context.service';
 import { ErrorMessageService } from '../../shared/error-message.service';
 import { loaded, translationsLoaded } from '../../shared/translated';
@@ -37,36 +38,136 @@ const CHOICES: Record<Choice, readonly string[]> = {
   installment_markup_mode: ['A', 'B_ENABLED'],
 };
 
+/** The settings grouped the way an owner thinks about them (pilot feedback 2026-10-25). */
+const GROUPS: { title: string; keys: Choice[] }[] = [
+  {
+    title: 'policies.groupPartners',
+    keys: [
+      'profit_policy',
+      'distribution_frequency',
+      'loss_handling',
+      'prorata_method',
+      'rounding_remainder',
+    ],
+  },
+  {
+    title: 'policies.groupSales',
+    keys: [
+      'installment_markup_mode',
+      'sale_cancellation_method',
+      'overpayment_policy',
+      'cash_negative_policy',
+    ],
+  },
+];
+
 /** Settings → Policies (D-40, D-41): how profit is distributed, how sales are cancelled, aging colours. */
 @Component({
   selector: 'app-policies-page',
-  imports: [FormsModule, TranslocoPipe, ButtonModule, CheckboxModule, InputTextModule, SelectModule],
+  imports: [
+    FormsModule,
+    TranslocoPipe,
+    ButtonModule,
+    CheckboxModule,
+    InputTextModule,
+    SelectModule,
+    ProfitRulesComponent,
+  ],
   template: `
-    <div class="page-header"><h1 class="page-title">{{ 'policies.title' | transloco }}</h1></div>
-    <section class="card dialog-fields" data-testid="policies">
-      @for (key of keys; track key) {
-        <div class="field">
-          <label [for]="'pol-' + key">{{ 'policies.' + key | transloco }}</label>
-          <p-select [inputId]="'pol-' + key" [options]="options()[key]" [(ngModel)]="values[key]" optionLabel="label"
-                    optionValue="value" [fluid]="true" />
-          <small class="sub">{{ 'policies.' + key + '_hint' | transloco }}</small>
-        </div>
-      }
-      <div class="field">
-        <span>{{ 'policies.aging' | transloco }}</span>
-        <div class="row">
-          @for (i of [0, 1, 2]; track i) {
-            <input pInputText type="number" inputmode="numeric" [(ngModel)]="aging[i]"
-                   [attr.aria-label]="('policies.aging' | transloco) + ' ' + (i + 1)" />
+    <div class="page-header">
+      <h1 class="page-title">{{ 'policies.title' | transloco }}</h1>
+    </div>
+    <div class="groups" data-testid="policies">
+      @for (group of groups; track group.title; let first = $first) {
+        <section class="card dialog-fields">
+          <h2>{{ group.title | transloco }}</h2>
+          @if (first) {
+            <app-profit-rules
+              [settings]="{
+                profit_policy: values.profit_policy,
+                loss_handling: values.loss_handling,
+              }"
+            />
           }
+          @for (key of group.keys; track key) {
+            <div class="field">
+              <label [for]="'pol-' + key">{{ 'policies.' + key | transloco }}</label>
+              <p-select
+                [inputId]="'pol-' + key"
+                [options]="options()[key]"
+                [(ngModel)]="values[key]"
+                optionLabel="label"
+                optionValue="value"
+                [fluid]="true"
+              />
+              <small class="sub">{{ 'policies.' + key + '_hint' | transloco }}</small>
+            </div>
+          }
+          @if (first) {
+            <span class="check"
+              ><p-checkbox [(ngModel)]="partnerSeesSummary" [binary]="true" inputId="pol-summary" />
+              <label for="pol-summary">{{
+                'policies.partner_sees_summary' | transloco
+              }}</label></span
+            >
+          }
+        </section>
+      }
+      <section class="card dialog-fields">
+        <h2>{{ 'policies.groupStock' | transloco }}</h2>
+        <div class="field">
+          <label for="pol-tolerance">{{
+            'policies.request_budget_tolerance_pct' | transloco
+          }}</label>
+          <input
+            pInputText
+            id="pol-tolerance"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            max="50"
+            step="1"
+            [(ngModel)]="tolerance"
+            data-testid="pol-tolerance"
+          />
+          <small class="sub">{{ 'policies.request_budget_tolerance_pct_hint' | transloco }}</small>
         </div>
-      </div>
-      <span class="check"><p-checkbox [(ngModel)]="partnerSeesSummary" [binary]="true" inputId="pol-summary" />
-        <label for="pol-summary">{{ 'policies.partner_sees_summary' | transloco }}</label></span>
-      <p-button [label]="'settings.save' | transloco" (onClick)="save()" [loading]="busy()" data-testid="policies-save" />
-    </section>
+        <div class="field">
+          <span>{{ 'policies.aging' | transloco }}</span>
+          <div class="row">
+            @for (i of [0, 1, 2]; track i) {
+              <input
+                pInputText
+                type="number"
+                inputmode="numeric"
+                [(ngModel)]="aging[i]"
+                [attr.aria-label]="('policies.aging' | transloco) + ' ' + (i + 1)"
+              />
+            }
+          </div>
+        </div>
+      </section>
+      <p-button
+        [label]="'settings.save' | transloco"
+        (onClick)="save()"
+        [loading]="busy()"
+        data-testid="policies-save"
+      />
+    </div>
   `,
   styles: `
+    .groups {
+      display: grid;
+      gap: var(--space-3);
+      max-inline-size: 760px;
+    }
+    h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+    p-button {
+      justify-self: start;
+    }
     .check {
       display: flex;
       gap: var(--space-2);
@@ -82,17 +183,24 @@ export class PoliciesPage implements OnInit {
   private readonly translations = translationsLoaded();
 
   protected readonly keys = Object.keys(CHOICES) as Choice[];
+  protected readonly groups = GROUPS;
   protected readonly busy = signal(false);
   protected values = {} as Record<Choice, string>;
   protected aging: number[] = [30, 60, 90];
   protected partnerSeesSummary = false;
+  protected tolerance: number | string = 10;
 
   protected readonly options = computed(() => {
     const ready = loaded(this.translations());
     return Object.fromEntries(
       this.keys.map((key) => [
         key,
-        ready ? CHOICES[key].map((value) => ({ value, label: this.transloco.translate(`policies.${key}_${value}`) })) : [],
+        ready
+          ? CHOICES[key].map((value) => ({
+              value,
+              label: this.transloco.translate(`policies.${key}_${value}`),
+            }))
+          : [],
       ]),
     ) as Record<Choice, { value: string; label: string }[]>;
   });
@@ -100,9 +208,13 @@ export class PoliciesPage implements OnInit {
   ngOnInit(): void {
     const settings = this.context.tenant()?.settings;
     if (settings) {
-      this.values = Object.fromEntries(this.keys.map((key) => [key, settings[key]])) as Record<Choice, string>;
+      this.values = Object.fromEntries(this.keys.map((key) => [key, settings[key]])) as Record<
+        Choice,
+        string
+      >;
       this.aging = [...settings.aging_thresholds];
       this.partnerSeesSummary = settings.partner_sees_summary;
+      this.tolerance = Number(settings.request_budget_tolerance_pct);
     }
   }
 
@@ -113,6 +225,7 @@ export class PoliciesPage implements OnInit {
         ...(this.values as Partial<TenantSettings>),
         aging_thresholds: this.aging.map(Number),
         partner_sees_summary: this.partnerSeesSummary,
+        request_budget_tolerance_pct: String(this.tolerance === '' ? 0 : this.tolerance),
       });
       this.toast.add({ severity: 'success', summary: this.transloco.translate('settings.saved') });
     } catch (error) {

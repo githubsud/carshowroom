@@ -10161,6 +10161,21 @@
             "title": "Matched At",
             "type": "string"
           },
+          "over_budget": {
+            "anyOf": [
+              {
+                "examples": [
+                  "25000.00"
+                ],
+                "pattern": "^-?\\d{1,16}(\\.\\d{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Over Budget"
+          },
           "request_id": {
             "format": "uuid",
             "title": "Request Id",
@@ -13129,6 +13144,11 @@
             "title": "Prorata Method",
             "type": "string"
           },
+          "request_budget_tolerance_pct": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Request Budget Tolerance Pct",
+            "type": "string"
+          },
           "rounding_remainder": {
             "enum": [
               "LARGEST_REMAINDER",
@@ -13161,7 +13181,8 @@
           "prorata_method",
           "rounding_remainder",
           "sale_cancellation_method",
-          "overpayment_policy"
+          "overpayment_policy",
+          "request_budget_tolerance_pct"
         ],
         "title": "TenantSettingsOut",
         "type": "object"
@@ -13362,6 +13383,23 @@
               }
             ],
             "title": "Prorata Method"
+          },
+          "request_budget_tolerance_pct": {
+            "anyOf": [
+              {
+                "maximum": 50.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,3}|(?=[\\d.]{1,6}0*$)\\d{0,3}\\.\\d{0,2}0*$)",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Budget Tolerance Pct"
           },
           "rounding_remainder": {
             "anyOf": [

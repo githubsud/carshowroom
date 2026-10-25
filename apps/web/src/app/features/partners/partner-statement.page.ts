@@ -8,8 +8,19 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
-import { CashAccount, Partner, PartnerPosition, PartnerPosting, PartnerStatement } from '../../core/api/api.models';
-import { AppDatePipe, FormatService, MoneyPipe, PercentPipe } from '../../core/format/format.service';
+import {
+  CashAccount,
+  Partner,
+  PartnerPosition,
+  PartnerPosting,
+  PartnerStatement,
+} from '../../core/api/api.models';
+import {
+  AppDatePipe,
+  FormatService,
+  MoneyPipe,
+  PercentPipe,
+} from '../../core/format/format.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { CanDirective } from '../../core/permissions/can.directive';
 import { TenantContextService } from '../../core/tenant/tenant-context.service';
@@ -17,6 +28,7 @@ import { StateComponent } from '../../shared/components/state.component';
 import { ErrorMessageService } from '../../shared/error-message.service';
 import { FinanceService } from '../finance/finance.service';
 import { PartnerTransactionDialogComponent } from './partner-transaction-dialog.component';
+import { ProfitRulesComponent } from './profit-rules.component';
 import { PartnersService } from './partners.service';
 
 /** Partner statement (كشف حساب شريك, SPEC §4.2): opening, every movement, running balance, closing. */
@@ -36,6 +48,7 @@ import { PartnersService } from './partners.service';
     CanDirective,
     StateComponent,
     PartnerTransactionDialogComponent,
+    ProfitRulesComponent,
   ],
   templateUrl: './partner-statement.page.html',
   styleUrl: './partners.page.scss',
@@ -175,7 +188,13 @@ export class PartnerStatementPage implements OnInit {
   protected async download(format: 'xlsx' | 'pdf'): Promise<void> {
     this.downloading.set(format);
     try {
-      await this.api.downloadStatement(this.partnerId(), this.dateFrom, this.dateTo, format, this.language.language());
+      await this.api.downloadStatement(
+        this.partnerId(),
+        this.dateFrom,
+        this.dateTo,
+        format,
+        this.language.language(),
+      );
     } catch (error) {
       this.toast.add({ severity: 'error', summary: this.errors.message(error) });
     } finally {
@@ -186,7 +205,9 @@ export class PartnerStatementPage implements OnInit {
   protected async onPosted(result: PartnerPosting): Promise<void> {
     this.toast.add({
       severity: 'success',
-      summary: this.transloco.translate('finance.posted', { entryNo: result.journal_entries[0]?.entry_no }),
+      summary: this.transloco.translate('finance.posted', {
+        entryNo: result.journal_entries[0]?.entry_no,
+      }),
     });
     await this.load();
   }

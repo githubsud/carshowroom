@@ -32,6 +32,7 @@
 | BR-C4 | A cash/bank account with a non-zero balance cannot be archived (D-53) | `finance.update_cash_account` | `test_ledger.py::test_cash_account_with_money_cannot_be_archived` ✅ |
 | BR-C5 | Every cash box / bank account has its own ledger sub-account (1101…, 1201…), and every general category its own 62xx account | `finance.create_cash_account`, `finance.create_category` | `test_ledger.py::test_new_cash_account_*`, `test_new_general_category_*` ✅ |
 | BR-C6 | A posted expense or transfer is never edited; it moves to REVERSED only together with its reversal entry | DB trigger `posted_document_before_update`; `journal.reverse` | `test_ledger.py::test_reversal_restores_balances_and_marks_the_document` ✅ |
+| BR-C6a | A car is matched again when its make, model, year or price change while AVAILABLE; a price up to the tenant tolerance above the budget still fits; an edited request drops suggestions it no longer fits unless the customer was told (D-134) | triggers `vehicles_available_rematch`, `tenant_settings_rematch`; `private.match_request` | pgTAP 15 ✅ |
 
 ## Partners (Phase 3)
 

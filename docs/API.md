@@ -197,7 +197,7 @@ As built in Phase 4. Every vehicle response passes through cost masking (ARCHITE
 | GET | `/suppliers/{id}/statement?date_from=&date_to=` | `supplier.manage` | Opening, lines, running balance |
 | POST 💰👁 | `/suppliers/{id}/payments` (+ `/preview`) | `supplier.pay` | Rule 32; at most what is owed |
 | GET | `/customer-requests?status=&customer_id=&open_only=&q=`, `/customer-requests/{id}` | `customer.view` | With `match_count`; the single request carries its `matches` |
-| POST / PATCH | `/customer-requests`, `/customer-requests/{id}` | `request.manage` | `{customer_id, make?, model?, year_from?, year_to?, budget_min?, budget_max?, color_pref?, notes?, assigned_to?, source?, financing_needed, trade_in_offered}` (+ `status` on PATCH); matched at once against available cars (D-97) |
+| POST / PATCH | `/customer-requests`, `/customer-requests/{id}` | `request.manage` | `{customer_id, make?, model?, year_from?, year_to?, budget_min?, budget_max?, color_pref?, notes?, assigned_to?, source?, financing_needed, trade_in_offered}` (+ `status` on PATCH); matched at once against available cars (D-97); each match carries `over_budget` when the price is above the budget within the tolerance (D-134) |
 | GET | `/vehicles/{id}/request-matches` | `customer.view` | “N customers asked for this car”: open requests with customer name and phone |
 | PUT | `/request-matches/{id}/contacted` | `request.manage` | `{contacted}`; moves a new/contacted request to VEHICLE_FOUND |
 | GET | `/follow-ups?customer_id=&limit=`, `/follow-ups/due?mine=` | `customer.view` | History, newest first; due = latest follow-up's next date ≤ today (D-98) |

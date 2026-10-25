@@ -371,6 +371,8 @@ class RequestMatch(BaseModel):
     customer_name: str
     customer_phone: str | None
     request_summary: str
+    # How much the car's price is above the customer's maximum (within the showroom's tolerance, D-134).
+    over_budget: Money | None = None
     matched_at: datetime
     contacted: bool
     contacted_at: datetime | None

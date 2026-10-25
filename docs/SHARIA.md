@@ -63,7 +63,7 @@ This file states principles and how the app applies them. It is **not a fatwa**:
 | R-2 | **Pricing the installment difference by a percentage of the rest.** | The percentage is only a calculator: the result is a fixed amount agreed at the sale | Believed acceptable because the price is fixed once; confirm with a scholar |
 | R-3 | **Keeping a deposit (بيع العربون)** when the buyer withdraws | Allowed as a full forfeit (D-72) | Accepted by the Hanbali school and widely by contemporary scholars; confirm. The pilot refunds in practice |
 | R-4 | **Consignment at a net price** ("sell above X, keep the rest") | Supported (net-price terms, D-91) | Discussed by the scholars; many permit it when the net is known. Confirm |
-| R-5 | **Car-level investors** (a trader funds one car) | Not built | Build only as mudaraba/musharaka: profit by agreed ratio, loss on capital per Sharia, no guaranteed return or capital. Terms awaited from the pilot owner |
+| R-5 | **Car-level investors** (a trader funds one car) | Not built | Build only as mudaraba/musharaka: profit by agreed ratio, loss on capital per Sharia, no guaranteed return or capital. The pilot asked for it again on 2026-10-25; the terms to confirm are DECISIONS Q-44 |
 | R-6 | **Bank interest received** on a showroom's bank account | No account for it | If it ever arises, record it apart (not as profit) for purification/charity; never in distributable profit. Confirm the treatment |
 | R-7 | **Recharging bounced-cheque charges to the customer** | Optional, actual amount only (P-07) | Confirm that recovering the actual bank charge is acceptable |
 

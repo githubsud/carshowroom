@@ -13,7 +13,7 @@ import { ErrorMessageService } from '../../shared/error-message.service';
 import { CustomerPickerComponent } from '../customers/customer-picker.component';
 import { CrmService } from './crm.service';
 
-/** A customer asks for a car we do not have yet (SPEC §4.6). */
+/** A customer asks for a car we do not have yet (SPEC §4.6); also edits an existing request. */
 @Component({
   selector: 'app-request-form-dialog',
   imports: [
@@ -28,13 +28,22 @@ import { CrmService } from './crm.service';
     CustomerPickerComponent,
   ],
   template: `
-    <p-dialog [visible]="visible()" (visibleChange)="visible.set($event)" [modal]="true"
-              [header]="'requests.add' | transloco" [style]="{ width: 'min(520px, 96vw)' }">
+    <p-dialog
+      [visible]="visible()"
+      (visibleChange)="visible.set($event)"
+      [modal]="true"
+      [header]="(request() ? 'requests.edit' : 'requests.add') | transloco"
+      [style]="{ width: 'min(520px, 96vw)' }"
+    >
       <form class="dialog-fields" [formGroup]="form" (ngSubmit)="save()" data-testid="request-form">
-        @if (!customerId()) {
+        @if (!customerId() && !request()) {
           <div class="field">
             <label for="rq-customer">{{ 'sales.customer' | transloco }}</label>
-            <app-customer-picker inputId="rq-customer" formControlName="customer_id" testId="rq-customer" />
+            <app-customer-picker
+              inputId="rq-customer"
+              formControlName="customer_id"
+              testId="rq-customer"
+            />
           </div>
         }
         <div class="row">
@@ -50,11 +59,23 @@ import { CrmService } from './crm.service';
         <div class="row">
           <div class="field">
             <label for="rq-from">{{ 'requests.yearFrom' | transloco }}</label>
-            <input pInputText id="rq-from" type="number" inputmode="numeric" formControlName="year_from" />
+            <input
+              pInputText
+              id="rq-from"
+              type="number"
+              inputmode="numeric"
+              formControlName="year_from"
+            />
           </div>
           <div class="field">
             <label for="rq-to">{{ 'requests.yearTo' | transloco }}</label>
-            <input pInputText id="rq-to" type="number" inputmode="numeric" formControlName="year_to" />
+            <input
+              pInputText
+              id="rq-to"
+              type="number"
+              inputmode="numeric"
+              formControlName="year_to"
+            />
           </div>
         </div>
         <div class="row">
@@ -64,7 +85,11 @@ import { CrmService } from './crm.service';
           </div>
           <div class="field">
             <label for="rq-max">{{ 'requests.budgetMax' | transloco }}</label>
-            <app-money-input inputId="rq-max" formControlName="budget_max" data-testid="rq-budget" />
+            <app-money-input
+              inputId="rq-max"
+              formControlName="budget_max"
+              data-testid="rq-budget"
+            />
           </div>
         </div>
         <div class="field">
@@ -76,17 +101,31 @@ import { CrmService } from './crm.service';
           <input pInputText id="rq-notes" formControlName="notes" />
         </div>
         <div class="checks">
-          <span class="check"><p-checkbox formControlName="financing_needed" [binary]="true" inputId="rq-fin" />
-            <label for="rq-fin">{{ 'requests.financing' | transloco }}</label></span>
-          <span class="check"><p-checkbox formControlName="trade_in_offered" [binary]="true" inputId="rq-trade" />
-            <label for="rq-trade">{{ 'requests.tradeIn' | transloco }}</label></span>
+          <span class="check"
+            ><p-checkbox formControlName="financing_needed" [binary]="true" inputId="rq-fin" />
+            <label for="rq-fin">{{ 'requests.financing' | transloco }}</label></span
+          >
+          <span class="check"
+            ><p-checkbox formControlName="trade_in_offered" [binary]="true" inputId="rq-trade" />
+            <label for="rq-trade">{{ 'requests.tradeIn' | transloco }}</label></span
+          >
         </div>
         @if (error()) {
           <p-message severity="error" data-testid="dialog-error">{{ error() }}</p-message>
         }
         <div class="actions">
-          <p-button type="button" [text]="true" [label]="'common.cancel' | transloco" (onClick)="visible.set(false)" />
-          <p-button type="submit" [label]="'settings.save' | transloco" [loading]="busy()" data-testid="rq-save" />
+          <p-button
+            type="button"
+            [text]="true"
+            [label]="'common.cancel' | transloco"
+            (onClick)="visible.set(false)"
+          />
+          <p-button
+            type="submit"
+            [label]="'settings.save' | transloco"
+            [loading]="busy()"
+            data-testid="rq-save"
+          />
         </div>
       </form>
     </p-dialog>
@@ -116,6 +155,8 @@ export class RequestFormDialogComponent {
   readonly visible = model(false);
   /** Fixed customer (from the customer page); otherwise picked in the form. */
   readonly customerId = input<string | null>(null);
+  /** The request being edited; a new one when null. */
+  readonly request = input<CustomerRequest | null>(null);
   readonly saved = output<CustomerRequest>();
 
   protected readonly busy = signal(false);
@@ -139,6 +180,23 @@ export class RequestFormDialogComponent {
       if (this.visible()) {
         this.error.set(null);
         this.form.reset();
+        const r = this.request();
+        if (r) {
+          const text = (value: string | number | null) => (value === null ? '' : String(value));
+          this.form.patchValue({
+            customer_id: r.customer_id,
+            make: text(r.make),
+            model: text(r.model),
+            year_from: text(r.year_from),
+            year_to: text(r.year_to),
+            budget_min: text(r.budget_min),
+            budget_max: text(r.budget_max),
+            color_pref: text(r.color_pref),
+            notes: text(r.notes),
+            financing_needed: r.financing_needed,
+            trade_in_offered: r.trade_in_offered,
+          });
+        }
       }
     });
   }
@@ -150,20 +208,23 @@ export class RequestFormDialogComponent {
     const year = (value: string) => (String(value).trim() ? Number(value) : null);
     this.busy.set(true);
     this.error.set(null);
+    const fields = {
+      make: text(v.make),
+      model: text(v.model),
+      year_from: year(v.year_from),
+      year_to: year(v.year_to),
+      budget_min: text(v.budget_min),
+      budget_max: text(v.budget_max),
+      color_pref: text(v.color_pref),
+      notes: text(v.notes),
+      financing_needed: v.financing_needed,
+      trade_in_offered: v.trade_in_offered,
+    };
+    const editing = this.request();
     try {
-      const request = await this.api.createRequest({
-        customer_id: customer,
-        make: text(v.make),
-        model: text(v.model),
-        year_from: year(v.year_from),
-        year_to: year(v.year_to),
-        budget_min: text(v.budget_min),
-        budget_max: text(v.budget_max),
-        color_pref: text(v.color_pref),
-        notes: text(v.notes),
-        financing_needed: v.financing_needed,
-        trade_in_offered: v.trade_in_offered,
-      });
+      const request = editing
+        ? await this.api.updateRequest(editing.id, fields)
+        : await this.api.createRequest({ customer_id: customer, ...fields });
       this.visible.set(false);
       this.saved.emit(request);
     } catch (error) {
