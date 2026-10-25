@@ -5,9 +5,12 @@
  * - API reads (GET /api/v1/...): network first, the last answer kept per user
  *   and URL so lists and records can be read offline. Writes are never cached
  *   or queued: offline, the app refuses them (the interceptor) and shows a banner.
- * - A new deployment ships a new CACHE name; old caches are removed on activate.
+ * - Translations (/i18n/): network first, so a deployment's new texts show at once;
+ *   their names never change, so cache-first would keep old texts forever.
+ * - Bump CACHE when cached unversioned files must be dropped; old caches are
+ *   removed on activate (v2: stale translations, pilot 2026-10-25).
  */
-const CACHE = 'sayyara-v1';
+const CACHE = 'sayyara-v2';
 const API_CACHE = 'sayyara-api-v1';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
@@ -67,12 +70,26 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(fetch(request).catch(() => caches.match('/index.html')));
     return;
   }
+  if (url.pathname.startsWith('/i18n/')) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || Response.error())),
+    );
+    return;
+  }
   event.respondWith(
     caches.match(request).then(
       (cached) =>
         cached ||
         fetch(request).then((response) => {
-          if (response.ok && (url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname.startsWith('/i18n/'))) {
+          if (response.ok && (url.pathname.endsWith('.js') || url.pathname.endsWith('.css'))) {
             const copy = response.clone();
             caches.open(CACHE).then((cache) => cache.put(request, copy));
           }
